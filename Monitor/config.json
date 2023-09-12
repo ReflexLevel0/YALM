@@ -1,0 +1,9 @@
+{
+  "IntervalInSeconds": 300,
+  "Cpu": true,
+  "Memory": true,
+  "Services": [
+    "postgresql",
+    "sshd"
+  ]
+}
