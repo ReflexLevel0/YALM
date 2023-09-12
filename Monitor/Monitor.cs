@@ -9,18 +9,24 @@ internal class Monitor
 	{
 		var config = JsonSerializer.Deserialize<Config>(File.ReadAllText("config.json"));
 		if (config == null) throw new Exception("Configuration invalid!");
-		var processInfo = new ProcessStartInfo("/bin/bash", "");
+		var process = new Process();
+		process.StartInfo.FileName = "/usr/bin/top";
+		process.StartInfo.RedirectStandardOutput = true;
 
 		Console.WriteLine($"Interval: {config.IntervalInSeconds}");
 		
+		//Short sleep is necessary so that the program doesn't take up all the CPU and displays wrong statistics
+		Thread.Sleep(3000);
+		
 		if (config.Cpu)
 		{
-			Console.WriteLine("top -bn1 --sort-override \"%CPU\"");
+			var cpu = DataHelper.GetCpuInfo();
 		}
 		
+		//Parsing memory information
 		if (config.Memory)
 		{
-			Console.WriteLine("top -bn1 --sort-override \"%MEM\"");
+			var memory = DataHelper.GetMemoryInfo();
 		}
 
 		if (config.Storage)
@@ -30,7 +36,7 @@ internal class Monitor
 
 		if (config.Network)
 		{
-			//TODO: figure out a way to track network usage
+			//TODO: figure out a way to track network usage (this might require sudo privileges)
 			Console.WriteLine();
 		}
 		
