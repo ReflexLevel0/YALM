@@ -10,4 +10,9 @@ public class ProcessCpuInfo
 		Name = name;
 		CpuUsage = cpuUsage;
 	}
+
+	public override string ToString()
+	{
+		return $"{Name}: {CpuUsage:P} CPU";
+	}
 }

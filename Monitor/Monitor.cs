@@ -13,10 +13,10 @@ internal class Monitor
 		process.StartInfo.FileName = "/usr/bin/top";
 		process.StartInfo.RedirectStandardOutput = true;
 
-		Console.WriteLine($"Interval: {config.IntervalInSeconds}");
+		Console.WriteLine($"Interval: {config.IntervalInSeconds}\n");
 		
 		//Short sleep is necessary so that the program doesn't take up all the CPU and displays wrong statistics
-		Thread.Sleep(3000);
+		Thread.Sleep(2000);
 		
 		if (config.Cpu)
 		{
@@ -42,9 +42,9 @@ internal class Monitor
 		
 		if (config.Services != null)
 		{
-			foreach (string service in config.Services)
+			foreach (string serviceName in config.Services)
 			{
-				Console.WriteLine($"systemctl status {service}");
+				DataHelper.GetServiceInfo(serviceName);
 			}
 		}
 	}

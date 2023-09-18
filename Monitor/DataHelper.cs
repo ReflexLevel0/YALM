@@ -12,7 +12,7 @@ public class DataHelper
 		process.StartInfo.RedirectStandardOutput = true;
 		process.StartInfo.Arguments = "-bn1 --sort-override \"%CPU\" -w 400";
 		process.Start();
-		
+
 		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
 		for (int i = 0; i < lines.Count; i++)
 		{
@@ -21,28 +21,29 @@ public class DataHelper
 				case 1:
 				{
 					string totalTasks = lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries).Skip(1).First();
-					Console.WriteLine($"Total number of tasks: {totalTasks}");
+					cpu.NumberOfTasks = int.Parse(totalTasks);
 					break;
 				}
 				case 2:
 				{
 					double cpuUsage = (100 - double.Parse(lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries).Skip(7).First())) / 100;
 					cpu.Usage = cpuUsage;
-					Console.WriteLine($"CPU usage: {cpu.Usage:P}");
 					break;
 				}
 				case >= 7:
 				{
 					string[] parts = lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 					double cpuPercentage = double.Parse(parts[8]) / 100;
+					if(cpuPercentage == 0) continue;
 					string command = parts[11];
 					cpu.Processes.Add(new ProcessCpuInfo(command, cpuPercentage));
-					Console.WriteLine($"{command} {cpuPercentage:P} CPU");
 					break;
 				}
 			}
 		}
 
+		process.WaitForExit();
+		Console.WriteLine(cpu);
 		return cpu;
 	}
 
@@ -54,7 +55,7 @@ public class DataHelper
 		process.StartInfo.RedirectStandardOutput = true;
 		process.StartInfo.Arguments = "-bn1 --sort-override \"%MEM\" -w 400";
 		process.Start();
-		
+
 		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
 		for (int i = 0; i < lines.Count; i++)
 		{
@@ -70,21 +71,63 @@ public class DataHelper
 					memory.TotalMemoryMb = totalMemory;
 					memory.UsedMemoryMb = usedMemory;
 					memory.UsedPercentage = usage;
-					Console.WriteLine($"Memory: {totalMemory}MB total, {usedMemory}MB used, {usage:P} used");
 					break;
 				}
 				case >= 7:
 				{
 					string[] parts = lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-					string memPercentage = parts[9];
+					double memPercentage = double.Parse(parts[9]) / 100;
 					string command = parts[11];
-					Console.WriteLine($"{command} {memPercentage}% MEM");
+					if(memPercentage == 0) continue;
+					memory.Processes.Add(new ProcessMemoryInfo(command, memPercentage));
 					break;
 				}
 			}
 		}
-		process.WaitForExit();
 
+		process.WaitForExit();
+		Console.WriteLine(memory);
 		return memory;
+	}
+
+	public static Service GetServiceInfo(string serviceName)
+	{
+		var service = new Service(serviceName);
+		var process = new Process();
+		process.StartInfo.FileName = "/usr/bin/systemctl";
+		process.StartInfo.RedirectStandardOutput = true;
+		process.StartInfo.Arguments = $"status {serviceName}";
+		process.Start();
+		
+		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
+		foreach (string line in lines)
+		{
+			string trimmedLine = line.Trim();
+			if (string.IsNullOrWhiteSpace(trimmedLine))
+			{
+				break;
+			}
+
+			if (trimmedLine.StartsWith("Active:"))
+			{
+				service.Active = trimmedLine.Split("Active: ").Last();
+			}
+			else if (trimmedLine.StartsWith("Tasks:"))
+			{
+				service.Tasks = int.Parse(trimmedLine.Split("Tasks: ").Last().Split(" ").First());
+			}
+			else if (trimmedLine.StartsWith("Memory:"))
+			{
+				service.Memory = trimmedLine.Split("Memory: ").Last();
+			}
+			else if (trimmedLine.StartsWith("CPU:"))
+			{
+				service.Cpu = trimmedLine.Split("CPU: ").Last();
+			}
+		}
+
+		process.WaitForExit();
+		Console.WriteLine(service);
+		return service;
 	}
 }
