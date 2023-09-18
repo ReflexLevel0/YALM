@@ -1,11 +1,11 @@
 namespace Monitor;
 
-public class ProcessMemoryInfo
+public class ProcessMemoryLog
 {
 	public string Name { get; set; }
 	public double MemoryUsagePercentage { get; set; }
 	
-	public ProcessMemoryInfo(string name, double memoryUsagePercentage)
+	public ProcessMemoryLog(string name, double memoryUsagePercentage)
 	{
 		Name = name;
 		MemoryUsagePercentage = memoryUsagePercentage;

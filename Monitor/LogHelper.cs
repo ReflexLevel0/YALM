@@ -2,11 +2,11 @@ using System.Diagnostics;
 
 namespace Monitor;
 
-public class DataHelper
+public class LogHelper
 {
-	public static Cpu GetCpuInfo()
+	public static CpuLog GetCpuInfo()
 	{
-		var cpu = new Cpu();
+		var cpu = new CpuLog();
 		var process = new Process();
 		process.StartInfo.FileName = "/usr/bin/top";
 		process.StartInfo.RedirectStandardOutput = true;
@@ -36,7 +36,7 @@ public class DataHelper
 					double cpuPercentage = double.Parse(parts[8]) / 100;
 					if(cpuPercentage == 0) continue;
 					string command = parts[11];
-					cpu.Processes.Add(new ProcessCpuInfo(command, cpuPercentage));
+					cpu.Processes.Add(new ProcessCpuLog(command, cpuPercentage));
 					break;
 				}
 			}
@@ -47,9 +47,9 @@ public class DataHelper
 		return cpu;
 	}
 
-	public static Memory GetMemoryInfo()
+	public static MemoryLog GetMemoryInfo()
 	{
-		var memory = new Memory();
+		var memory = new MemoryLog();
 		var process = new Process();
 		process.StartInfo.FileName = "/usr/bin/top";
 		process.StartInfo.RedirectStandardOutput = true;
@@ -79,7 +79,7 @@ public class DataHelper
 					double memPercentage = double.Parse(parts[9]) / 100;
 					string command = parts[11];
 					if(memPercentage == 0) continue;
-					memory.Processes.Add(new ProcessMemoryInfo(command, memPercentage));
+					memory.Processes.Add(new ProcessMemoryLog(command, memPercentage));
 					break;
 				}
 			}
@@ -90,9 +90,9 @@ public class DataHelper
 		return memory;
 	}
 
-	public static Service GetServiceInfo(string serviceName)
+	public static ServiceLog GetServiceInfo(string serviceName)
 	{
-		var service = new Service(serviceName);
+		var service = new ServiceLog(serviceName);
 		var process = new Process();
 		process.StartInfo.FileName = "/usr/bin/systemctl";
 		process.StartInfo.RedirectStandardOutput = true;

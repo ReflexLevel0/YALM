@@ -20,13 +20,13 @@ internal class Monitor
 		
 		if (config.Cpu)
 		{
-			var cpu = DataHelper.GetCpuInfo();
+			var cpu = LogHelper.GetCpuInfo();
 		}
 		
 		//Parsing memory information
 		if (config.Memory)
 		{
-			var memory = DataHelper.GetMemoryInfo();
+			var memory = LogHelper.GetMemoryInfo();
 		}
 
 		if (config.Storage)
@@ -44,7 +44,7 @@ internal class Monitor
 		{
 			foreach (string serviceName in config.Services)
 			{
-				DataHelper.GetServiceInfo(serviceName);
+				LogHelper.GetServiceInfo(serviceName);
 			}
 		}
 	}

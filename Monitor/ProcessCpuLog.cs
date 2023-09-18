@@ -1,11 +1,11 @@
 namespace Monitor;
 
-public class ProcessCpuInfo
+public class ProcessCpuLog
 {
 	public string Name { get; set; }
 	public double CpuUsage { get; set; }
 
-	public ProcessCpuInfo(string name, double cpuUsage)
+	public ProcessCpuLog(string name, double cpuUsage)
 	{
 		Name = name;
 		CpuUsage = cpuUsage;

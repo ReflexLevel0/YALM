@@ -2,11 +2,11 @@ using System.Text;
 
 namespace Monitor;
 
-public class Cpu
+public class CpuLog
 {
 	public double Usage { get; set; }
 	public int NumberOfTasks { get; set; }
-	public List<ProcessCpuInfo> Processes { get; } = new();
+	public List<ProcessCpuLog> Processes { get; } = new();
 
 	public override string ToString()
 	{

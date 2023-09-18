@@ -2,12 +2,12 @@ using System.Text;
 
 namespace Monitor;
 
-public class Memory
+public class MemoryLog
 {
 	public double TotalMemoryMb { get; set; }
 	public double UsedMemoryMb { get; set; }
 	public double UsedPercentage { get; set; }
-	public List<ProcessMemoryInfo> Processes { get; } = new();
+	public List<ProcessMemoryLog> Processes { get; } = new();
 
 	public override string ToString()
 	{

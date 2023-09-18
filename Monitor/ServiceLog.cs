@@ -1,6 +1,6 @@
 namespace Monitor;
 
-public class Service
+public class ServiceLog
 {
 	public string Name { get; }
 	public string Active { get; set; }
@@ -8,7 +8,7 @@ public class Service
 	public string Memory { get; set; }
 	public string Cpu { get; set; }
 
-	public Service(string name)
+	public ServiceLog(string name)
 	{
 		Name = name;
 	}
