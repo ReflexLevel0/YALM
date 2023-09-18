@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Monitor;
 
 public class ServiceLog
@@ -7,6 +9,7 @@ public class ServiceLog
 	public int Tasks { get; set; }
 	public string Memory { get; set; }
 	public string Cpu { get; set; }
+	public List<Log> Logs { get; } = new();
 
 	public ServiceLog(string name)
 	{
@@ -15,6 +18,13 @@ public class ServiceLog
 
 	public override string ToString()
 	{
-		return $"Service: {Name}\nActive: {Active}\nTasks: {Tasks}\nMemory: {Memory}\nCpu: {Cpu}\n";
+		var builder = new StringBuilder(2048);
+		builder.AppendLine($"Service: {Name}\nActive: {Active}\nTasks: {Tasks}\nMemory: {Memory}\nCpu: {Cpu}");
+		foreach (var log in Logs)
+		{
+			builder.AppendLine(log.ToString());
+		}
+
+		return builder.ToString();
 	}
 }

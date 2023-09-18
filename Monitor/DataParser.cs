@@ -2,16 +2,12 @@ using System.Diagnostics;
 
 namespace Monitor;
 
-public class LogHelper
+public class DataParser
 {
 	public static CpuLog GetCpuInfo()
 	{
 		var cpu = new CpuLog();
-		var process = new Process();
-		process.StartInfo.FileName = "/usr/bin/top";
-		process.StartInfo.RedirectStandardOutput = true;
-		process.StartInfo.Arguments = "-bn1 --sort-override \"%CPU\" -w 400";
-		process.Start();
+		var process = StartProcess("top", "-bn1 --sort-override \"%CPU\" -w 400");
 
 		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
 		for (int i = 0; i < lines.Count; i++)
@@ -49,11 +45,7 @@ public class LogHelper
 	public static MemoryLog GetMemoryInfo()
 	{
 		var memory = new MemoryLog();
-		var process = new Process();
-		process.StartInfo.FileName = "/usr/bin/top";
-		process.StartInfo.RedirectStandardOutput = true;
-		process.StartInfo.Arguments = "-bn1 --sort-override \"%MEM\" -w 400";
-		process.Start();
+		var process = StartProcess("top", "-bn1 --sort-override \"%MEM\" -w 400");
 
 		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
 		for (int i = 0; i < lines.Count; i++)
@@ -91,11 +83,7 @@ public class LogHelper
 	public static ServiceLog GetServiceInfo(string serviceName)
 	{
 		var service = new ServiceLog(serviceName);
-		var process = new Process();
-		process.StartInfo.FileName = "/usr/bin/systemctl";
-		process.StartInfo.RedirectStandardOutput = true;
-		process.StartInfo.Arguments = $"status {serviceName}";
-		process.Start();
+		var process = StartProcess("systemctl", $"status {serviceName}");
 		
 		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
 		foreach (string line in lines)
@@ -125,6 +113,27 @@ public class LogHelper
 		}
 
 		process.WaitForExit();
+		process = StartProcess("journalctl", $"--since=\"2023-09-18 00:00:00\" --output=short-iso -u {serviceName}");
+		foreach (string logString in process.StandardOutput.ReadToEnd().Split('\n'))
+		{
+			int index = logString.IndexOf(" ", StringComparison.Ordinal);
+			if (index == -1 || logString.StartsWith("--")) continue;
+			var date = DateTime.Parse(logString[..index]);
+			var log = new Log(date, logString[(index + 1)..]);
+			service.Logs.Add(log);
+		}
+
+		process.WaitForExit();
 		return service;
+	}
+
+	private static Process StartProcess(string programPath, string arguments)
+	{
+		var process = new Process();
+		process.StartInfo.FileName = programPath;
+		process.StartInfo.RedirectStandardOutput = true;
+		process.StartInfo.Arguments = arguments;
+		process.Start();
+		return process;
 	}
 }
