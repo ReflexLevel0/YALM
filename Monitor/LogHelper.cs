@@ -43,7 +43,6 @@ public class LogHelper
 		}
 
 		process.WaitForExit();
-		Console.WriteLine(cpu);
 		return cpu;
 	}
 
@@ -86,7 +85,6 @@ public class LogHelper
 		}
 
 		process.WaitForExit();
-		Console.WriteLine(memory);
 		return memory;
 	}
 
@@ -127,7 +125,6 @@ public class LogHelper
 		}
 
 		process.WaitForExit();
-		Console.WriteLine(service);
 		return service;
 	}
 }
