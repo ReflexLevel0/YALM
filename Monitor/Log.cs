@@ -7,7 +7,8 @@ public class Log
 	public DateTime LogTime { get; }
 	public CpuLog? CpuLog { get; set; }
 	public MemoryLog? MemoryLog { get; set; }
-	public List<ServiceLog> ServiceLogs { get; } = new();
+	public List<StorageLog>? StorageLogs { get; set; }
+	public List<ServiceLog>? ServiceLogs { get; set; }
 
 	public Log(DateTime logTime)
 	{
@@ -18,12 +19,14 @@ public class Log
 	{
 		var builder = new StringBuilder(2048);
 		builder.AppendLine($"Log time: {LogTime}\n");
-		builder.AppendLine($"{CpuLog}\n{MemoryLog}\n");
-		foreach (var service in ServiceLogs)
+		if (CpuLog != null) builder.AppendLine(CpuLog.ToString());
+		if (MemoryLog != null) builder.AppendLine(MemoryLog.ToString());
+		if (StorageLogs != null)
 		{
-			builder.AppendLine(service.ToString());
+			StorageLogs.ForEach(l => builder.AppendLine(l.ToString()));
+			builder.AppendLine();
 		}
-
+		ServiceLogs?.ForEach(l => builder.AppendLine(l.ToString()));
 		return builder.ToString();
 	}
 }

@@ -25,22 +25,18 @@ public class LogHelper
 
 		if (_config.Storage)
 		{
-			//TODO: log storage
-			Console.WriteLine("df -H");
+			log.StorageLogs = DataParser.GetStorageInfo().ToList();
 		}
 
 		if (_config.Network)
 		{
-			//TODO: figure out a way to track network usage (this might require sudo privileges)
 			Console.WriteLine("");
 		}
 		
 		if (_config.Services != null)
 		{
-			foreach (string serviceName in _config.Services)
-			{
-				log.ServiceLogs.Add(DataParser.GetServiceInfo(serviceName));
-			}
+			var serviceLogs = _config.Services.Select(DataParser.GetServiceInfo).ToList();
+			log.ServiceLogs = serviceLogs;
 		}
 		
 		return log;

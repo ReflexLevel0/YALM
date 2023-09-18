@@ -30,7 +30,7 @@ public class DataParser
 				{
 					string[] parts = lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 					double cpuPercentage = double.Parse(parts[8]) / 100;
-					if(cpuPercentage == 0) continue;
+					if (cpuPercentage == 0) continue;
 					string command = parts[11];
 					cpu.Processes.Add(new ProcessCpuLog(command, cpuPercentage));
 					break;
@@ -54,7 +54,6 @@ public class DataParser
 			{
 				case 3:
 				{
-					//TODO: take into account swap memory
 					string[] parts = lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 					double totalMemory = double.Parse(parts[3]);
 					double usedMemory = double.Parse(parts[7]);
@@ -69,7 +68,7 @@ public class DataParser
 					string[] parts = lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 					double memPercentage = double.Parse(parts[9]) / 100;
 					string command = parts[11];
-					if(memPercentage == 0) continue;
+					if (memPercentage == 0) continue;
 					memory.Processes.Add(new ProcessMemoryLog(command, memPercentage));
 					break;
 				}
@@ -84,7 +83,7 @@ public class DataParser
 	{
 		var service = new ServiceLog(serviceName);
 		var process = StartProcess("systemctl", $"status {serviceName}");
-		
+
 		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
 		foreach (string line in lines)
 		{
@@ -125,6 +124,21 @@ public class DataParser
 
 		process.WaitForExit();
 		return service;
+	}
+
+	public static IEnumerable<StorageLog> GetStorageInfo()
+	{
+		var process = StartProcess("df", "-BK");
+		foreach (string line in process.StandardOutput.ReadToEnd().Split('\n').Skip(1))
+		{
+			if(string.IsNullOrWhiteSpace(line)) continue;
+			string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			string filesystem = parts[0];
+			string mountPath = parts[5];
+			double bytes = double.Parse(parts[1].Split('K').First()) * 1024;
+			double usedBytes = double.Parse(parts[2].Split('K').First()) * 1024;
+			yield return new StorageLog(filesystem, mountPath, bytes, usedBytes);
+		}
 	}
 
 	private static Process StartProcess(string programPath, string arguments)

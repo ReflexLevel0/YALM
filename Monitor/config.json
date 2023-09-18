@@ -2,6 +2,7 @@
   "IntervalInSeconds": 300,
   "Cpu": true,
   "Memory": true,
+  "Storage": true,
   "Services": [
     "postgresql",
     "sshd"
