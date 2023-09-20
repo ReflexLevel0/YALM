@@ -79,11 +79,12 @@ public class DataParser
 		return memory;
 	}
 
-	public static ServiceLog GetServiceInfo(string serviceName)
+	public static ServiceLog GetServiceInfo(string serviceName, DateTime? lastLogDate)
 	{
 		var service = new ServiceLog(serviceName);
 		var process = StartProcess("systemctl", $"status {serviceName}");
 
+		//Getting service status, used memory, etc.
 		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
 		foreach (string line in lines)
 		{
@@ -110,9 +111,13 @@ public class DataParser
 				service.Cpu = trimmedLine.Split("CPU: ").Last();
 			}
 		}
-
 		process.WaitForExit();
-		process = StartProcess("journalctl", $"--since=\"2023-09-18 00:00:00\" --output=short-iso -u {serviceName}");
+		
+		//Getting service logs since the last time logging was executed
+		string arguments = "";
+		if (lastLogDate != null) arguments += $"--since=\"{lastLogDate:yyyy-MM-dd HH:mm:ss}\" "; 
+		arguments += $"--output=short-iso -u {serviceName}";
+		process = StartProcess("journalctl", arguments);
 		foreach (string logString in process.StandardOutput.ReadToEnd().Split('\n'))
 		{
 			int index = logString.IndexOf(" ", StringComparison.Ordinal);

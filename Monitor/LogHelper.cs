@@ -3,10 +3,16 @@ namespace Monitor;
 public class LogHelper
 {
 	private readonly Config _config;
+	private DateTime? _lastLogDate;
+	private const string LastLogDateFilename = "log_date.txt";
 
 	public LogHelper(Config config)
 	{
 		_config = config;
+		if (File.Exists(LastLogDateFilename))
+		{
+			_lastLogDate = DateTime.Parse(File.ReadAllText(LastLogDateFilename));
+		}
 	}
 	
 	public Log Log()
@@ -35,8 +41,10 @@ public class LogHelper
 		
 		if (_config.Services != null)
 		{
-			var serviceLogs = _config.Services.Select(DataParser.GetServiceInfo).ToList();
+			var serviceLogs = _config.Services.Select(s => DataParser.GetServiceInfo(s, _lastLogDate)).ToList();
 			log.ServiceLogs = serviceLogs;
+			File.WriteAllText(LastLogDateFilename, DateTime.Now.ToString("u"));
+			_lastLogDate = DateTime.Now;
 		}
 		
 		return log;
