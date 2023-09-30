@@ -7,4 +7,4 @@ builder.Services
 
 var app = builder.Build();
 app.MapGraphQL();
-app.Run();
+await app.RunAsync();
