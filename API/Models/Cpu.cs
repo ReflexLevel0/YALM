@@ -1,22 +1,13 @@
-using System.Text;
-
 namespace API.Models;
 
-public class Cpu
+public class Cpu : Log
 {
-	public double Usage { get; set; }
-	public int NumberOfTasks { get; set; }
-	public List<ProcessCpuInfo> Processes { get; } = new();
+	public double Usage { get; }
+	public int NumberOfTasks { get; }
 
-	public override string ToString()
+	public Cpu(int serverId, DateTime date, int interval, double usage, int numberOfTasks) : base(serverId, date, interval)
 	{
-		var builder = new StringBuilder(512);
-		builder.AppendLine($"CPU usage: {Usage:P}\nNumber of tasks: {NumberOfTasks}");
-		foreach (var process in Processes)
-		{
-			builder.AppendLine(process.ToString());
-		}
-		
-		return builder.ToString();
+		Usage = usage;
+		NumberOfTasks = numberOfTasks;
 	}
 }

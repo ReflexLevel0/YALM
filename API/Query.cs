@@ -6,12 +6,11 @@ public class Query
 {
 	public Cpu Cpu()
 	{
-		return new Cpu
-		{
-			Processes =
-			{
-				new ProcessCpuInfo("java", 50), new ProcessCpuInfo("sshd", 10.5)
-			}, Usage = 60.5, NumberOfTasks = 2
-		};
+		return new Cpu(0, DateTime.Today, 5, 0.1, 13);
+	}
+
+	public Ram Ram()
+	{
+		return new Ram(0, DateTime.Today, 5, 1512, 8192);
 	}
 }
