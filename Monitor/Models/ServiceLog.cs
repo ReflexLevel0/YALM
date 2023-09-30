@@ -1,20 +1,15 @@
 using System.Text;
 
-namespace Monitor;
+namespace Monitor.Models;
 
 public class ServiceLog
 {
-	public string Name { get; }
-	public string Active { get; set; }
+	public string? Name { get; init; }
+	public string? Active { get; set; }
 	public int Tasks { get; set; }
-	public string Memory { get; set; }
-	public string Cpu { get; set; }
+	public string? Memory { get; set; }
+	public string? Cpu { get; set; }
 	public List<JournalLog> Logs { get; } = new();
-
-	public ServiceLog(string name)
-	{
-		Name = name;
-	}
 
 	public override string ToString()
 	{

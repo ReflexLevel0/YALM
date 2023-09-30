@@ -1,3 +1,5 @@
+using Monitor.Models;
+
 namespace Monitor;
 
 public class LogHelper

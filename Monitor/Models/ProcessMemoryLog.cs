@@ -1,9 +1,9 @@
-namespace Monitor;
+namespace Monitor.Models;
 
 public class ProcessMemoryLog
 {
-	public string Name { get; set; }
-	public double MemoryUsagePercentage { get; set; }
+	public string Name { get; }
+	public double MemoryUsagePercentage { get; }
 	
 	public ProcessMemoryLog(string name, double memoryUsagePercentage)
 	{

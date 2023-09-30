@@ -1,9 +1,9 @@
-namespace Monitor;
+namespace Monitor.Models;
 
 public class ProcessCpuLog
 {
-	public string Name { get; set; }
-	public double CpuUsage { get; set; }
+	public string Name { get; }
+	public double CpuUsage { get; }
 
 	public ProcessCpuLog(string name, double cpuUsage)
 	{

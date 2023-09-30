@@ -1,4 +1,4 @@
-namespace Monitor;
+namespace Monitor.Models;
 
 public class JournalLog
 {

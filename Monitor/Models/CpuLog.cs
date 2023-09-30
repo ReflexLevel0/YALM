@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Monitor;
+namespace Monitor.Models;
 
 public class CpuLog
 {

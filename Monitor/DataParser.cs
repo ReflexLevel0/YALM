@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Monitor.Models;
 
 namespace Monitor;
 
@@ -81,7 +82,7 @@ public class DataParser
 
 	public static ServiceLog GetServiceInfo(string serviceName, DateTime? lastLogDate)
 	{
-		var service = new ServiceLog(serviceName);
+		var service = new ServiceLog { Name = serviceName };
 		var process = StartProcess("systemctl", $"status {serviceName}");
 
 		//Getting service status, used memory, etc.
