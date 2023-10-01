@@ -2,6 +2,7 @@ using API;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
+	.AddSingleton(new Db(File.ReadAllText("dbConnectionString.txt")))
 	.AddGraphQLServer()
 	.AddQueryType<Query>();
 
