@@ -5,40 +5,49 @@ namespace API;
 public class Query
 {
 	private readonly Db _db;
-	
+
 	public Query(Db db)
 	{
 		_db = db;
 	}
-	
-	public async IAsyncEnumerable<Cpu> Cpu(string startDateString, string endDateString)
+
+	public async IAsyncEnumerable<Cpu> Cpu(int serverId, string? startDateTime, string? endDateTime, int interval, string method)
 	{
+		var cpuLogs = new List<Cpu>();
+		int intervalSum = 0;
+
+		Cpu CombineCpuLogs()
+		{
+			double usageProcessed = QueryHelper.CombineValues(method, cpuLogs.Select(c => c.Usage));
+			int numberOfTasksProcessed = (int)QueryHelper.CombineValues(method, cpuLogs.Select(c => (double)c.NumberOfTasks));
+			return new Cpu(serverId, cpuLogs.First().Date, cpuLogs.Sum(c => c.Interval), usageProcessed, numberOfTasksProcessed);
+		}
+
 		await foreach (var reader in _db.ExecuteReadAsync(
 			               $"SELECT serverid, date, interval, usage, numberoftasks " +
-			               $"FROM Cpu {CreateSqlFromStartAndEndDate(startDateString, endDateString)}"))
+			               $"FROM Cpu WHERE {QueryHelper.LimitSqlByParameters(serverId, startDateTime, endDateTime)} ORDER BY date;"))
 		{
 			int id = reader.GetInt32(0);
 			var date = reader.GetDateTime(1);
-			int interval = reader.GetInt32(2);
+			int logInterval = reader.GetInt32(2);
 			double usage = reader.GetDouble(3);
 			int numberOfTasks = reader.GetInt32(4);
-			yield return new Cpu(id, date, interval, usage, numberOfTasks);
+			var cpuLog = new Cpu(id, date, logInterval, usage, numberOfTasks);
+			
+			cpuLogs.Add(cpuLog);
+			intervalSum += cpuLog.Interval;
+			if (intervalSum < interval) continue;
+			
+			yield return CombineCpuLogs();
+			cpuLogs.Clear();
+			intervalSum = 0;
 		}
+
+		if (cpuLogs.Count > 0) yield return CombineCpuLogs();
 	}
 
 	public Ram Ram()
 	{
 		return new Ram(0, DateTime.Today, 5, 1512, 8192);
-	}
-
-	private string CreateSqlFromStartAndEndDate(string startDate, string endDate)
-	{
-		string result = "WHERE ";
-		bool startDateSpecified = DateTime.TryParse(startDate, out _);
-		if (startDateSpecified) result += $"date>='{startDate}'";
-		bool endDateSpecified = DateTime.TryParse(endDate, out _);
-		if (startDateSpecified && endDateSpecified) result += $" AND date<='{endDate}'";
-		else if (endDateSpecified) result += $"date<='{endDate}'";
-		return result;
 	}
 }
