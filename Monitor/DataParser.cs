@@ -124,7 +124,7 @@ public class DataParser
 			int index = logString.IndexOf(" ", StringComparison.Ordinal);
 			if (index == -1 || logString.StartsWith("--")) continue;
 			var date = DateTime.Parse(logString[..index]);
-			var log = new JournalLog(date, logString[(index + 1)..]);
+			var log = new ServiceJournalLog(date, logString[(index + 1)..]);
 			service.Logs.Add(log);
 		}
 

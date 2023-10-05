@@ -9,7 +9,7 @@ public class ServiceLog
 	public int Tasks { get; set; }
 	public string? Memory { get; set; }
 	public string? Cpu { get; set; }
-	public List<JournalLog> Logs { get; } = new();
+	public List<ServiceJournalLog> Logs { get; } = new();
 
 	public override string ToString()
 	{

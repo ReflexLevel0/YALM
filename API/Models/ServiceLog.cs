@@ -1,13 +1,19 @@
 namespace API.Models;
 
-public class ServiceLog : Log
+public class ServiceLog : LogBase
 {
-	public string ServiceName { get; }
-	public string LogText { get; }
-	
-	public ServiceLog(int serverId, DateTime date, int interval, string serviceName, string logText) : base(serverId, date, interval)
+	public string Name { get; }
+	public int RamUsageMegabytes { get; }
+	public ServiceStatus Status { get; }
+	public int Tasks { get; }
+	public double CpuSeconds { get; }
+
+	public ServiceLog(int serverId, DateTime date, int interval, string name, int ramUsageMegabytes, ServiceStatus status, int tasks, double cpuSeconds) : base(serverId, date, interval)
 	{
-		ServiceName = serviceName;
-		LogText = logText;
+		Name = name;
+		RamUsageMegabytes = ramUsageMegabytes;
+		Status = status;
+		Tasks = tasks;
+		CpuSeconds = cpuSeconds;
 	}
 }

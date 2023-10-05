@@ -1,6 +1,6 @@
 namespace API.Models;
 
-public class Storage : Log
+public class StorageLog : LogBase
 {
 	public string Filesystem { get; }
 	public string Mountpath { get; }
@@ -8,7 +8,7 @@ public class Storage : Log
 	public double UsedBytes { get; }
 	public double Usage => UsedBytes / BytesTotal;
 
-	public Storage(int serverId, DateTime date, int interval, string filesystem, string mountpath, double bytesTotal, double usedBytes) : base(serverId, date, interval)
+	public StorageLog(int serverId, DateTime date, int interval, string filesystem, string mountpath, double bytesTotal, double usedBytes) : base(serverId, date, interval)
 	{
 		Filesystem = filesystem;
 		Mountpath = mountpath;

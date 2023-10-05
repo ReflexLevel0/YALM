@@ -1,10 +1,10 @@
 namespace Monitor.Models;
 
-public class JournalLog
+public class ServiceJournalLog
 {
 	public DateTime Date { get; }
 	public string Text { get; }
-	public JournalLog(DateTime date, string text)
+	public ServiceJournalLog(DateTime date, string text)
 	{
 		Date = date;
 		Text = text;

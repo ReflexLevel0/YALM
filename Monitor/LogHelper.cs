@@ -17,9 +17,9 @@ public class LogHelper
 		}
 	}
 	
-	public Log Log()
+	public LogBase Log()
 	{
-		var log = new Log(DateTime.Now);
+		var log = new LogBase(DateTime.Now);
 
 		if (_config.Cpu)
 		{

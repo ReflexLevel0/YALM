@@ -1,6 +1,6 @@
 namespace API.Models;
 
-public class Program
+public class ProgramLog
 {
 	
 }

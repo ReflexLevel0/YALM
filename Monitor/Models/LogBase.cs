@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Monitor.Models;
 
-public class Log
+public class LogBase
 {
 	public DateTime LogTime { get; }
 	public CpuLog? CpuLog { get; set; }
@@ -10,7 +10,7 @@ public class Log
 	public List<StorageLog>? StorageLogs { get; set; }
 	public List<ServiceLog>? ServiceLogs { get; set; }
 
-	public Log(DateTime logTime)
+	public LogBase(DateTime logTime)
 	{
 		LogTime = logTime;
 	}
