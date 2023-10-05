@@ -1,4 +1,6 @@
 using API.Models;
+using API.Models.Graphql;
+using API.Models.Logs;
 
 namespace API;
 
@@ -20,17 +22,21 @@ public class Query
 	/// <param name="interval">Interval that specifies time distance between two logs (for example, if interval is 10, then two logs of 5 minutes will be combined into a single log and returned)</param>
 	/// <param name="method">Method for combining multiple logs into one (min, max, avg, etc.)</param>
 	/// <returns></returns>
-	public async IAsyncEnumerable<CpuLog> Cpu(int serverId, string? startDateTime, string? endDateTime, int interval, string method)
+	public async IAsyncEnumerable<Cpu> Cpu(int serverId, string? startDateTime, string? endDateTime, int interval, string method)
 	{
+		DateTime? lastDate = null;
 		var cpuLogs = new List<CpuLog>();
 		int intervalSum = 0;
 
 		//Combines multiple cpu logs into a single log
-		CpuLog CombineCpuLogs()
+		Cpu CombineCpuLogs()
 		{
 			double usageProcessed = QueryHelper.CombineValues(method, cpuLogs.Select(c => c.Usage));
 			int numberOfTasksProcessed = (int)QueryHelper.CombineValues(method, cpuLogs.Select(c => (double)c.NumberOfTasks));
-			return new CpuLog(serverId, cpuLogs.First().Date, cpuLogs.Sum(c => c.Interval), usageProcessed, numberOfTasksProcessed);
+			var log = new Cpu(serverId, cpuLogs.First().Date, usageProcessed, numberOfTasksProcessed);
+			cpuLogs.Clear();
+			intervalSum = 0;
+			return log;
 		}
 
 		await foreach (var reader in _db.ExecuteReadAsync(
@@ -46,16 +52,25 @@ public class Query
 			double usage = reader.GetDouble(3);
 			int numberOfTasks = reader.GetInt32(4);
 			var cpuLog = new CpuLog(id, date, logInterval, usage, numberOfTasks);
+
+			//Combining logs and adding additional logs if there has been some kind of a break
+			//between the last log and the current one so that the charts goes to 0 in case of break
+			if (lastDate != null && date != lastDate)
+			{
+				var breakDate = cpuLogs.First().Date.AddMinutes(intervalSum);
+				yield return CombineCpuLogs();
+				yield return new Cpu(serverId, breakDate, 0, 0);
+				yield return new Cpu(serverId, cpuLog.Date.Subtract(new TimeSpan(0, 0, 0, 1)), 0, 0);
+			}
 			
 			//Adding cpu log to the list of logs
 			cpuLogs.Add(cpuLog);
+			lastDate = cpuLog.Date.AddMinutes(cpuLog.Interval);
 			intervalSum += cpuLog.Interval;
 			if (intervalSum < interval) continue;
 			
 			//Returning the combined log
 			yield return CombineCpuLogs();
-			cpuLogs.Clear();
-			intervalSum = 0;
 		}
 
 		if (cpuLogs.Count > 0) yield return CombineCpuLogs();
