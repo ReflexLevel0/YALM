@@ -13,13 +13,13 @@ public class QueryHelper
 		if (startDateTime != null)
 		{
 			if (result.Length != 0) result.Append(" AND ");
-			result.Append($"date <= '{startDateTime}'");
+			result.Append($"date >= '{startDateTime}'");
 		}
 
 		if (endDateTime != null)
 		{
 			if (result.Length != 0) result.Append(" AND ");
-			result.Append($"date >= '{endDateTime}'");
+			result.Append($"date <= '{endDateTime}'");
 		}
 
 		return result.ToString();

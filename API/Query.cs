@@ -1,4 +1,3 @@
-using API.Models;
 using API.Models.Graphql;
 using API.Models.Logs;
 
