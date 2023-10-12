@@ -1,3 +1,19 @@
+<script>
+import Chart from "./components/Chart.vue";
+import { ChartHelper } from "@/ChartHelper";
+
+export default {
+  name: "app",
+  computed: {
+    ChartHelper() {
+      return ChartHelper;
+    },
+  },
+  components: {
+    Chart,
+  },
+};
+</script>
 <template>
-  <p>This is a test</p>
+  <Chart name="CPU" :get-data-promise="ChartHelper.GetCpuDatasets()" />
 </template>
