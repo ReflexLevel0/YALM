@@ -10,7 +10,6 @@ export class ChartHelper {
         const usagePoints: object[] = [];
         const cpuLogs: CpuLog[] = json.data.cpu;
         cpuLogs.forEach((log) => {
-          console.log(log)
           numberOfTasksPoints.push({ x: log.date, y: log.numberOfTasks });
           usagePoints.push({ x: log.date, y: log.usage });
         });

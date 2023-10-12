@@ -1,6 +1,6 @@
-namespace API;
+namespace API.Models;
 
 public enum ServiceStatus
 {
-	
+    
 }

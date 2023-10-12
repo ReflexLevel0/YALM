@@ -17,8 +17,8 @@ export class Api {
   static getCpuLogs(startDate: Date, endDate: Date) {
     const startDateString = moment(startDate).format("yyyy-MM-DD HH:mm:ss");
     const endDateString = moment(endDate).format("yyyy-MM-DD HH:mm:ss");
-    const queryString = `{ cpu(serverId: 0, interval: 60, method: "avg", startDateTime: "${startDateString}" endDateTime: "${endDateString}") {date, numberOfTasks, usage} }`;
-    console.log(queryString)
+    const dateDiff = moment(endDate).diff(startDate, 'hours')
+    const queryString = `{ cpu(serverId: 0, interval: ${dateDiff}, method: "avg", startDateTime: "${startDateString}" endDateTime: "${endDateString}") {date, numberOfTasks, usage} }`;
     return this.executeQuery(queryString);
   }
 }
