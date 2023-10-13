@@ -64,12 +64,16 @@ export default defineComponent({
               },
             },
             zoom: {
+              mode: "x",
               wheel: {
-                enabled: false,
+                enabled: true,
               },
               drag: {
-                enabled: false,
+                enabled: true,
                 modifierKey: "ctrl",
+              },
+              pinch: {
+                enabled: true,
               },
             },
           },
