@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,6 +32,7 @@ export default defineComponent({
   components: {
     Scatter,
   },
+  emits: ['zoomChanged'],
   data() {
     return {
       loadingData: false,
@@ -55,6 +56,7 @@ export default defineComponent({
           zoom: {
             pan: {
               enabled: true,
+              modifierKey: "ctrl",
               mode: "x",
             },
             scales: {
@@ -66,14 +68,17 @@ export default defineComponent({
             zoom: {
               mode: "x",
               wheel: {
-                enabled: true,
+                enabled: false,
               },
               drag: {
                 enabled: true,
-                modifierKey: "ctrl",
+                modifierKey: "alt",
               },
               pinch: {
-                enabled: true,
+                enabled: false,
+              },
+              onZoomComplete: (chart) => {
+                if(chart.chart.getZoomLevel() !== 1) this.emitZoomChanged(chart);
               },
             },
           },
@@ -82,27 +87,48 @@ export default defineComponent({
     };
   },
   async mounted() {
-    this.loadingData = true;
-    this.getDataPromise.then((data) => {
-      this.chartData = data as never;
-      this.loadingData = false;
-      this.loadedData = true;
-    });
+    this.refreshData()
+  },
+  methods: {
+    refreshData(){
+      this.loadingData = true;
+      this.getDataPromise.then((data) => {
+        this.chartData = data;
+        this.loadingData = false;
+        this.loadedData = true;
+      });
+    },
+    emitZoomChanged(chart){
+      let chartJS = chart.chart
+      const startDate = new Date(chartJS.scales.x.min)
+      const endDate = new Date(chartJS.scales.x.max)
+      this.$emit('zoomChanged', {
+          startDate: startDate,
+          endDate: endDate
+      })
+    }
   },
   props: {
     name: {
       type: String,
     },
     getDataPromise: {
-      type: Promise,
       required: true,
     },
   },
+  watch: {
+    'getDataPromise': {
+      handler: function(){
+        this.refreshData()
+        this.$refs.chart.chart.resetZoom()
+      }
+    }
+  }
 });
 </script>
 
 <template>
-  <Scatter v-if="this.loadedData" :data="chartData" :options="options" />
+  <Scatter v-if="this.loadedData" :data="chartData" :options="options" ref="chart" />
   <div v-if="this.loadingData" class="loading-info">
     Loading {{ this.$props.name }} data...
   </div>
