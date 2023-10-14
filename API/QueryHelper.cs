@@ -25,11 +25,12 @@ public class QueryHelper
 		return result.ToString();
 	}
 
-	public static double CombineValues(string method, IEnumerable<double> values)
+	public static double CombineValues(string? method, IEnumerable<double> values)
 	{
 		double result;
 		switch (method)
 		{
+			case null:
 			case "avg":
 			case "average":
 				result = values.Average();

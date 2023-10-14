@@ -21,7 +21,7 @@ public class Query
 	/// <param name="interval">Interval that specifies time distance between two logs (for example, if interval is 10, then two logs of 5 minutes will be combined into a single log and returned). If interval is null, then interval is decided dynamically (interval=1 minute for every hour between <param name="startDateTime"></param> and <param name="endDateTime"></param>).</param>
 	/// <param name="method">Method for combining multiple logs into one (min, max, avg, etc.)</param>
 	/// <returns></returns>
-	public async IAsyncEnumerable<Cpu> Cpu(int serverId, string? startDateTime, string? endDateTime, int? interval, string method)
+	public async IAsyncEnumerable<Cpu> Cpu(int serverId, string? startDateTime, string? endDateTime, int? interval, string? method)
 	{
 		DateTime? lastDate = null;
 		var cpuLogs = new List<CpuLog>();
