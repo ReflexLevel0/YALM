@@ -49,6 +49,7 @@ export default {
         this.$data.cpuConfig.startDate = this.$data.startDate
         this.$data.cpuConfig.endDate = this.$data.endDate
         this.$data.cpuConfig.reloadingCpuChart = false
+        console.log(this.$data.cpuConfig)
       })
     }
   }
@@ -58,10 +59,14 @@ export default {
   <VueDatePicker v-model="startDate" />
   <VueDatePicker v-model="endDate" />
   <Chart
-    v-if="cpuConfig.startDate && cpuConfig.endDate && cpuConfig === false"
+    v-if="cpuConfig.startDate && cpuConfig.endDate && cpuConfig.reloadingCpuChart === false"
     name="CPU"
     :get-data-promise="CpuDatasetLoader"
-    @zoom-changed="(limits) => $data.cpuConfig = limits"
+    @zoom-changed="(limits) =>
+    {
+      $data.cpuConfig.startDate = limits.startDate;
+      $data.cpuConfig.endDate = limits.endDate
+    }"
     @reload-chart="refreshChartDates"
   />
 </template>

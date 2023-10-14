@@ -13,7 +13,7 @@ import {
 import { Scatter } from "vue-chartjs";
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom";
-import { defineComponent, nextTick } from "vue";
+import { defineComponent } from "vue";
 
 ChartJS.register(
   CategoryScale,
