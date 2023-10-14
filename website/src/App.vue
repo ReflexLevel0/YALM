@@ -3,6 +3,7 @@ import Chart from "./components/Chart.vue";
 import { ChartHelper } from "@/ChartHelper";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import { nextTick } from "vue";
 
 export default {
   name: "app",
@@ -10,10 +11,11 @@ export default {
     return {
       startDate: null,
       endDate: null,
-      cpuChartDates: {
+      cpuConfig: {
         startDate: null,
-        endDate: null
-      }
+        endDate: null,
+        reloadingCpuChart: false
+      },
     };
   },
   computed: {
@@ -21,7 +23,7 @@ export default {
       return ChartHelper;
     },
     CpuDatasetLoader(){
-      return ChartHelper.GetCpuDatasets(this.$data.cpuChartDates.startDate, this.$data.cpuChartDates.endDate)
+      return ChartHelper.GetCpuDatasets(this.$data.cpuConfig.startDate, this.$data.cpuConfig.endDate)
     }
   },
   components: {
@@ -42,8 +44,12 @@ export default {
   },
   methods: {
     refreshChartDates(){
-      this.$data.cpuChartDates.startDate = this.$data.startDate
-      this.$data.cpuChartDates.endDate = this.$data.endDate
+      this.$data.cpuConfig.reloadingCpuChart = true
+      nextTick(() => {
+        this.$data.cpuConfig.startDate = this.$data.startDate
+        this.$data.cpuConfig.endDate = this.$data.endDate
+        this.$data.cpuConfig.reloadingCpuChart = false
+      })
     }
   }
 };
@@ -52,9 +58,10 @@ export default {
   <VueDatePicker v-model="startDate" />
   <VueDatePicker v-model="endDate" />
   <Chart
-    v-if="cpuChartDates.startDate && cpuChartDates.endDate"
+    v-if="cpuConfig.startDate && cpuConfig.endDate && cpuConfig === false"
     name="CPU"
     :get-data-promise="CpuDatasetLoader"
-    @zoom-changed="(limits) => $data.cpuChartDates = limits"
+    @zoom-changed="(limits) => $data.cpuConfig = limits"
+    @reload-chart="refreshChartDates"
   />
 </template>

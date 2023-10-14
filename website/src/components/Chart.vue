@@ -13,7 +13,7 @@ import {
 import { Scatter } from "vue-chartjs";
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom";
-import { defineComponent } from "vue";
+import { defineComponent, nextTick } from "vue";
 
 ChartJS.register(
   CategoryScale,
@@ -32,7 +32,7 @@ export default defineComponent({
   components: {
     Scatter,
   },
-  emits: ['zoomChanged'],
+  emits: ['zoomChanged', 'reloadChart'],
   data() {
     return {
       loadingData: false,
@@ -55,7 +55,7 @@ export default defineComponent({
         plugins: {
           zoom: {
             pan: {
-              enabled: true,
+              enabled: false,
               modifierKey: "ctrl",
               mode: "x",
             },
@@ -78,7 +78,9 @@ export default defineComponent({
                 enabled: false,
               },
               onZoomComplete: (chart) => {
-                if(chart.chart.getZoomLevel() !== 1) this.emitZoomChanged(chart);
+                if(chart.chart.getZoomLevel() !== 1) {
+                  this.emitZoomChanged(chart);
+                }
               },
             },
           },
@@ -87,10 +89,10 @@ export default defineComponent({
     };
   },
   async mounted() {
-    this.refreshData()
+    await this.refreshData()
   },
   methods: {
-    refreshData(){
+    async refreshData(){
       this.loadingData = true;
       this.getDataPromise.then((data) => {
         this.chartData = data;
@@ -106,6 +108,9 @@ export default defineComponent({
           startDate: startDate,
           endDate: endDate
       })
+    },
+    reloadChart(){
+      this.$emit('reloadChart')
     }
   },
   props: {
@@ -120,7 +125,6 @@ export default defineComponent({
     'getDataPromise': {
       handler: function(){
         this.refreshData()
-        this.$refs.chart.chart.resetZoom()
       }
     }
   }
@@ -132,6 +136,7 @@ export default defineComponent({
   <div v-if="this.loadingData" class="loading-info">
     Loading {{ this.$props.name }} data...
   </div>
+  <button @click="reloadChart">Reset zoom</button>
 </template>
 
 <style scoped>
