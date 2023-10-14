@@ -19,9 +19,6 @@ export default {
     };
   },
   computed: {
-    ChartHelper() {
-      return ChartHelper;
-    },
     CpuDatasetLoader(){
       return ChartHelper.GetCpuDatasets(this.$data.cpuConfig.startDate, this.$data.cpuConfig.endDate)
     }

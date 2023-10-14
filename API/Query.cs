@@ -18,15 +18,38 @@ public class Query
 	/// <param name="serverId"></param>
 	/// <param name="startDateTime"></param>
 	/// <param name="endDateTime"></param>
-	/// <param name="interval">Interval that specifies time distance between two logs (for example, if interval is 10, then two logs of 5 minutes will be combined into a single log and returned)</param>
+	/// <param name="interval">Interval that specifies time distance between two logs (for example, if interval is 10, then two logs of 5 minutes will be combined into a single log and returned). If interval is null, then interval is decided dynamically (interval=1 minute for every hour between <param name="startDateTime"></param> and <param name="endDateTime"></param>).</param>
 	/// <param name="method">Method for combining multiple logs into one (min, max, avg, etc.)</param>
 	/// <returns></returns>
-	public async IAsyncEnumerable<Cpu> Cpu(int serverId, string? startDateTime, string? endDateTime, int interval, string method)
+	public async IAsyncEnumerable<Cpu> Cpu(int serverId, string? startDateTime, string? endDateTime, int? interval, string method)
 	{
 		DateTime? lastDate = null;
 		var cpuLogs = new List<CpuLog>();
 		int intervalSum = 0;
 
+		//Dynamically calculating the interval if it is null
+		if (interval == null)
+		{
+			bool hasStart = DateTime.TryParse(startDateTime, out var startDate);
+			bool hasEnd = DateTime.TryParse(endDateTime, out var endDate);
+			if (hasStart == false)
+			{
+				await foreach (var reader in _db.ExecuteReadAsync("SELECT date FROM Cpu ORDER BY date LIMIT 1"))
+				{
+					startDate = reader.GetDateTime(0);
+				}
+			}
+			if (hasEnd == false)
+			{
+				await foreach (var reader in _db.ExecuteReadAsync("SELECT date FROM Cpu ORDER BY date DESC LIMIT 1"))
+				{
+					endDate = reader.GetDateTime(0);
+				}
+			}
+
+			interval = (int)endDate.Subtract(startDate).TotalHours;
+		}
+		
 		//Combines multiple cpu logs into a single log
 		Cpu CombineCpuLogs()
 		{
