@@ -56,7 +56,7 @@ export default {
   <VueDatePicker v-model="startDate" />
   <VueDatePicker v-model="endDate" />
   <Chart
-    v-if="cpuConfig.startDate && cpuConfig.endDate && cpuConfig.reloadingCpuChart === false"
+    v-if="cpuConfig.reloadingCpuChart === false"
     name="CPU"
     :get-data-promise="CpuDatasetLoader"
     @zoom-changed="(limits) =>

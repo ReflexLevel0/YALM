@@ -10,13 +10,13 @@ public class QueryHelper
 		
 		if (serverId != null) result.Append($"serverId = {serverId}");
 
-		if (startDateTime != null)
+		if (string.IsNullOrWhiteSpace(startDateTime) == false)
 		{
 			if (result.Length != 0) result.Append(" AND ");
 			result.Append($"date >= '{startDateTime}'");
 		}
 
-		if (endDateTime != null)
+		if (string.IsNullOrWhiteSpace(endDateTime) == false)
 		{
 			if (result.Length != 0) result.Append(" AND ");
 			result.Append($"date <= '{endDateTime}'");

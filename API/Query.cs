@@ -39,6 +39,7 @@ public class Query
 					startDate = reader.GetDateTime(0);
 				}
 			}
+
 			if (hasEnd == false)
 			{
 				await foreach (var reader in _db.ExecuteReadAsync("SELECT date FROM Cpu ORDER BY date DESC LIMIT 1"))
@@ -49,7 +50,7 @@ public class Query
 
 			interval = (int)endDate.Subtract(startDate).TotalHours;
 		}
-		
+
 		//Combines multiple cpu logs into a single log
 		Cpu CombineCpuLogs()
 		{
@@ -84,13 +85,13 @@ public class Query
 				yield return new Cpu(serverId, breakDate, 0, 0);
 				yield return new Cpu(serverId, cpuLog.Date.Subtract(new TimeSpan(0, 0, 0, 1)), 0, 0);
 			}
-			
+
 			//Adding cpu log to the list of logs
 			cpuLogs.Add(cpuLog);
 			lastDate = cpuLog.Date.AddMinutes(cpuLog.Interval);
 			intervalSum += cpuLog.Interval;
 			if (intervalSum < interval) continue;
-			
+
 			//Returning the combined log
 			yield return CombineCpuLogs();
 		}
