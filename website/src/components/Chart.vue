@@ -35,6 +35,7 @@ export default defineComponent({
   emits: ['zoomChanged', 'reloadChart'],
   data() {
     return {
+      noData: false,
       loadingData: false,
       loadedData: false,
       chartData: null,
@@ -96,6 +97,9 @@ export default defineComponent({
       this.loadingData = true;
       this.getDataPromise.then((data) => {
         this.chartData = data;
+        let dataCount = 0
+        data.datasets.forEach(dataset => dataCount += dataset.data.length)
+        this.$data.noData = dataCount === 0
         this.loadingData = false;
         this.loadedData = true;
       });
@@ -132,15 +136,18 @@ export default defineComponent({
 </script>
 
 <template>
-  <Scatter v-if="this.loadedData" :data="chartData" :options="options" ref="chart" />
-  <div v-if="this.loadingData" class="loading-info">
+  <Scatter v-if="this.loadedData && this.noData === false" :data="chartData" :options="options" ref="chart" />
+  <div v-if="this.loadingData" class="info">
     Loading {{ this.$props.name }} data...
+  </div>
+  <div v-if="this.noData" class="info">
+    No data (try choosing a different date range)
   </div>
   <button @click="reloadChart">Reset zoom</button>
 </template>
 
 <style scoped>
-.loading-info {
+.info {
   display: flex;
   justify-content: center;
   align-items: center;
