@@ -39,6 +39,7 @@ export default defineComponent({
       loadingData: false,
       loadedData: false,
       chartData: null,
+      apiError: false,
       options: {
         responsive: true,
         maintainAspectRatio: true,
@@ -102,6 +103,10 @@ export default defineComponent({
         this.$data.noData = dataCount === 0
         this.loadingData = false;
         this.loadedData = true;
+      }).catch(() => {
+        this.loadingData = false;
+        this.loadedData = false;
+        this.apiError = true;
       });
     },
     emitZoomChanged(chart){
@@ -142,6 +147,9 @@ export default defineComponent({
   </div>
   <div v-if="this.noData" class="info">
     No data (try choosing a different date range)
+  </div>
+  <div v-if="this.apiError" class="info">
+    API error! Try checking if API setup is correct.
   </div>
   <button @click="reloadChart">Reset zoom</button>
 </template>
