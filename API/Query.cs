@@ -28,28 +28,7 @@ public class Query
 		int intervalSum = 0;
 
 		//Dynamically calculating the interval if it is null
-		if (interval == null)
-		{
-			bool hasStart = DateTime.TryParse(startDateTime, out var startDate);
-			bool hasEnd = DateTime.TryParse(endDateTime, out var endDate);
-			if (hasStart == false)
-			{
-				await foreach (var reader in _db.ExecuteReadAsync("SELECT date FROM Cpu ORDER BY date LIMIT 1"))
-				{
-					startDate = reader.GetDateTime(0);
-				}
-			}
-
-			if (hasEnd == false)
-			{
-				await foreach (var reader in _db.ExecuteReadAsync("SELECT date FROM Cpu ORDER BY date DESC LIMIT 1"))
-				{
-					endDate = reader.GetDateTime(0);
-				}
-			}
-
-			interval = (int)endDate.Subtract(startDate).TotalHours;
-		}
+		interval ??= await CalculateInterval(startDateTime, endDateTime, "CPU");
 
 		//Combines multiple cpu logs into a single log
 		Cpu CombineCpuLogs()
@@ -99,6 +78,36 @@ public class Query
 		if (cpuLogs.Count > 0) yield return CombineCpuLogs();
 	}
 
+	/// <summary>
+	/// Dynamically calculates the interval based on start and end date so that the API doesn't return too much data
+	/// </summary>
+	/// <param name="startDateString"></param>
+	/// <param name="endDateString"></param>
+	/// <param name="tableName"></param>
+	/// <returns></returns>
+	public async Task<int> CalculateInterval(string? startDateString, string? endDateString, string tableName)
+	{
+		bool hasStart = DateTime.TryParse(startDateString, out var startDate);
+		bool hasEnd = DateTime.TryParse(endDateString, out var endDate);
+		if (hasStart == false)
+		{
+			await foreach (var reader in _db.ExecuteReadAsync($"SELECT date FROM {tableName} ORDER BY date LIMIT 1"))
+			{
+				startDate = reader.GetDateTime(0);
+			}
+		}
+
+		if (hasEnd == false)
+		{
+			await foreach (var reader in _db.ExecuteReadAsync($"SELECT date FROM {tableName} ORDER BY date DESC LIMIT 1"))
+			{
+				endDate = reader.GetDateTime(0);
+			}
+		}
+
+		return (int)endDate.Subtract(startDate).TotalHours;
+	}
+	
 	public RamLog Ram()
 	{
 		return new RamLog(0, DateTime.Today, 5, 1512, 8192);
