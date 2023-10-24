@@ -24,6 +24,7 @@ public class Query
 	public async IAsyncEnumerable<Cpu> Cpu(int serverId, string? startDateTime, string? endDateTime, int? interval, string? method)
 	{
 		DateTime? lastDate = null;
+		DateTime? breakDate = null;
 		var cpuLogs = new List<CpuLog>();
 		int intervalSum = 0;
 
@@ -51,16 +52,16 @@ public class Query
 
 			//Combining logs and adding additional logs if there has been some kind of a break
 			//between the last log and the current one so that the charts goes to 0 in case of break
-			if (lastDate != null && cpuLog.Date != lastDate)
+			if (lastDate != null && breakDate != null && cpuLog.Date != lastDate)
 			{
-				var breakDate = cpuLogs.First().Date.AddMinutes(intervalSum);
-				yield return CombineCpuLogs();
-				yield return new Cpu(serverId, breakDate, 0, 0);
+				if(cpuLogs.Count != 0) yield return CombineCpuLogs();
+				yield return new Cpu(serverId, (DateTime)breakDate, 0, 0);
 				yield return new Cpu(serverId, cpuLog.Date.Subtract(new TimeSpan(0, 0, 0, 1)), 0, 0);
 			}
 
 			//Adding cpu log to the list of logs
 			cpuLogs.Add(cpuLog);
+			breakDate = cpuLog.Date.AddSeconds(1);
 			lastDate = cpuLog.Date.AddMinutes(cpuLog.Interval);
 			intervalSum += cpuLog.Interval;
 			if (intervalSum < interval) continue;
@@ -101,7 +102,7 @@ public class Query
 
 		return (int)endDate.Subtract(startDate).TotalHours;
 	}
-	
+
 	public RamLog Ram()
 	{
 		return new RamLog(0, DateTime.Today, 5, 1512, 8192);
