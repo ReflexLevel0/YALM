@@ -11,7 +11,7 @@ export class ChartHelper {
         const cpuLogs: CpuLog[] = json.data.cpu;
         cpuLogs.forEach((log) => {
           numberOfTasksPoints.push({ x: log.date, y: log.numberOfTasks });
-          usagePoints.push({ x: log.date, y: log.usage });
+          usagePoints.push({ x: log.date, y: log.usage * 100 });
         });
 
         chartData = {
