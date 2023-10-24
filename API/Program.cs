@@ -1,10 +1,12 @@
 using API;
+using API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
 	.AddSingleton(new Db(File.ReadAllText("dbConnectionString.txt")))
 	.AddGraphQLServer()
-	.AddQueryType<Query>();
+	.AddQueryType<Query>()
+	.AddMutationType<Mutation>();
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAll", b =>

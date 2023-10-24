@@ -1,5 +1,5 @@
+using API.Models.Db;
 using API.Models.Graphql;
-using API.Models.Logs;
 
 namespace API;
 
@@ -41,23 +41,17 @@ public class Query
 			return log;
 		}
 
-		await foreach (var reader in _db.ExecuteReadAsync(
+		await foreach (var reader in _db.ExecuteReaderAsync(
 			               $"SELECT serverid, date, interval, usage, numberoftasks " +
 			               $"FROM Cpu " +
 			               $"WHERE {QueryHelper.LimitSqlByParameters(serverId, startDateTime, endDateTime)} " +
 			               $"ORDER BY date;"))
 		{
-			//Parsing db record data
-			int id = reader.GetInt32(0);
-			var date = reader.GetDateTime(1);
-			int logInterval = reader.GetInt32(2);
-			double usage = reader.GetDouble(3);
-			int numberOfTasks = reader.GetInt32(4);
-			var cpuLog = new CpuLog(id, date, logInterval, usage, numberOfTasks);
+			var cpuLog = _db.ParseCpuRecord(reader);
 
 			//Combining logs and adding additional logs if there has been some kind of a break
 			//between the last log and the current one so that the charts goes to 0 in case of break
-			if (lastDate != null && date != lastDate)
+			if (lastDate != null && cpuLog.Date != lastDate)
 			{
 				var breakDate = cpuLogs.First().Date.AddMinutes(intervalSum);
 				yield return CombineCpuLogs();
@@ -91,7 +85,7 @@ public class Query
 		bool hasEnd = DateTime.TryParse(endDateString, out var endDate);
 		if (hasStart == false)
 		{
-			await foreach (var reader in _db.ExecuteReadAsync($"SELECT date FROM {tableName} ORDER BY date LIMIT 1"))
+			await foreach (var reader in _db.ExecuteReaderAsync($"SELECT date FROM {tableName} ORDER BY date LIMIT 1"))
 			{
 				startDate = reader.GetDateTime(0);
 			}
@@ -99,7 +93,7 @@ public class Query
 
 		if (hasEnd == false)
 		{
-			await foreach (var reader in _db.ExecuteReadAsync($"SELECT date FROM {tableName} ORDER BY date DESC LIMIT 1"))
+			await foreach (var reader in _db.ExecuteReaderAsync($"SELECT date FROM {tableName} ORDER BY date DESC LIMIT 1"))
 			{
 				endDate = reader.GetDateTime(0);
 			}

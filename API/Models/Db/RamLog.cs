@@ -1,4 +1,4 @@
-namespace API.Models.Logs;
+namespace API.Models.Db;
 
 public class RamLog : LogBase
 {
