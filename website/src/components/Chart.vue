@@ -46,9 +46,6 @@ export default defineComponent({
         scales: {
           x: {
             type: "time",
-            time: {
-              unit: "day",
-            },
           },
           y: {
             min: 0,
