@@ -5,9 +5,9 @@ namespace API;
 
 public class Query
 {
-	private readonly Db _db;
+	private readonly IDb _db;
 
-	public Query(Db db)
+	public Query(IDb db)
 	{
 		_db = db;
 	}

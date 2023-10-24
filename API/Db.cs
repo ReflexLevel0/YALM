@@ -4,7 +4,7 @@ namespace API;
 
 using Npgsql;
 
-public class Db
+public class Db : IDb
 {
 	private readonly NpgsqlDataSource _dataSource;
 
@@ -18,14 +18,14 @@ public class Db
 
 	public async IAsyncEnumerable<NpgsqlDataReader> ExecuteReaderAsync(string command)
 	{
-		await using var cmd=_dataSource.CreateCommand(command);
+		await using var cmd = _dataSource.CreateCommand(command);
 		await using var reader = await cmd.ExecuteReaderAsync();
 		while (await reader.ReadAsync())
 		{
 			yield return reader;
 		}
 	}
-	
+
 	public async Task ExecuteNonQueryAsync(string command)
 	{
 		await using var cmd = _dataSource.CreateCommand(command);

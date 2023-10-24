@@ -3,7 +3,7 @@ using API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-	.AddSingleton(new Db(File.ReadAllText("dbConnectionString.txt")))
+	.AddSingleton<IDb>(new Db(File.ReadAllText("dbConnectionString.txt")))
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
 	.AddMutationType<Mutation>();

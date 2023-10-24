@@ -6,27 +6,28 @@ namespace API.Models;
 
 public class Mutation
 {
-	private readonly API.Db _db;
+	private readonly IDb _db;
 
-	public Mutation(API.Db db)
+	public Mutation(IDb db)
 	{
 		_db = db;
 	}
-
+	
 	public async Task<CpuAddedPayload> AddCpuLog(CpuLog cpu)
 	{
 		CpuLog? log = null;
 		try
 		{
-			Console.WriteLine(cpu.Date);
+			//Inserting the CPU into the database
 			await _db.ExecuteNonQueryAsync($"INSERT INTO Cpu(serverId, date, interval, usage, numberoftasks) " +
-			                               $"VALUES ({cpu.ServerId}, '{cpu.Date:yyyy-MM-dd HH:mm:ss}', {cpu.Interval}, {cpu.Usage}, {cpu.NumberOfTasks})");
-			string q = $"SELECT serverid, date, interval, usage, numberoftasks " +
-			           $"FROM Cpu WHERE serverId = {cpu.ServerId} AND " +
-			           $"date = '{cpu.Date:yyyy-MM-dd HH:mm:ss zz}'";
-			Console.WriteLine(q);
-			await foreach (var reader in _db.ExecuteReaderAsync
-				               (q))
+			                               $"VALUES ({cpu.ServerId}, '{cpu.Date:yyyy-MM-dd HH:mm:ss}', " +
+			                               $"{cpu.Interval}, {cpu.Usage}, {cpu.NumberOfTasks})");
+			
+			//Reading the CPU log that was just added so it can be returned
+			string query = $"SELECT serverid, date, interval, usage, numberoftasks " + 
+			               $"FROM Cpu WHERE serverId = {cpu.ServerId} AND " + 
+			               $"date = '{cpu.Date:yyyy-MM-dd HH:mm:ss}'";
+			await foreach (var reader in _db.ExecuteReaderAsync(query))
 			{
 				log = _db.ParseCpuRecord(reader);
 				break;
