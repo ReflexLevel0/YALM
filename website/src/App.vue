@@ -11,16 +11,30 @@ export default {
     return {
       startDate: null,
       endDate: null,
-      cpuConfig: {
+      cpuUsageConfig: {
         startDate: null,
         endDate: null,
-        reloadingCpuChart: false
+        reloadingChart: false
       },
+      cpuNumberOfTasksConfig: {
+        startDate: null,
+        endDate: null,
+        reloadingChart: false
+      }
     };
   },
   computed: {
-    CpuDatasetLoader(){
-      return ChartHelper.GetCpuDatasets(this.$data.cpuConfig.startDate, this.$data.cpuConfig.endDate)
+    CpuUsageDatasetLoader(){
+      return ChartHelper.GetCpuUsageDataset(
+        this.$data.cpuUsageConfig.startDate,
+        this.$data.cpuUsageConfig.endDate
+      )
+    },
+    CpuNumberOfTasksDatasetLoader(){
+      return ChartHelper.GetCpuNumberOfTasksDataset(
+        this.$data.cpuNumberOfTasksConfig.startDate,
+        this.$data.cpuNumberOfTasksConfig.endDate
+      )
     }
   },
   components: {
@@ -41,12 +55,23 @@ export default {
   },
   methods: {
     refreshChartDates(){
-      this.$data.cpuConfig.reloadingCpuChart = true
+      this.refreshCpuUsageChartDates()
+      this.refreshCpuNumberOfTasksChartDates()
+    },
+    refreshCpuUsageChartDates(){
+      this.$data.cpuUsageConfig.reloadingChart = true
       nextTick(() => {
-        this.$data.cpuConfig.startDate = this.$data.startDate
-        this.$data.cpuConfig.endDate = this.$data.endDate
-        this.$data.cpuConfig.reloadingCpuChart = false
-        console.log(this.$data.cpuConfig)
+        this.$data.cpuUsageConfig.startDate = this.$data.startDate
+        this.$data.cpuUsageConfig.endDate = this.$data.endDate
+        this.$data.cpuUsageConfig.reloadingChart = false
+      })
+    },
+    refreshCpuNumberOfTasksChartDates(){
+      this.$data.cpuNumberOfTasksConfig.reloadingChart = true
+      nextTick(() => {
+        this.$data.cpuNumberOfTasksConfig.startDate = this.$data.startDate
+        this.$data.cpuNumberOfTasksConfig.endDate = this.$data.endDate
+        this.$data.cpuNumberOfTasksConfig.reloadingChart = false
       })
     }
   }
@@ -56,14 +81,25 @@ export default {
   <VueDatePicker v-model="startDate" />
   <VueDatePicker v-model="endDate" />
   <Chart
-    v-if="cpuConfig.reloadingCpuChart === false"
+    v-if="cpuUsageConfig.reloadingChart === false"
     name="CPU"
-    :get-data-promise="CpuDatasetLoader"
+    :get-data-promise="CpuUsageDatasetLoader"
     @zoom-changed="(limits) =>
     {
-      $data.cpuConfig.startDate = limits.startDate;
-      $data.cpuConfig.endDate = limits.endDate
+      $data.cpuUsageConfig.startDate = limits.startDate;
+      $data.cpuUsageConfig.endDate = limits.endDate
     }"
-    @reload-chart="refreshChartDates"
+    @reload-chart="refreshCpuUsageChartDates"
+  />
+  <Chart
+    v-if="cpuNumberOfTasksConfig.reloadingChart === false"
+    name="CPU"
+    :get-data-promise="CpuNumberOfTasksDatasetLoader"
+    @zoom-changed="(limits) =>
+    {
+      $data.cpuNumberOfTasksConfig.startDate = limits.startDate;
+      $data.cpuNumberOfTasksConfig.endDate = limits.endDate
+    }"
+    @reload-chart="refreshCpuNumberOfTasksChartDates"
   />
 </template>

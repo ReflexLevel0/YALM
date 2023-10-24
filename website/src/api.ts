@@ -14,10 +14,29 @@ export class Api {
     });
   }
 
-  static getCpuLogs(startDate: Date, endDate: Date) {
-    const startDateString = startDate === null ? "" : moment(startDate).format("yyyy-MM-DD HH:mm:ss");
-    const endDateString = endDate === null ? "" : moment(endDate).format("yyyy-MM-DD HH:mm:ss");
-    const queryString = `{ cpu(serverId: 0, startDateTime: "${startDateString}", endDateTime: "${endDateString}") {date, numberOfTasks, usage} }`;
+  private static dateToString(date: Date){
+    return date === null ? "" : moment(date).format("yyyy-MM-DD HH:mm:ss")
+  }
+
+  static getCpuUsage(startDate: Date, endDate: Date) {
+    const queryString = `
+    { 
+      cpu(serverId: 0, startDateTime: "${this.dateToString(startDate)}", endDateTime: "${this.dateToString(endDate)}") {
+        date, 
+        usage
+      } 
+    }`;
+    return this.executeQuery(queryString);
+  }
+
+  static getCpuNumberOfTasks(startDate: Date, endDate: Date){
+    const queryString = `
+    { 
+      cpu(serverId: 0, startDateTime: "${this.dateToString(startDate)}", endDateTime: "${this.dateToString(endDate)}") {
+        date, 
+        numberOfTasks
+      } 
+    }`;
     return this.executeQuery(queryString);
   }
 }

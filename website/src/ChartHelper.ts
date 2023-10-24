@@ -1,17 +1,42 @@
 import { Api } from "@/api";
 import { CpuLog } from "@/models/CpuLog";
+
 export class ChartHelper {
-  static async GetCpuDatasets(startDate: Date, endDate: Date) {
+  static async GetCpuUsageDataset(startDate: Date, endDate: Date) {
     let chartData: object;
-    return Api.getCpuLogs(startDate, endDate)
+    return Api.getCpuUsage(startDate, endDate)
       .then((r) => r.json())
       .then((json) => {
-        const numberOfTasksPoints: object[] = [];
-        const usagePoints: object[] = [];
+        const points: object[] = [];
         const cpuLogs: CpuLog[] = json.data.cpu;
         cpuLogs.forEach((log) => {
-          numberOfTasksPoints.push({ x: log.date, y: log.numberOfTasks });
-          usagePoints.push({ x: log.date, y: log.usage * 100 });
+          points.push({ x: log.date, y: log.usage * 100 });
+        });
+
+        chartData = {
+          datasets: [
+            {
+              showLine: true,
+              label: "usage",
+              borderColor: "#00ff04",
+              backgroundColor: "#00ff04",
+              data: points
+            }
+          ]
+        };
+        return chartData;
+      });
+  }
+
+  static async GetCpuNumberOfTasksDataset(startDate: Date, endDate: Date) {
+    let chartData: object;
+    return Api.getCpuNumberOfTasks(startDate, endDate)
+      .then((r) => r.json())
+      .then((json) => {
+        const points: object[] = [];
+        const cpuLogs: CpuLog[] = json.data.cpu;
+        cpuLogs.forEach((log) => {
+          points.push({ x: log.date, y: log.numberOfTasks });
         });
 
         chartData = {
@@ -21,16 +46,9 @@ export class ChartHelper {
               label: "number of tasks",
               borderColor: "#7acbf9",
               backgroundColor: "#7acbf9",
-              data: numberOfTasksPoints,
-            },
-            {
-              showLine: true,
-              label: "usage",
-              borderColor: "#00ff04",
-              backgroundColor: "#00ff04",
-              data: usagePoints,
-            },
-          ],
+              data: points
+            }
+          ]
         };
         return chartData;
       });

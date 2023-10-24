@@ -100,11 +100,12 @@ export default defineComponent({
         this.$data.noData = dataCount === 0
         this.loadingData = false;
         this.loadedData = true;
-      }).catch(() => {
+      }).catch(err => {
+        console.log(err)
         this.loadingData = false;
         this.loadedData = false;
         this.apiError = true;
-      });
+      })
     },
     emitZoomChanged(chart){
       let chartJS = chart.chart
