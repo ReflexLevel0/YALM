@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hotchocolate.AspNetCore" Version="13.5.1" />
+    <PackageReference Include="Hotchocolate.AspNetCore" Version="13.6.0-preview.31" />
     <PackageReference Include="Npgsql" Version="8.0.0-preview.4" />
   </ItemGroup>
 
@@ -16,6 +16,10 @@
     <EmbeddedResource Include="dbConnectionString.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>

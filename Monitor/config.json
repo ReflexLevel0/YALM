@@ -1,5 +1,6 @@
 {
-  "IntervalInSeconds": 300,
+  "ApiUrl": "http://localhost:3000/graphql",
+  "IntervalInSeconds": 3,
   "Cpu": true,
   "Memory": true,
   "Storage": true,

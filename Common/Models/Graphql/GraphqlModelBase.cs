@@ -1,4 +1,4 @@
-namespace API.Models.Graphql;
+namespace Common.Models.Graphql;
 
 public class GraphqlModelBase
 {

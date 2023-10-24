@@ -1,5 +1,5 @@
 using API.Models.Db;
-using API.Models.Graphql;
+using Common.Models.Graphql;
 
 namespace API;
 

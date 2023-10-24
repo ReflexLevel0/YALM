@@ -2,6 +2,7 @@ namespace Monitor;
 
 public class Config
 {
+	public string ApiUrl { get; set; } = "";
 	public int IntervalInSeconds { get; set; }
 	public bool Cpu { get; set; }
 	public bool Memory { get; set; }
