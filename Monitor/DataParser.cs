@@ -13,6 +13,7 @@ public class DataParser
 		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
 		for (int i = 0; i < lines.Count; i++)
 		{
+			Console.WriteLine(lines[i]);
 			switch (i)
 			{
 				case 1:
@@ -23,7 +24,9 @@ public class DataParser
 				}
 				case 2:
 				{
-					double cpuUsage = (100 - double.Parse(lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries).Skip(7).First())) / 100;
+					string idleString = lines[i].Split(',', StringSplitOptions.RemoveEmptyEntries).Skip(3).First();
+					double idle = double.Parse(idleString.Split("id").First().Trim());
+					double cpuUsage = (100 - idle) / 100;
 					cpu.Usage = cpuUsage;
 					break;
 				}
