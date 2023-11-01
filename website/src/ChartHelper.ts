@@ -2,6 +2,10 @@ import { Api } from "@/api";
 import { CpuLog } from "@/models/CpuLog";
 
 export class ChartHelper {
+  static DateToString(date: Date){
+    return date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+  }
+
   static async GetCpuUsageDataset(startDate: Date, endDate: Date) {
     let chartData: object;
     return Api.getCpuUsage(startDate, endDate)
@@ -10,7 +14,10 @@ export class ChartHelper {
         const points: object[] = [];
         const cpuLogs: CpuLog[] = json.data.cpu;
         cpuLogs.forEach((log) => {
-          points.push({ x: log.date, y: log.usage * 100 });
+          points.push({
+            x: this.DateToString(new Date(Date.parse(log.date))),
+            y: log.usage * 100
+          });
         });
 
         chartData = {
@@ -36,7 +43,10 @@ export class ChartHelper {
         const points: object[] = [];
         const cpuLogs: CpuLog[] = json.data.cpu;
         cpuLogs.forEach((log) => {
-          points.push({ x: log.date, y: log.numberOfTasks });
+          points.push({
+            x: this.DateToString(new Date(Date.parse(log.date))),
+            y: log.numberOfTasks
+          });
         });
 
         chartData = {

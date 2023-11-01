@@ -15,7 +15,9 @@ export class Api {
   }
 
   private static dateToString(date: Date){
-    return date === null ? "" : moment(date).format("yyyy-MM-DD HH:mm:ss")
+    if(date === null) return ""
+    date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
+    return moment(date).format("yyyy-MM-DD HH:mm:ss")
   }
 
   static getCpuUsage(startDate: Date, endDate: Date) {
@@ -26,6 +28,7 @@ export class Api {
         usage
       } 
     }`;
+    console.log(queryString)
     return this.executeQuery(queryString);
   }
 
