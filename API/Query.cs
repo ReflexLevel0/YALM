@@ -54,7 +54,7 @@ public class Query
 			//between the last log and the current one so that the charts goes to 0 in case of break
 			if (lastDate != null && breakDate != null && cpuLog.Date != lastDate)
 			{
-				if(cpuLogs.Count != 0) yield return CombineCpuLogs();
+				if (cpuLogs.Count != 0) yield return CombineCpuLogs();
 				yield return new Cpu(serverId, (DateTime)breakDate, 0, 0);
 				yield return new Cpu(serverId, cpuLog.Date.Subtract(new TimeSpan(0, 0, 0, 1)), 0, 0);
 			}
@@ -84,22 +84,26 @@ public class Query
 	{
 		bool hasStart = DateTime.TryParse(startDateString, out var startDate);
 		bool hasEnd = DateTime.TryParse(endDateString, out var endDate);
-		if (hasStart == false)
+		
+		//Getting first log date
+		string startQuery = $"SELECT date FROM {tableName} " +
+		                    $"{(hasStart ? $"WHERE date>='{startDateString}'" : "")} " +
+		                    $"ORDER BY date LIMIT 1";
+		await foreach (var reader in _db.ExecuteReaderAsync(startQuery))
 		{
-			await foreach (var reader in _db.ExecuteReaderAsync($"SELECT date FROM {tableName} ORDER BY date LIMIT 1"))
-			{
-				startDate = reader.GetDateTime(0);
-			}
+			startDate = reader.GetDateTime(0);
+		}
+		
+		//Getting last log date
+		string endQuery = $"SELECT date FROM {tableName} " +
+		                  $"{(hasEnd ? $"WHERE date<='{endDateString}'" : "")} " +
+		                  $"ORDER BY date DESC LIMIT 1";
+		await foreach (var reader in _db.ExecuteReaderAsync(endQuery))
+		{
+			endDate = reader.GetDateTime(0);
 		}
 
-		if (hasEnd == false)
-		{
-			await foreach (var reader in _db.ExecuteReaderAsync($"SELECT date FROM {tableName} ORDER BY date DESC LIMIT 1"))
-			{
-				endDate = reader.GetDateTime(0);
-			}
-		}
-
+		//Interval is calculated based on the range between first and last log
 		return (int)endDate.Subtract(startDate).TotalHours;
 	}
 
