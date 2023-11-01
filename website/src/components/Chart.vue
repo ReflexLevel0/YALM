@@ -88,6 +88,7 @@ export default defineComponent({
     };
   },
   async mounted() {
+    this.$data.options.scales = this.$props.scales
     await this.refreshData()
   },
   methods: {
@@ -126,6 +127,10 @@ export default defineComponent({
     },
     getDataPromise: {
       required: true,
+    },
+    scales: {
+      type: Object,
+      required: true
     },
   },
   watch: {

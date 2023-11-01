@@ -83,6 +83,7 @@ export default {
   <Chart
     v-if="cpuUsageConfig.reloadingChart === false"
     name="CPU"
+    :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
     :get-data-promise="CpuUsageDatasetLoader"
     @zoom-changed="(limits) =>
     {
@@ -94,6 +95,7 @@ export default {
   <Chart
     v-if="cpuNumberOfTasksConfig.reloadingChart === false"
     name="CPU"
+    :scales="{ x: { type: 'time' }, y: { min: 0 } }"
     :get-data-promise="CpuNumberOfTasksDatasetLoader"
     @zoom-changed="(limits) =>
     {
