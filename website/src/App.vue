@@ -78,8 +78,8 @@ export default {
 };
 </script>
 <template>
-  <VueDatePicker v-model="startDate" />
-  <VueDatePicker v-model="endDate" />
+  <VueDatePicker v-model="startDate" format="yyyy-MM-dd HH:mm:ss" />
+  <VueDatePicker v-model="endDate" format="yyyy-MM-dd HH:mm:ss" />
   <Chart
     v-if="cpuUsageConfig.reloadingChart === false"
     name="CPU"
