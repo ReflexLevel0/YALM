@@ -17,7 +17,7 @@ export class Api {
   private static dateToString(date: Date){
     if(date === null) return ""
     date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
-    return moment(date).format("yyyy-MM-DD HH:mm:ss")
+    return moment(date).format("yyyy-MM-DD HH:mm")
   }
 
   static getCpuUsage(startDate: Date, endDate: Date) {

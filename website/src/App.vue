@@ -53,6 +53,12 @@ export default {
       }
     }
   },
+  created() {
+    //Setting start date to be a week ago by default
+    let weekAgo = new Date(Date.now())
+    weekAgo = new Date(weekAgo.setDate(weekAgo.getDate() - 7))
+    this.$data.startDate = weekAgo
+  },
   methods: {
     refreshChartDates(){
       this.refreshCpuUsageChartDates()
@@ -78,8 +84,8 @@ export default {
 };
 </script>
 <template>
-  <VueDatePicker v-model="startDate" format="yyyy-MM-dd HH:mm:ss" />
-  <VueDatePicker v-model="endDate" format="yyyy-MM-dd HH:mm:ss" />
+  <VueDatePicker v-model="startDate" format="yyyy-MM-dd HH:mm" />
+  <VueDatePicker v-model="endDate" format="yyyy-MM-dd HH:mm" />
   <Chart
     v-if="cpuUsageConfig.reloadingChart === false"
     name="CPU"
