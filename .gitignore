@@ -37,3 +37,5 @@ Desktop.ini
 
 API/dbConnectionString.txt
 data.sql
+Monitor/log_date.txt
+website/.browserslistrc
