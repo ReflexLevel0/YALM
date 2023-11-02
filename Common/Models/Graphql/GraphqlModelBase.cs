@@ -1,9 +1,9 @@
 namespace Common.Models.Graphql;
 
-public class GraphqlModelBase
+public abstract class GraphqlModelBase
 {
 	public int ServerId { get; }
-	public DateTime Date { get; }
+	public DateTime Date { get; set; }
 
 	protected GraphqlModelBase(int serverId, DateTime date)
 	{
