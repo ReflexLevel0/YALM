@@ -47,30 +47,30 @@ internal class Monitor
 				};
 			}
 
-			// if (log.MemoryLog != null)
-			// {
-			// 	variableStringBuilder.Append("$memory: MemoryLogInput!,");
-			// 	queryStringBuilder.Append("""
-			// 	                          addMemoryLog(memory: $memory){
-			// 	                          		error
-			// 	                          },
-			// 	                          """);
-			// 	variables.memory = new
-			// 	{
-			// 		serverId = 0,
-			// 		date,
-			// 		interval = config.IntervalInMinutes,
-			// 		usedMemoryMb = log.MemoryLog?.UsedMemoryMb,
-			// 		totalMemoryMb = log.MemoryLog?.TotalMemoryMb
-			// 	};
-			// }
-
+			if (log.MemoryLog != null)
+			{
+				variableStringBuilder.Append("$memory: MemoryLogInput!,");
+				queryStringBuilder.Append("""
+				                          addMemoryLog(memory: $memory){
+				                          		error
+				                          },
+				                          """);
+				variables.memory = new
+				{
+					serverId = 0,
+					date,
+					interval = config.IntervalInMinutes,
+					mbUsed = (int)log.MemoryLog.UsedMemoryMb,
+					mbTotal = (int)log.MemoryLog.TotalMemoryMb
+				};
+			}
+			
 			//Configuring the request
 			var request = new GraphQLRequest(
 				$"mutation({variableStringBuilder}){{{queryStringBuilder}}}",
 				variables: variables
 			);
-
+			
 			try
 			{
 				//Sending the request and printing out result/errors

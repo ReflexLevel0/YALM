@@ -48,17 +48,33 @@ public class Mutation
 
 	public async Task<Payload<Cpu>> AddCpuLog(CpuLog cpu)
 	{
+		string date = DateToString(cpu.Date);
 		var payload = await AddLog<Cpu>(reader =>
 			{
 				var log = _db.ParseCpuRecord(reader);
 				return new Cpu(log.ServerId, log.Date, log.Usage, log.NumberOfTasks);
 			},
 			$"INSERT INTO Cpu(serverId, date, interval, usage, numberoftasks) " +
-			$"VALUES ({cpu.ServerId}, '{cpu.Date:yyyy-MM-dd HH:mm:ss}', " +
-			$"{cpu.Interval}, {cpu.Usage}, {cpu.NumberOfTasks})",
+			$"VALUES ({cpu.ServerId}, '{date}', {cpu.Interval}, {cpu.Usage}, {cpu.NumberOfTasks})",
 			$"SELECT serverid, date, interval, usage, numberoftasks " +
-			$"FROM Cpu WHERE serverId = {cpu.ServerId} AND " +
-			$"date = '{cpu.Date:yyyy-MM-dd HH:mm:ss}'");
+			$"FROM Cpu WHERE serverId = {cpu.ServerId} AND date = '{date}'");
 		return payload;
 	}
+
+	public async Task<Payload<Memory>> AddMemoryLog(MemoryLog memory)
+	{
+		string date = DateToString(memory.Date);
+		var payload = await AddLog<Memory>(reader =>
+			{
+				var log = _db.ParseMemoryRecord(reader);
+				return new Memory(log.ServerId, log.Date, log.MbUsed, log.MbTotal);
+			},
+			$"INSERT INTO Memory(serverId, date, interval, mbUsed, mbTotal)" +
+			$"VALUES({memory.ServerId}, '{date}', {memory.Interval}, {memory.MbUsed}, {memory.MbTotal})",
+			$"SELECT serverid, date, interval, mbUsed, mbTotal " +
+			$"FROM Memory WHERE serverId = {memory.ServerId} AND date = '{date}'");
+		return payload;
+	}
+
+	private static string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
 }

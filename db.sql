@@ -17,7 +17,7 @@ CREATE TABLE program
 	memoryutilizationpercentage numeric
 );
 
-CREATE TABLE ram
+CREATE TABLE memory
 (
 	serverid integer   NOT NULL,
 	date     timestamp NOT NULL,

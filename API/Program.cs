@@ -1,5 +1,4 @@
 using API;
-using API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services

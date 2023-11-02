@@ -47,4 +47,14 @@ public class Db : IDb
 		int numberOfTasks = reader.GetInt32(4);
 		return new CpuLog(id, date, logInterval, usage, numberOfTasks);
 	}
+
+	public MemoryLog ParseMemoryRecord(NpgsqlDataReader reader)
+	{
+		int id = reader.GetInt32(0);
+		var date = reader.GetDateTime(1);
+		int logInterval = reader.GetInt32(2);
+		int mbUsed = reader.GetInt32(3);
+		int mbTotal = reader.GetInt32(4);
+		return new MemoryLog(id, date, logInterval, mbUsed, mbTotal);
+	}
 }

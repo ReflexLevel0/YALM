@@ -4,6 +4,8 @@ public class MemoryLog : LogBase
 {
 	public int MbUsed { get; }
 	public int MbTotal { get; }
+	
+	[GraphQLIgnore]
 	public double Usage => (double)MbUsed / MbTotal;
 
 	public MemoryLog(int serverId, DateTime date, int interval, int mbUsed, int mbTotal) : base(serverId, date, interval)

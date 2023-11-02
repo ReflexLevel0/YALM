@@ -33,4 +33,11 @@ public interface IDb
 	/// <param name="reader"></param>
 	/// <returns></returns>
 	CpuLog ParseCpuRecord(NpgsqlDataReader reader);
+
+	/// <summary>
+	/// Parses a database record and turns it into <see cref="MemoryLog"/>
+	/// </summary>
+	/// <param name="reader"></param>
+	/// <returns></returns>
+	MemoryLog ParseMemoryRecord(NpgsqlDataReader reader);
 }
