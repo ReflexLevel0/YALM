@@ -107,8 +107,8 @@ public class Query
 		return (int)endDate.Subtract(startDate).TotalHours;
 	}
 
-	public RamLog Ram()
+	public MemoryLog Ram()
 	{
-		return new RamLog(0, DateTime.Today, 5, 1512, 8192);
+		return new MemoryLog(0, DateTime.Today, 5, 1512, 8192);
 	}
 }

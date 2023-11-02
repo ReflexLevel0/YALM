@@ -13,50 +13,52 @@ public class Mutation
 	{
 		_db = db;
 	}
-	
+
 	/// <summary>
 	/// Used for adding a generic log to the database 
 	/// </summary>
-	/// <param name="readerToLogMethod">Method used to convert <see cref="NpgsqlDataReader"/> record to <see cref="TLog"/></param>
+	/// <param name="readerToGraphqlObject">Method used to convert <see cref="NpgsqlDataReader"/> record to a GraphQL object which is ready to be returned to the user</param>
 	/// <param name="insertQuery">SQL query used for inserting the log into the database</param>
 	/// <param name="fetchQuery">SQL query for fetching the inserted log from the database</param>
-	/// <typeparam name="TLog">Log that was inserted into the database</typeparam>
+	/// <typeparam name="TModel">Log that was inserted into the database</typeparam>
 	/// <returns></returns>
-	private async Task<TLog?> AddLog<TLog>(Func<NpgsqlDataReader, TLog> readerToLogMethod, string insertQuery, string fetchQuery) where TLog : LogBase
+	private async Task<Payload<TModel>> AddLog<TModel>(Func<NpgsqlDataReader, TModel> readerToGraphqlObject, string insertQuery, string fetchQuery) where TModel : GraphqlModelBase
 	{
-		TLog? log = null;
+		TModel? log = null;
 
-		//Inserting the log into the database
-		await _db.ExecuteNonQueryAsync(insertQuery);
-
-		//Reading the log that was just added so it can be returned
-		await foreach (var reader in _db.ExecuteReaderAsync(fetchQuery))
-		{
-			log = readerToLogMethod(reader);
-			break;
-		}
-
-		return log;
-	}
-
-	public async Task<CpuAddedPayload> AddCpuLog(CpuLog cpu)
-	{
-		CpuLog? log;
 		try
 		{
-			log = await AddLog<CpuLog>(reader => _db.ParseCpuRecord(reader),
-				$"INSERT INTO Cpu(serverId, date, interval, usage, numberoftasks) " +
-				$"VALUES ({cpu.ServerId}, '{cpu.Date:yyyy-MM-dd HH:mm:ss}', " +
-				$"{cpu.Interval}, {cpu.Usage}, {cpu.NumberOfTasks})",
-				$"SELECT serverid, date, interval, usage, numberoftasks " +
-				$"FROM Cpu WHERE serverId = {cpu.ServerId} AND " +
-				$"date = '{cpu.Date:yyyy-MM-dd HH:mm:ss}'");
+			//Inserting the log into the database
+			await _db.ExecuteNonQueryAsync(insertQuery);
+
+			//Reading the log that was just added so it can be returned
+			await foreach (var reader in _db.ExecuteReaderAsync(fetchQuery))
+			{
+				log = readerToGraphqlObject(reader);
+				break;
+			}
 		}
 		catch (DbException ex)
 		{
-			return new CpuAddedPayload(null, ex.ToString());
+			return new Payload<TModel> { Error = ex.ToString() };
 		}
 
-		return new CpuAddedPayload(log == null ? null : new Cpu(log.ServerId, log.Date, log.Usage, log.NumberOfTasks), null);
+		return new Payload<TModel> { Log = log };
+	}
+
+	public async Task<Payload<Cpu>> AddCpuLog(CpuLog cpu)
+	{
+		var payload = await AddLog<Cpu>(reader =>
+			{
+				var log = _db.ParseCpuRecord(reader);
+				return new Cpu(log.ServerId, log.Date, log.Usage, log.NumberOfTasks);
+			},
+			$"INSERT INTO Cpu(serverId, date, interval, usage, numberoftasks) " +
+			$"VALUES ({cpu.ServerId}, '{cpu.Date:yyyy-MM-dd HH:mm:ss}', " +
+			$"{cpu.Interval}, {cpu.Usage}, {cpu.NumberOfTasks})",
+			$"SELECT serverid, date, interval, usage, numberoftasks " +
+			$"FROM Cpu WHERE serverId = {cpu.ServerId} AND " +
+			$"date = '{cpu.Date:yyyy-MM-dd HH:mm:ss}'");
+		return payload;
 	}
 }
