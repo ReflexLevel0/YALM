@@ -144,9 +144,9 @@ public class DataParser
 			string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			string filesystem = parts[0];
 			string mountPath = parts[5];
-			double bytes = double.Parse(parts[1].Split('K').First()) * 1024;
-			double usedBytes = double.Parse(parts[2].Split('K').First()) * 1024;
-			yield return new StorageLog(filesystem, mountPath, bytes, usedBytes);
+			long bytes = long.Parse(parts[1].Split('K').First()) * 1024;
+			long usedBytes = long.Parse(parts[2].Split('K').First()) * 1024;
+			yield return new StorageLog(filesystem, mountPath, bytes, usedBytes);;
 		}
 	}
 

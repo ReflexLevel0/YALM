@@ -65,8 +65,8 @@ public class Db : IDb
 		int logInterval = reader.GetInt32(2);
 		string filesystem = reader.GetString(3);
 		string mountpath = reader.GetString(4);
-		int bytesTotal = reader.GetInt32(5);
-		int bytesUsed = reader.GetInt32(6);
+		long bytesTotal = reader.GetInt64(5);
+		long bytesUsed = reader.GetInt64(6);
 		return new StorageLog(id, date, logInterval, filesystem, mountpath, bytesTotal, bytesUsed);
 	}
 }

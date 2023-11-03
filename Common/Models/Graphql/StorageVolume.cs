@@ -4,10 +4,10 @@ public class StorageVolume
 {
     public string Filesystem { get; }
     public string MountPath { get; }
-    public int Bytes { get; }
-    public int UsedBytes { get; }
+    public long Bytes { get; }
+    public long UsedBytes { get; }
 
-    public StorageVolume(string filesystem, string mountPath, int bytes, int usedBytes)
+    public StorageVolume(string filesystem, string mountPath, long bytes, long usedBytes)
     {
         Filesystem = filesystem;
         MountPath = mountPath;

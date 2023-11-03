@@ -1,3 +1,11 @@
+DROP TABLE IF EXISTS cpu CASCADE ;
+DROP TABLE IF EXISTS program CASCADE ;
+DROP TABLE IF EXISTS memory CASCADE ;
+DROP TABLE IF EXISTS service CASCADE ;
+DROP TABLE IF EXISTS servicelog CASCADE ;
+DROP TABLE IF EXISTS servicename CASCADE ;
+DROP TABLE IF EXISTS servicestatus CASCADE ;
+DROP TABLE IF EXISTS storage CASCADE ;
 CREATE TABLE cpu
 (
 	serverid      integer   NOT NULL,
@@ -34,8 +42,8 @@ CREATE TABLE storage
 	interval   integer,
 	filesystem varchar(256) NOT NULL,
 	mountpath  varchar(512),
-	bytestotal integer,
-	usedbytes  integer,
+	bytestotal bigint,
+	usedbytes  bigint,
 	PRIMARY KEY (serverid, date, filesystem)
 );
 
@@ -80,11 +88,3 @@ CREATE TABLE servicelog
 );
 
 SELECT * FROM cpu;
-
-UPDATE cpu
-SET numberoftasks = floor(random() * 100)
-WHERE TRUE;
-
-UPDATE cpu
-    set INTERVAL = 1
-WHERE interval <> 1;

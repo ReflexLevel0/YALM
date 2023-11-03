@@ -4,11 +4,11 @@ public class StorageLog
 {
 	public string Filesystem { get; }
 	public string MountPath { get; }
-	public double Bytes { get; }
-	public double UsedBytes { get; }
-	public double UsedPercentage => UsedBytes / Bytes;
+	public long Bytes { get; }
+	public long UsedBytes { get; }
+	public double UsedPercentage => (double)UsedBytes / Bytes;
 
-	public StorageLog(string filesystem, string mountPath, double bytes, double usedBytes)
+	public StorageLog(string filesystem, string mountPath, long bytes, long usedBytes)
 	{
 		Filesystem = filesystem;
 		MountPath = mountPath;
