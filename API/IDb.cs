@@ -40,4 +40,11 @@ public interface IDb
 	/// <param name="reader"></param>
 	/// <returns></returns>
 	MemoryLog ParseMemoryRecord(NpgsqlDataReader reader);
+
+	/// <summary>
+	/// Parses a database record and turns it into <see cref="StorageLog"/>
+	/// </summary>
+	/// <param name="reader"></param>
+	/// <returns></returns>
+	StorageLog ParseStorageRecord(NpgsqlDataReader reader);
 }

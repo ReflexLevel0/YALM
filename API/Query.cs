@@ -44,4 +44,12 @@ public class Query
 			yield return log;
 		}
 	}
+
+	// public async IAsyncEnumerable<Storage> Storage(int serverId, string? startDateTime, string? endDateTime, int? interval, string? method)
+	// {
+	// 	string sqlSelectQuery = $"SELECT serverid, date, interval, filesystem, mountpath, bytestotal, usedbytes " +
+	// 	                        $"FROM storage " +
+	// 	                        $"WHERE {QueryHelper.LimitSqlByParameters(serverId, startDateTime, endDateTime)} " +
+	// 	                        $"ORDER BY date";
+	// }
 }

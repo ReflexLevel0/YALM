@@ -29,7 +29,8 @@ internal class Monitor
 			var variables = new GraphqlVariables();
 			var variableStringBuilder = new StringBuilder(256);
 			var queryStringBuilder = new StringBuilder(1024);
-			if (log.CpuLog != null)
+			
+            if (log.CpuLog != null)
 			{
 				variableStringBuilder.Append("$cpu: CpuLogInput!,");
 				queryStringBuilder.Append("""
@@ -52,7 +53,7 @@ internal class Monitor
 				variableStringBuilder.Append("$memory: MemoryLogInput!,");
 				queryStringBuilder.Append("""
 				                          addMemoryLog(memory: $memory){
-				                          		error
+				                              error
 				                          },
 				                          """);
 				variables.memory = new
@@ -62,6 +63,23 @@ internal class Monitor
 					interval = config.IntervalInMinutes,
 					mbUsed = (int)log.MemoryLog.UsedMemoryMb,
 					mbTotal = (int)log.MemoryLog.TotalMemoryMb
+				};
+			}
+
+			if (log.StorageLogs != null)
+			{
+				variableStringBuilder.Append("$storage: StorageLogInput!,");
+				queryStringBuilder.Append("""
+				                          addStorageLog(storage: $storage){
+				                              error
+				                          },
+				                          """);
+				variables.storage = new
+				{
+					serverId = 0,
+					date,
+					interval = config.IntervalInMinutes,
+					sorageVolumes = log.StorageLogs
 				};
 			}
 			

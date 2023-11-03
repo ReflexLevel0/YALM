@@ -57,4 +57,16 @@ public class Db : IDb
 		int mbTotal = reader.GetInt32(4);
 		return new MemoryLog(id, date, logInterval, mbUsed, mbTotal);
 	}
+
+	public StorageLog ParseStorageRecord(NpgsqlDataReader reader)
+	{
+		int id = reader.GetInt32(0);
+		var date = reader.GetDateTime(1);
+		int logInterval = reader.GetInt32(2);
+		string filesystem = reader.GetString(3);
+		string mountpath = reader.GetString(4);
+		int bytesTotal = reader.GetInt32(5);
+		int bytesUsed = reader.GetInt32(6);
+		return new StorageLog(id, date, logInterval, filesystem, mountpath, bytesTotal, bytesUsed);
+	}
 }

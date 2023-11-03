@@ -76,5 +76,22 @@ public class Mutation
 		return payload;
 	}
 
+	public async Task<Payload<Storage>> AddStorageLog(StorageLog storage)
+	{
+		string date = DateToString(storage.Date);
+		var payload = await AddLog<Storage>(reader =>
+		{
+			var log = _db.ParseStorageRecord(reader);
+			return new Storage(log.ServerId, log.Date, new List<StorageVolume>()
+			{
+				new StorageVolume(log.Filesystem, log.Mountpath, (int)log.BytesTotal, (int)log.UsedBytes)
+			});
+		},$"INSERT INTO storage(serverid, date, interval, filesystem, mountpath, bytestotal, usedbytes) " +
+		  $"VALUES({storage.ServerId}, '{date}', {storage.Interval}, '{storage.Filesystem}', '{storage.Mountpath}', {storage.BytesTotal}, {storage.UsedBytes})",
+			$"SELECT serverid, date, interval, filesystem, mountpath, bytestotal, usedbytes " +
+			$"FROM storage WHERE serverid = {storage.ServerId} AND date = '{date}'");
+		return payload;
+	}
+	
 	private static string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
 }
