@@ -1,90 +1,85 @@
-DROP TABLE IF EXISTS cpu CASCADE ;
-DROP TABLE IF EXISTS program CASCADE ;
-DROP TABLE IF EXISTS memory CASCADE ;
-DROP TABLE IF EXISTS service CASCADE ;
-DROP TABLE IF EXISTS servicelog CASCADE ;
-DROP TABLE IF EXISTS servicename CASCADE ;
-DROP TABLE IF EXISTS servicestatus CASCADE ;
-DROP TABLE IF EXISTS storage CASCADE ;
+DROP SCHEMA public CASCADE ;
+CREATE SCHEMA public;
 CREATE TABLE cpu
 (
-	serverid      integer   NOT NULL,
-	date          timestamp NOT NULL,
-	interval      integer,
-	usage         numeric,
-	numberoftasks integer,
-	PRIMARY KEY (serverid, date)
+    serverid      integer   NOT NULL,
+    date          timestamp NOT NULL,
+    interval      integer   NOT NULL,
+    usage         numeric,
+    numberoftasks integer,
+    PRIMARY KEY (serverid, date)
 );
 
 CREATE TABLE program
 (
-	serverid                    integer,
-	date                        timestamp,
-	interval                    integer,
-	cpuutilizationpercentage    numeric,
-	memoryutilizationpercentage numeric
+    serverid                    integer   NOT NULL,
+    date                        timestamp NOT NULL,
+    interval                    integer   NOT NULL,
+    cpuutilizationpercentage    numeric,
+    memoryutilizationpercentage numeric
 );
 
 CREATE TABLE memory
 (
-	serverid integer   NOT NULL,
-	date     timestamp NOT NULL,
-	interval integer,
-	mbused   integer,
-	mbtotal  integer,
-	PRIMARY KEY (serverid, date)
+    serverid integer   NOT NULL,
+    date     timestamp NOT NULL,
+    interval integer   NOT NULL,
+    mbused   integer,
+    mbtotal  integer,
+    PRIMARY KEY (serverid, date)
 );
 
-CREATE TABLE storage
+CREATE TABLE partition(
+    uuid varchar(64) NOT NULL,
+    filesystemName varchar(64),
+    filesystemVersion varchar(64),
+    label varchar(256),
+    PRIMARY KEY (uuid)
+);
+
+CREATE TABLE storageLog
 (
-	serverid   integer      NOT NULL,
-	date       timestamp    NOT NULL,
-	interval   integer,
-	filesystem varchar(256) NOT NULL,
-	mountpath  varchar(512),
-	bytestotal bigint,
-	usedbytes  bigint,
-	PRIMARY KEY (serverid, date, filesystem)
+    serverid   integer      NOT NULL,
+    date       timestamp    NOT NULL,
+    uuid       varchar(64)  NOT NULL,
+    interval   integer      NOT NULL,
+    bytestotal bigint,
+    usage  decimal(3,2),
+    mountpath varchar(1024),
+    PRIMARY KEY (serverid, date, uuid)
 );
 
 CREATE TABLE servicename
 (
-	serviceid integer NOT NULL
-		PRIMARY KEY,
-	name      varchar(64)
+    serviceid integer NOT NULL PRIMARY KEY,
+    name      varchar(64)
 );
 
 CREATE TABLE servicestatus
 (
-	statusid integer NOT NULL
-		PRIMARY KEY,
-	name     varchar(64)
+    statusid integer NOT NULL PRIMARY KEY,
+    name     varchar(64)
 );
 
 CREATE TABLE service
 (
-	serverid          integer   NOT NULL,
-	serviceid         integer   NOT NULL
-		REFERENCES servicename,
-	date              timestamp NOT NULL,
-	interval          integer,
-	ramusagemegabytes integer,
-	statusid          integer
-		REFERENCES servicestatus,
-	tasks             integer,
-	cpuseconds        numeric,
-	PRIMARY KEY (serverid, serviceid, date)
+    serverid          integer   NOT NULL,
+    serviceid         integer   NOT NULL REFERENCES servicename,
+    date              timestamp NOT NULL,
+    interval          integer   NOT NULL,
+    ramusagemegabytes integer,
+    statusid          integer REFERENCES servicestatus,
+    tasks             integer,
+    cpuseconds        numeric,
+    PRIMARY KEY (serverid, serviceid, date)
 );
 
 CREATE TABLE servicelog
 (
-	serverid    integer       NOT NULL,
-	serviceid   integer       NOT NULL
-		REFERENCES servicename,
-	interval    integer,
-	date        timestamp     NOT NULL,
-	messagetext varchar(1024) NOT NULL,
-	PRIMARY KEY (serverid, serviceid, date, messagetext)
+    serverid    integer       NOT NULL,
+    serviceid   integer       NOT NULL REFERENCES servicename,
+    interval    integer       NOT NULL,
+    date        timestamp     NOT NULL,
+    messagetext varchar(1024) NOT NULL,
+    PRIMARY KEY (serverid, serviceid, date, messagetext)
 );
-
-SELECT * FROM cpu;
