@@ -31,8 +31,8 @@ public class Query
 		
 		Func<IList<CpuLog>, Cpu> combineLogsFunc = logs =>
 		{
-			double usageProcessed = QueryHelper.CombineValues(method, logs.Select(c => c.Usage));
-			int numberOfTasksProcessed = (int)QueryHelper.CombineValues(method, logs.Select(c => (double)c.NumberOfTasks));
+			double usageProcessed = QueryHelper.CombineValues(method, logs.Select(c => c.Usage).ToList());
+			int numberOfTasksProcessed = (int)QueryHelper.CombineValues(method, logs.Select(c => (double)c.NumberOfTasks).ToList());
 			return new Cpu(serverId, logs.First().Date, usageProcessed, numberOfTasksProcessed);
 		};
 		
@@ -63,8 +63,8 @@ public class Query
 
 		Func<IList<MemoryLog>, Memory> combineLogsFunc = logs =>
 		{
-			int mbused = (int)QueryHelper.CombineValues(method, logs.Select(l => (double)l.MbUsed));
-			int mbtotal = (int)QueryHelper.CombineValues(method, logs.Select(l => (double)l.MbTotal));
+			int mbused = (int)QueryHelper.CombineValues(method, logs.Select(l => (double)l.MbUsed).ToList());
+			int mbtotal = (int)QueryHelper.CombineValues(method, logs.Select(l => (double)l.MbTotal).ToList());
 			return new Memory(serverId, logs.First().Date, mbused, mbtotal);
 		};
 		
@@ -77,11 +77,29 @@ public class Query
 		}
 	}
 
-	// public async IAsyncEnumerable<Storage> Storage(int serverId, string? startDateTime, string? endDateTime, int? interval, string? method)
-	// {
-	// 	string sqlSelectQuery = $"SELECT serverid, date, interval, filesystem, mountpath, bytestotal, usedbytes " +
-	// 	                        $"FROM storage " +
-	// 	                        $"WHERE {QueryHelper.LimitSqlByParameters(serverId, startDateTime, endDateTime)} " +
-	// 	                        $"ORDER BY date";
-	// }
+	public async IAsyncEnumerable<Storage> Storage(int serverId, string? startDateTime, string? endDateTime, int? interval, string? method)
+	{
+		string selectQuery = $"SELECT serverid, date, interval, filesystem, mountpath, bytestotal, usedbytes " +
+		                     $"FROM storage " +
+		                     $"WHERE {QueryHelper.LimitSqlByParameters(serverId, startDateTime, endDateTime)} " +
+		                     $"ORDER BY filesystem,date";
+
+		Func<IList<StorageLog>, Storage> combineLogsFunc = logs =>
+		{
+			long usedBytes = (long)QueryHelper.CombineValues(method, logs.Select(s => s.UsedBytes).ToList());
+			long totalBytes = (long)QueryHelper.CombineValues(method, logs.Select(s => s.BytesTotal).ToList());
+			return new Storage(serverId, logs.First().Date, new[]
+			{
+				new StorageVolume(logs.First().Filesystem, logs.First().Mountpath, totalBytes, usedBytes)
+			});
+		};
+		
+		Func<NpgsqlDataReader, StorageLog> parseRecordFunc = reader => _db.ParseStorageRecord(reader);
+		var getEmptyRecordFunc = () => new Storage(serverId, DateTime.Now, new List<StorageVolume>());
+		
+		await foreach(var log in QueryHelper.GetLogs(_db, "Storage", selectQuery, combineLogsFunc, parseRecordFunc, getEmptyRecordFunc, startDateTime, endDateTime, interval))
+		{
+			yield return log;
+		}
+	}
 }

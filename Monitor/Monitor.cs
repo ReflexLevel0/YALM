@@ -66,7 +66,7 @@ internal class Monitor
 				};
 			}
 
-			if (log.StorageLogs != null)
+			if (log.StorageLogs != null && log.StorageLogs.Count != 0)
 			{
 				variableStringBuilder.Append("$storage: StorageLogInput!,");
 				queryStringBuilder.Append("""

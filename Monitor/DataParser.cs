@@ -1,5 +1,8 @@
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using Monitor.Models;
+using Monitor.Models.StorageJSON;
+using Newtonsoft.Json;
 
 namespace Monitor;
 
@@ -115,11 +118,12 @@ public class DataParser
 				service.Cpu = trimmedLine.Split("CPU: ").Last();
 			}
 		}
+
 		process.WaitForExit();
-		
+
 		//Getting service logs since the last time logging was executed
 		string arguments = "";
-		if (lastLogDate != null) arguments += $"--since=\"{lastLogDate:yyyy-MM-dd HH:mm:ss}\" "; 
+		if (lastLogDate != null) arguments += $"--since=\"{lastLogDate:yyyy-MM-dd HH:mm:ss}\" ";
 		arguments += $"--output=short-iso -u {serviceName}";
 		process = StartProcess("journalctl", arguments);
 		foreach (string logString in process.StandardOutput.ReadToEnd().Split('\n'))
@@ -137,16 +141,22 @@ public class DataParser
 
 	public static IEnumerable<StorageLog> GetStorageInfo()
 	{
-		var process = StartProcess("df", "-BK");
-		foreach (string line in process.StandardOutput.ReadToEnd().Split('\n').Skip(1))
+		var process = StartProcess("lsblk", "-p -f -b --json");
+		var jsonStorage = JsonConvert.DeserializeObject<StorageJson>(process.StandardOutput.ReadToEnd());
+		if (jsonStorage == null) throw new Exception("Can't parse storage info!");
+
+		foreach (var blockDevice in jsonStorage.BlockDevices)
 		{
-			if(string.IsNullOrWhiteSpace(line)) continue;
-			string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-			string filesystem = parts[0];
-			string mountPath = parts[5];
-			long bytes = long.Parse(parts[1].Split('K').First()) * 1024;
-			long usedBytes = long.Parse(parts[2].Split('K').First()) * 1024;
-			yield return new StorageLog(filesystem, mountPath, bytes, usedBytes);;
+			//Going through every partition and returning it
+			foreach (var child in blockDevice.Children)
+			{
+				if (child.Uuid == null) continue;
+				var fs = new Filesystem(child.FsType, child.FsVer);
+				string? mountpoint = blockDevice.Mountpoints.Count == 0 ? null : blockDevice.Mountpoints.First();
+				long? fsAvail = blockDevice.FsAvail == null ? null : long.Parse(blockDevice.FsAvail);
+				double? used = child.FsUse == null ? null : double.Parse(child.FsUse.Split('%').First()) / 100;
+				yield return new StorageLog(child.Uuid, child.Label, fs, mountpoint, fsAvail, used);
+			}
 		}
 	}
 

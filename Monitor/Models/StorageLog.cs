@@ -2,19 +2,22 @@ namespace Monitor.Models;
 
 public class StorageLog
 {
-	public string Filesystem { get; }
-	public string MountPath { get; }
-	public long Bytes { get; }
-	public long UsedBytes { get; }
-	public double UsedPercentage => (double)UsedBytes / Bytes;
+	public string UUID { get; }
+	public string? Label { get; }
+	public Filesystem Filesystem { get; }
+	public string? MountPath { get; }
+	public long? Bytes { get; }
+	public double? UsedPercentage { get; }
 
-	public StorageLog(string filesystem, string mountPath, long bytes, long usedBytes)
+	public StorageLog(string uuid, string? label, Filesystem filesystem, string? mountPath, long? bytes, double? usedPercentage)
 	{
+		UUID = uuid;
+		Label = label;
 		Filesystem = filesystem;
 		MountPath = mountPath;
 		Bytes = bytes;
-		UsedBytes = usedBytes;
+		UsedPercentage = usedPercentage;
 	}
 
-	public override string ToString() => $"{Filesystem} {MountPath} {Bytes} {UsedBytes} {UsedPercentage:P}";
+	public override string ToString() => $"{UUID} {Label} {Filesystem} {MountPath} {Bytes} {UsedPercentage:P}";
 }

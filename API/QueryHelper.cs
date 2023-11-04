@@ -28,21 +28,22 @@ public class QueryHelper
 		return result.ToString();
 	}
 
-	public static double CombineValues(string? method, IEnumerable<double> values)
+	public static double CombineValues<T>(string? method, IList<T> values)
 	{
+		bool longMode = values.All(v => v is long);
 		double result;
 		switch (method)
 		{
 			case null:
 			case "avg":
 			case "average":
-				result = values.Average();
+				result = longMode ? values.Cast<long>().Average() : values.Cast<double>().Average();
 				break;
 			case "min":
-				result = values.Min();
+				result = longMode ? values.Cast<long>().Min() : values.Cast<double>().Min();
 				break;
 			case "max":
-				result = values.Max();
+				result = longMode ? values.Cast<long>().Max() : values.Cast<double>().Max();
 				break;
 			default:
 				throw new Exception($"Invalid method '{method}'");
