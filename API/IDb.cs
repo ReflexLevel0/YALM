@@ -28,23 +28,23 @@ public interface IDb
 	Task<object?> ExecuteScalarAsync(string command);
 
 	/// <summary>
-	/// Parses a database record and turns it into <see cref="CpuLog"/>
+	/// Parses a database record and turns it into <see cref="CpuDbLog"/>
 	/// </summary>
 	/// <param name="reader"></param>
 	/// <returns></returns>
-	CpuLog ParseCpuRecord(NpgsqlDataReader reader);
+	CpuDbLog ParseCpuRecord(NpgsqlDataReader reader);
 
 	/// <summary>
-	/// Parses a database record and turns it into <see cref="MemoryLog"/>
+	/// Parses a database record and turns it into <see cref="MemoryDbLog"/>
 	/// </summary>
 	/// <param name="reader"></param>
 	/// <returns></returns>
-	MemoryLog ParseMemoryRecord(NpgsqlDataReader reader);
+	MemoryDbLog ParseMemoryRecord(NpgsqlDataReader reader);
 
 	/// <summary>
-	/// Parses a database record and turns it into <see cref="StorageLog"/>
+	/// Parses a database record and turns it into <see cref="StorageDbLog"/>
 	/// </summary>
 	/// <param name="reader"></param>
 	/// <returns></returns>
-	StorageLog ParseStorageRecord(NpgsqlDataReader reader);
+	StorageDbLog ParseStorageRecord(NpgsqlDataReader reader);
 }

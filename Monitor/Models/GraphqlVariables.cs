@@ -1,8 +1,10 @@
+using Common.Models.Graphql.InputModels;
+
 namespace Monitor.Models;
 
 public class GraphqlVariables
 {
-	public object? cpu;
-	public object? memory;
-	public object? storage;
+	public CpuInput cpu;
+	public MemoryInput memory;
+	public StorageInput storage;
 }

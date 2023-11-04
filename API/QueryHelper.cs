@@ -1,5 +1,5 @@
 using System.Text;
-using API.Models.Db;
+using Common.Models;
 using Common.Models.Graphql;
 using Npgsql;
 
@@ -111,7 +111,7 @@ public class QueryHelper
 		Func<TGraphqlLog> getEmptyLogFunc,
 		string? startDateTime,
 		string? endDateTime,
-		int? interval) where TLog : LogBase where TGraphqlLog : GraphqlModelBase
+		int? interval) where TLog : IDbLogBase where TGraphqlLog : GraphqlModelBase
 	{
 		DateTime? lastDate = null;
 		DateTime? breakDate = null;

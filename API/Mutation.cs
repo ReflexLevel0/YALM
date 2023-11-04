@@ -1,6 +1,7 @@
 using System.Data.Common;
-using API.Models.Db;
 using Common.Models.Graphql;
+using Common.Models.Graphql.InputModels;
+using Common.Models.Graphql.OutputModels;
 using Npgsql;
 
 namespace API;
@@ -17,15 +18,18 @@ public class Mutation
 	/// <summary>
 	/// Used for adding a generic log to the database 
 	/// </summary>
-	/// <param name="readerToGraphqlObject">Method used to convert <see cref="NpgsqlDataReader"/> record to a GraphQL object which is ready to be returned to the user</param>
+	/// <param name="readerToObject">Converts database row to object of type <see cref="TReader"/></param>
+	/// <param name="readersToOutput">Converts object of type <see cref="TReader"/> into <see cref="TOutput"/></param>
 	/// <param name="insertQuery">SQL query used for inserting the log into the database</param>
 	/// <param name="fetchQuery">SQL query for fetching the inserted log from the database</param>
-	/// <typeparam name="TModel">Log that was inserted into the database</typeparam>
+	/// <typeparam name="TInput">Type of record that should be inserted into the database</typeparam>
+	/// <typeparam name="TReader">Middleware object type</typeparam>
+	/// <typeparam name="TOutput">Type of record that is returned to the user</typeparam>
 	/// <returns></returns>
-	private async Task<Payload<TModel>> AddLog<TModel>(Func<NpgsqlDataReader, TModel> readerToGraphqlObject, string insertQuery, string fetchQuery) where TModel : GraphqlModelBase
+	private async Task<Payload<TOutput>> AddLog<TInput, TReader, TOutput>(Func<NpgsqlDataReader, TReader> readerToObject, Func<List<TReader>, TOutput> readersToOutput, string insertQuery, string fetchQuery) where TOutput : GraphqlModelBase
 	{
-		TModel? log = null;
-
+		var objects = new List<TReader>();
+		
 		try
 		{
 			//Inserting the log into the database
@@ -34,25 +38,32 @@ public class Mutation
 			//Reading the log that was just added so it can be returned
 			await foreach (var reader in _db.ExecuteReaderAsync(fetchQuery))
 			{
-				log = readerToGraphqlObject(reader);
+				objects.Add(readerToObject(reader));
 				break;
 			}
 		}
 		catch (DbException ex)
 		{
-			return new Payload<TModel> { Error = ex.ToString() };
+			return new Payload<TOutput> { Error = ex.ToString() };
 		}
 
-		return new Payload<TModel> { Log = log };
+		var log = readersToOutput(objects);
+		return new Payload<TOutput> { Log = log };
 	}
 
-	public async Task<Payload<Cpu>> AddCpuLog(CpuLog cpu)
+	public async Task<Payload<CpuOutput>> AddCpuLog(CpuInput cpu)
 	{
 		string date = DateToString(cpu.Date);
-		var payload = await AddLog<Cpu>(reader =>
+		var payload = await AddLog<CpuInput, CpuInput, CpuOutput>(reader =>
 			{
 				var log = _db.ParseCpuRecord(reader);
-				return new Cpu(log.ServerId, log.Date, log.Usage, log.NumberOfTasks);
+				return new CpuInput(log.ServerId, log.Date, log.Interval, log.Usage, log.NumberOfTasks);
+			},
+			objects =>
+			{
+				if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
+				var obj = objects.First();
+				return new CpuOutput(obj.ServerId, obj.Date, obj.Usage, obj.NumberOfTasks);
 			},
 			$"INSERT INTO Cpu(serverId, date, interval, usage, numberoftasks) " +
 			$"VALUES ({cpu.ServerId}, '{date}', {cpu.Interval}, {cpu.Usage}, {cpu.NumberOfTasks})",
@@ -61,13 +72,19 @@ public class Mutation
 		return payload;
 	}
 
-	public async Task<Payload<Memory>> AddMemoryLog(MemoryLog memory)
+	public async Task<Payload<MemoryOutput>> AddMemoryLog(MemoryInput memory)
 	{
 		string date = DateToString(memory.Date);
-		var payload = await AddLog<Memory>(reader =>
+		var payload = await AddLog<MemoryInput, MemoryInput, MemoryOutput>(reader =>
 			{
 				var log = _db.ParseMemoryRecord(reader);
-				return new Memory(log.ServerId, log.Date, log.MbUsed, log.MbTotal);
+				return new MemoryInput(log.ServerId, log.Date, log.Interval, log.MbUsed, log.MbTotal);
+			},
+			objects =>
+			{
+				if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
+				var obj = objects.First();
+				return new MemoryOutput(obj.ServerId, obj.Date, obj.MbUsed, obj.MbTotal);
 			},
 			$"INSERT INTO Memory(serverId, date, interval, mbUsed, mbTotal)" +
 			$"VALUES({memory.ServerId}, '{date}', {memory.Interval}, {memory.MbUsed}, {memory.MbTotal})",
@@ -76,22 +93,25 @@ public class Mutation
 		return payload;
 	}
 
-	public async Task<Payload<Storage>> AddStorageLog(StorageLog storage)
-	{
-		string date = DateToString(storage.Date);
-		var payload = await AddLog<Storage>(reader =>
-		{
-			var log = _db.ParseStorageRecord(reader);
-			return new Storage(log.ServerId, log.Date, new List<StorageVolume>()
-			{
-				new StorageVolume(log.Filesystem, log.Mountpath, (int)log.BytesTotal, (int)log.UsedBytes)
-			});
-		},$"INSERT INTO storage(serverid, date, interval, filesystem, mountpath, bytestotal, usedbytes) " +
-		  $"VALUES({storage.ServerId}, '{date}', {storage.Interval}, '{storage.Filesystem}', '{storage.Mountpath}', {storage.BytesTotal}, {storage.UsedBytes})",
-			$"SELECT serverid, date, interval, filesystem, mountpath, bytestotal, usedbytes " +
-			$"FROM storage WHERE serverid = {storage.ServerId} AND date = '{date}'");
-		return payload;
-	}
+	// public async Task<Payload<StorageInput>> AddStorageLog(StorageInput storage)
+	// {
+	// 	string date = DateToString(storage.Date);
+	// 	var payload = await AddLog<StorageInput>(readers =>
+	// 		{
+	// 			var volumes = new List<StorageVolume>();
+	// 			foreach (var reader in readers)
+	// 			{
+	// 				var log = _db.ParseStorageRecord(reader);
+	// 				volumes.Add(new StorageVolume(log.UUID, log.Label, log.FilesystemName, log.FilesystemVersion, log.MountPath, log.Bytes, log.UsedPercentage));
+	// 			}
+	// 			return new StorageInput(storage.ServerId, storage.Date, volumes);
+	// 		}, $"INSERT INTO partition(uuid, filesystemName, filesystemVersion, label) " +
+	// 		   $"VALUES({storage.Uuid}, '{storage.FilesystemName}', '{storage.FilesystemVersion}', '{storage.Label}') " +
+	// 		   $"ON CONFLICT(uuid) DO UPDATE SET filesystemName={storage.FilesystemName}, filesystemVersion={storage.FilesystemVersion}, label = {storage.Label}; " +
+	// 		   $"INSERT INTO storagelog(serverid, date, uuid, interval, bytestotal, usage, mountpath) " +
+	// 		   $"VALUES({storage.ServerId}, '{storage.Date}', '{storage.Uuid}', {storage.Interval}, {storage.BytesTotal}, {storage.Usage}, '{storage.Mountpath}')",);
+	// 	return payload;
+	// }
 	
 	private static string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
 }

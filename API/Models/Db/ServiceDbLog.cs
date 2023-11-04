@@ -1,6 +1,8 @@
+using Common.Models;
+
 namespace API.Models.Db;
 
-public class ServiceLog : LogBase
+public class ServiceDbLog : DbLogBase
 {
 	public string Name { get; }
 	public int RamUsageMegabytes { get; }
@@ -8,7 +10,7 @@ public class ServiceLog : LogBase
 	public int Tasks { get; }
 	public double CpuSeconds { get; }
 
-	public ServiceLog(int serverId, DateTime date, int interval, string name, int ramUsageMegabytes, ServiceStatus status, int tasks, double cpuSeconds) : base(serverId, date, interval)
+	public ServiceDbLog(int serverId, DateTime date, int interval, string name, int ramUsageMegabytes, ServiceStatus status, int tasks, double cpuSeconds) : base(serverId, date, interval)
 	{
 		Name = name;
 		RamUsageMegabytes = ramUsageMegabytes;

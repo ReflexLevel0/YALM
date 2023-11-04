@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using Common.Models.Graphql;
+using Common.Models.Graphql.InputModels;
 using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
@@ -38,14 +39,7 @@ internal class Monitor
 				                              error
 				                          },
 				                          """);
-				variables.cpu = new
-				{
-					serverId = 0,
-					date,
-					interval = config.IntervalInMinutes,
-					numberOfTasks = log.CpuLog?.NumberOfTasks,
-					usage = log.CpuLog?.Usage
-				};
+				variables.cpu = new CpuInput(0, date, config.IntervalInMinutes, log.CpuLog.Usage, log.CpuLog.NumberOfTasks);
 			}
 
 			if (log.MemoryLog != null)
@@ -56,32 +50,25 @@ internal class Monitor
 				                              error
 				                          },
 				                          """);
-				variables.memory = new
-				{
-					serverId = 0,
-					date,
-					interval = config.IntervalInMinutes,
-					mbUsed = (int)log.MemoryLog.UsedMemoryMb,
-					mbTotal = (int)log.MemoryLog.TotalMemoryMb
-				};
+				variables.memory = new MemoryInput(0, date, config.IntervalInMinutes, (int)log.MemoryLog.UsedMemoryMb, (int)log.MemoryLog.TotalMemoryMb);
 			}
 
-			if (log.StorageLogs != null && log.StorageLogs.Count != 0)
-			{
-				variableStringBuilder.Append("$storage: StorageLogInput!,");
-				queryStringBuilder.Append("""
-				                          addStorageLog(storage: $storage){
-				                              error
-				                          },
-				                          """);
-				variables.storage = new
-				{
-					serverId = 0,
-					date,
-					interval = config.IntervalInMinutes,
-					sorageVolumes = log.StorageLogs
-				};
-			}
+			// if (log.StorageLogs != null && log.StorageLogs.Count != 0)
+			// {
+			// 	variableStringBuilder.Append("$storage: StorageLogInput!,");
+			// 	queryStringBuilder.Append("""
+			// 	                          addStorageLog(storage: $storage){
+			// 	                              error
+			// 	                          },
+			// 	                          """);
+			// 	variables.storage = new
+			// 	{
+			// 		serverId = 0,
+			// 		date,
+			// 		interval = config.IntervalInMinutes,
+			// 		sorageVolumes = log.StorageLogs
+			// 	};
+			// }
 			
 			//Configuring the request
 			var request = new GraphQLRequest(
@@ -92,7 +79,7 @@ internal class Monitor
 			try
 			{
 				//Sending the request and printing out result/errors
-				var payload = await graphQlClient.SendMutationAsync<Payload<Cpu>>(request);
+				var payload = await graphQlClient.SendMutationAsync<Payload<CpuInput>>(request);
 				if (payload.Errors != null && payload.Errors.Length != 0) throw new Exception(payload.Errors[0].Message);
 				if (payload.Data.Error != null) Console.WriteLine($"ERROR: {payload.Data.Error}");
 				Console.WriteLine(payload.Data.Log);

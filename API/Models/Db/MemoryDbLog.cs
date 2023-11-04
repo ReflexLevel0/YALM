@@ -1,6 +1,8 @@
+using Common.Models;
+
 namespace API.Models.Db;
 
-public class MemoryLog : LogBase
+public class MemoryDbLog : DbLogBase
 {
 	public int MbUsed { get; }
 	public int MbTotal { get; }
@@ -8,7 +10,7 @@ public class MemoryLog : LogBase
 	[GraphQLIgnore]
 	public double Usage => (double)MbUsed / MbTotal;
 
-	public MemoryLog(int serverId, DateTime date, int interval, int mbUsed, int mbTotal) : base(serverId, date, interval)
+	public MemoryDbLog(int serverId, DateTime date, int interval, int mbUsed, int mbTotal) : base(serverId, date, interval)
 	{
 		MbUsed = mbUsed;
 		MbTotal = mbTotal;

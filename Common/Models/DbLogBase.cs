@@ -1,12 +1,12 @@
-namespace API.Models.Db;
+namespace Common.Models;
 
-public abstract class LogBase
+public abstract class DbLogBase : IDbLogBase
 { 
 	public int ServerId { get; }
 	public DateTime Date { get; }
 	public int Interval { get; }
 	
-	protected LogBase(int serverId, DateTime date, int interval)
+	protected DbLogBase(int serverId, DateTime date, int interval)
 	{
 		ServerId = serverId;
 		Date = date;

@@ -1,6 +1,8 @@
-namespace Monitor.Models;
+using Common.Models;
 
-public class StorageLog
+namespace API.Models.Db;
+
+public class StorageDbLog : DbLogBase
 {
 	public string UUID { get; }
 	public string? Label { get; }
@@ -10,7 +12,7 @@ public class StorageLog
 	public long? Bytes { get; }
 	public double? UsedPercentage { get; }
 
-	public StorageLog(string uuid, string? label, string? filesystemName, string? filesystemVersion, string? mountPath, long? bytes, double? usedPercentage)
+	public StorageDbLog(int serverId, DateTime date, int interval, string uuid, string? label, string? filesystemName, string? filesystemVersion, string? mountPath, long? bytes, double? usedPercentage) : base(serverId, date, interval)
 	{
 		UUID = uuid;
 		Label = label;
@@ -20,6 +22,4 @@ public class StorageLog
 		Bytes = bytes;
 		UsedPercentage = usedPercentage;
 	}
-
-	public override string ToString() => $"{UUID} {Label} {FilesystemName} {FilesystemVersion} {MountPath} {Bytes} {UsedPercentage:P}";
 }

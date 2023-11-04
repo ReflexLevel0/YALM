@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using Monitor.Models;
 using Monitor.Models.StorageJSON;
 using Newtonsoft.Json;
@@ -151,11 +150,10 @@ public class DataParser
 			foreach (var child in blockDevice.Children)
 			{
 				if (child.Uuid == null) continue;
-				var fs = new Filesystem(child.FsType, child.FsVer);
 				string? mountpoint = blockDevice.Mountpoints.Count == 0 ? null : blockDevice.Mountpoints.First();
 				long? fsAvail = blockDevice.FsAvail == null ? null : long.Parse(blockDevice.FsAvail);
 				double? used = child.FsUse == null ? null : double.Parse(child.FsUse.Split('%').First()) / 100;
-				yield return new StorageLog(child.Uuid, child.Label, fs, mountpoint, fsAvail, used);
+				yield return new StorageLog(child.Uuid, child.Label, child.FsType, child.FsVer, mountpoint, fsAvail, used);
 			}
 		}
 	}
