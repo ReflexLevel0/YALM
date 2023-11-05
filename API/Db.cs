@@ -60,14 +60,16 @@ public class Db : IDb
 
 	public StorageDbLog ParseStorageRecord(NpgsqlDataReader reader)
 	{
-		// int id = reader.GetInt32(0);
-		// var date = reader.GetDateTime(1);
-		// int logInterval = reader.GetInt32(2);
-		// string filesystem = reader.GetString(3);
-		// string mountpath = reader.GetString(4);
-		// long bytesTotal = reader.GetInt64(5);
-		// long bytesUsed = reader.GetInt64(6);
-		// return new StorageLog(id, date, logInterval, filesystem, mountpath, bytesTotal, bytesUsed);
-		return null;
+		int id = reader.GetInt32(0);
+		var date = reader.GetDateTime(1);
+		int logInterval = reader.GetInt32(2);
+		string uuid = reader.GetString(3);
+		string label = reader.GetString(4);
+		string filesystemName = reader.GetString(5);
+		string filesystemVersion = reader.GetString(6);
+		string mountpath = reader.GetString(7);
+		long bytesTotal = reader.GetInt64(8);
+		double usedPercentage = reader.GetDouble(9);
+		return new StorageDbLog(id, date, logInterval, uuid, label, filesystemName, filesystemVersion, mountpath, bytesTotal, usedPercentage);
 	}
 }
