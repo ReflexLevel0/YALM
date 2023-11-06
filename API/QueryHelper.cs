@@ -96,6 +96,7 @@ public class QueryHelper
 	/// <param name="combineLogsFunc">Function to combine multiple logs into one</param>
 	/// <param name="parseRecordFunc">Function used to parse a database record and return a log</param>
 	/// <param name="getEmptyLogFunc">Function that returns an empty log</param>
+	/// <param name="calculateHash">Used for calculating hash of a log (this is important when there are multiple sets of data returned, for example 10 logs at the same date-time for 10 different cpu cores, so that dates and breaks between them don't get mixed up</param>
 	/// <param name="startDateTime">Start date for the data (if null, start is unlimited)</param>
 	/// <param name="endDateTime">End date for the data (if null, end is unlimited)</param>
 	/// <param name="interval">Interval between different log points (multiple points withing the interval are combined into one; if null then it is calculated dynamically)</param>
@@ -109,56 +110,41 @@ public class QueryHelper
 		Func<IList<TLog>, TGraphqlLog> combineLogsFunc,
 		Func<NpgsqlDataReader, TLog> parseRecordFunc,
 		Func<TGraphqlLog> getEmptyLogFunc,
+		Func<TLog, string> calculateHash,
 		string? startDateTime,
 		string? endDateTime,
 		int? interval) where TLog : IDbLogBase where TGraphqlLog : GraphqlModelBase
 	{
-		DateTime? lastDate = null;
-		DateTime? breakDate = null;
-		var logs = new List<TLog>();
-		int intervalSum = 0;
+		var limits = new List<DatasetHelper<TLog, TGraphqlLog>>();
 		
 		//Dynamically calculating the interval
 		interval ??= await CalculateInterval(db, startDateTime, endDateTime, tableName);
-		
-		//Combines multiple logs into a single log
-		TGraphqlLog CombineLogs()
-		{
-			var log = combineLogsFunc(logs);
-			logs.Clear();
-			intervalSum = 0;
-			return log;
-		}
 		
 		//Going through each record in the database
 		await foreach (var reader in db.ExecuteReaderAsync(sqlSelectQuery))
 		{
 			var log = parseRecordFunc(reader);
-
-			//Combining logs and adding additional logs if there has been some kind of a break
-			//between the last log and the current one so that the charts goes to 0 in case of break
-			if (lastDate != null && breakDate != null && log.Date != lastDate)
+			string hash = calculateHash(log);
+			var limit = limits.FirstOrDefault(l => string.Compare(l.Hash, hash, StringComparison.Ordinal) == 0);
+			if (limit == null)
 			{
-				if (logs.Count != 0) yield return CombineLogs();
-				var emptyLog = getEmptyLogFunc();
-				emptyLog.Date = (DateTime)breakDate;
-				yield return emptyLog;
-				emptyLog.Date = emptyLog.Date.Subtract(new TimeSpan(0, 0, 0, 1));
-				yield return emptyLog;
+				limit = new DatasetHelper<TLog, TGraphqlLog>(combineLogsFunc, getEmptyLogFunc, hash);
+				limits.Add(limit);
 			}
 
-			//Adding log to the list of logs
-			logs.Add(log);
-			breakDate = log.Date.AddSeconds(1);
-			lastDate = log.Date.AddMinutes(log.Interval);
-			intervalSum += log.Interval;
-			if (intervalSum < interval) continue;
-
-			//Returning the combined log
-			yield return CombineLogs();
+			//Adding the log to the list of logs
+			foreach (var point in limit.AddLog(log, interval))
+			{
+				if(point == null) continue;
+				yield return point;
+			}
 		}
 
 		//Combining last of the logs into a single log and returning it
-		if (logs.Count > 0) yield return CombineLogs();
+		foreach (var limit in limits)
+		{
+			var point = limit.CombineLogs();
+			if (point != null) yield return point;
+		}
 	} 
 }

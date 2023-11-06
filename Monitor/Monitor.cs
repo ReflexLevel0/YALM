@@ -33,7 +33,7 @@ internal class Monitor
 			
             if (log.CpuLog != null)
 			{
-				variableStringBuilder.Append("$cpu: CpuLogInput!,");
+				variableStringBuilder.Append("$cpu: CpuInput!,");
 				queryStringBuilder.Append("""
 				                          addCpuLog(cpu: $cpu){
 				                              error
@@ -44,7 +44,7 @@ internal class Monitor
 
 			if (log.MemoryLog != null)
 			{
-				variableStringBuilder.Append("$memory: MemoryLogInput!,");
+				variableStringBuilder.Append("$memory: MemoryInput!,");
 				queryStringBuilder.Append("""
 				                          addMemoryLog(memory: $memory){
 				                              error

@@ -1,5 +1,4 @@
 using API.Models.Db;
-using Common.Models.Graphql.InputModels;
 using Common.Models.Graphql.OutputModels;
 using Npgsql;
 
@@ -40,7 +39,7 @@ public class Query
 		Func<NpgsqlDataReader, CpuDbLog> parseRecordFunc = reader => _db.ParseCpuRecord(reader);
 		var getEmptyRecordFunc = () => new CpuOutput(serverId, DateTime.Now, 0, 0);
 
-		await foreach (var log in QueryHelper.GetLogs(_db, "Cpu", sqlSelectQuery, combineLogsFunc, parseRecordFunc, getEmptyRecordFunc, startDateTime, endDateTime, interval))
+		await foreach (var log in QueryHelper.GetLogs(_db, "Cpu", sqlSelectQuery, combineLogsFunc, parseRecordFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
 		{
 			yield return log;
 		}
@@ -72,7 +71,7 @@ public class Query
 		Func<NpgsqlDataReader, MemoryDbLog> parseRecordFunc = reader => _db.ParseMemoryRecord(reader);
 		var getEmptyRecordFunc = () => new MemoryOutput(serverId, DateTime.Now, 0, 0);
 		
-		await foreach(var log in QueryHelper.GetLogs(_db, "Memory", selectQuery, combineLogsFunc, parseRecordFunc, getEmptyRecordFunc, startDateTime, endDateTime, interval))
+		await foreach(var log in QueryHelper.GetLogs(_db, "Memory", selectQuery, combineLogsFunc, parseRecordFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
 		{
 			yield return log;
 		}
@@ -85,7 +84,7 @@ public class Query
 	// 	                     $"WHERE {QueryHelper.LimitSqlByParameters(serverId, startDateTime, endDateTime)} " +
 	// 	                     $"ORDER BY filesystem,date";
 	//
-	// 	Func<IList<StorageLog>, StorageInput> combineLogsFunc = logs =>
+	// 	Func<IList<StorageDbLog>, StorageOutput> combineLogsFunc = logs =>
 	// 	{
 	// 		long usedBytes = (long)QueryHelper.CombineValues(method, logs.Select(s => s.UsedBytes).ToList());
 	// 		long totalBytes = (long)QueryHelper.CombineValues(method, logs.Select(s => s.BytesTotal).ToList());
