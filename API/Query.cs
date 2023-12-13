@@ -77,29 +77,64 @@ public class Query
 		}
 	}
 
-	// public async IAsyncEnumerable<StorageInput> Storage(int serverId, string? startDateTime, string? endDateTime, int? interval, string? method)
-	// {
-	// 	string selectQuery = $"SELECT serverid, date, interval, filesystem, mountpath, bytestotal, usedbytes " +
-	// 	                     $"FROM storage " +
-	// 	                     $"WHERE {QueryHelper.LimitSqlByParameters(serverId, startDateTime, endDateTime)} " +
-	// 	                     $"ORDER BY filesystem,date";
-	//
-	// 	Func<IList<StorageDbLog>, StorageOutput> combineLogsFunc = logs =>
-	// 	{
-	// 		long usedBytes = (long)QueryHelper.CombineValues(method, logs.Select(s => s.UsedBytes).ToList());
-	// 		long totalBytes = (long)QueryHelper.CombineValues(method, logs.Select(s => s.BytesTotal).ToList());
-	// 		return new StorageInput(serverId, logs.First().Date, new[]
-	// 		{
-	// 			new StorageVolume(logs.First().Filesystem, logs.First().Mountpath, totalBytes, usedBytes)
-	// 		});
-	// 	};
-	// 	
-	// 	Func<NpgsqlDataReader, StorageLog> parseRecordFunc = reader => _db.ParseStorageRecord(reader);
-	// 	var getEmptyRecordFunc = () => new StorageInput(serverId, DateTime.Now, new List<StorageVolume>());
-	// 	
-	// 	await foreach(var log in QueryHelper.GetLogs(_db, "Storage", selectQuery, combineLogsFunc, parseRecordFunc, getEmptyRecordFunc, startDateTime, endDateTime, interval))
-	// 	{
-	// 		yield return log;
-	// 	}
-	// }
+	/// <summary>
+	/// Returns logs for the specified storage volume
+	/// </summary>
+	/// <param name="uuid">UUID of the partition for which logs are being returned</param>
+	/// <returns></returns>
+	public async IAsyncEnumerable<StorageVolume> StorageVolume(int serverId, string uuid, string? startDateTime, string? endDateTime, int? interval, string? method)
+	{
+		await foreach (var volume in GetStorageVolumesForUuid(serverId, uuid, startDateTime, endDateTime, interval, method))
+		{
+			yield return volume;
+		}
+	}
+
+	/// <summary>
+	/// Returns logs for all partitions
+	/// </summary>
+	/// <returns></returns>
+	public async IAsyncEnumerable<StorageOutput> Storage(int serverId, string? startDateTime, string? endDateTime, int? interval, string? method)
+	{
+		//Getting all UUID's and then returning data for each one of them
+		await foreach (var reader in _db.ExecuteReaderAsync("SELECT DISTINCT uuid from storagelog"))
+		{
+			string uuid = reader.GetString(0);
+			var volumes = new List<StorageVolume>();
+			await foreach (var volume in GetStorageVolumesForUuid(serverId, uuid, startDateTime, endDateTime, interval, method))
+			{
+				volumes.Add(volume);
+			}
+
+			yield return new StorageOutput(serverId, volumes.First().Date, volumes);
+		}
+	}
+	
+	/// <summary>
+	/// Returns storage logs for the specified partition
+	/// </summary>
+	private async IAsyncEnumerable<StorageVolume> GetStorageVolumesForUuid(int serverId, string uuid, string? startDateTime, string? endDateTime, int? interval, string? method)
+	{
+		string selectQuery = $"SELECT serverid, date, interval, sl.uuid, label, filesystemname, filesystemversion, mountpath, bytestotal, usage " +
+		                     $"FROM storagelog sl " +
+		                     $"JOIN partition p ON sl.uuid = p.uuid " +
+		                     $"WHERE {QueryHelper.LimitSqlByParameters(serverId, startDateTime, endDateTime)} AND sl.uuid='{uuid}' " +
+		                     $"ORDER BY date";
+	
+		Func<IList<StorageDbLog>, StorageVolume> combineLogsFunc = logs =>
+		{
+			var firstLog = logs.First();
+			long usedPercentage = (long)QueryHelper.CombineValues(method, logs.Select(s => s.UsedPercentage).ToList());
+			long totalBytes = (long)QueryHelper.CombineValues(method, logs.Select(s => s.Bytes).ToList());
+			return new StorageVolume(serverId, firstLog.Date, firstLog.UUID, firstLog.Label, firstLog.FilesystemName, firstLog.FilesystemVersion, firstLog.MountPath, totalBytes, usedPercentage);
+		};
+		
+		Func<NpgsqlDataReader, StorageDbLog> parseRecordFunc = reader => _db.ParseStorageRecord(reader);
+		var getEmptyRecordFunc = () => new StorageVolume(serverId, DateTime.Now, "", "", "", "", "", 0, 0);
+
+		await foreach(var log in QueryHelper.GetLogs(_db, "StorageLog", selectQuery, combineLogsFunc, parseRecordFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+		{
+			yield return log;
+		}
+	}
 }

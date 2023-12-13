@@ -111,7 +111,7 @@ public class Mutation
 		var payload = await AddLog<StorageInput, StorageVolume, StorageOutput>(reader =>
 			{
 				var log = _db.ParseStorageRecord(reader);
-				return new StorageVolume(log.UUID, log.Label, log.FilesystemName, log.FilesystemVersion, log.MountPath, log.Bytes, log.UsedPercentage);
+				return new StorageVolume(storage.ServerId, storage.Date, log.UUID, log.Label, log.FilesystemName, log.FilesystemVersion, log.MountPath, log.Bytes, log.UsedPercentage);
 			},
 			objects => new StorageOutput(storage.ServerId, storage.Date, objects),
 			$"INSERT INTO partition(uuid, filesystemName, filesystemVersion, label) " +

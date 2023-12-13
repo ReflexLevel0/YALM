@@ -1,6 +1,6 @@
-namespace Common.Models.Graphql;
+namespace Common.Models.Graphql.OutputModels;
 
-public class StorageVolume
+public class StorageVolume : GraphqlModelBase
 {
     public string UUID { get; }
     public string? Label { get; }
@@ -10,7 +10,7 @@ public class StorageVolume
     public long? Bytes { get; }
     public double? UsedPercentage { get; }
 
-    public StorageVolume(string uuid, string? label, string? filesystemName, string? filesystemVersion, string? mountPath, long? bytes, double? usedPercentage)
+    public StorageVolume(int serverId, DateTime date, string uuid, string? label, string? filesystemName, string? filesystemVersion, string? mountPath, long? bytes, double? usedPercentage) : base(serverId, date)
     {
         UUID = uuid;
         Label = label;
