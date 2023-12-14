@@ -117,5 +117,35 @@ public class Mutation
 		return payload;
 	}
 	
+	public async Task<Payload<PartitionOutputBase>> AddPartition(PartitionInput partition)
+	{
+		int? diskId = null;
+		await foreach (var reader in _db.ExecuteReaderAsync($"SELECT id FROM disk WHERE label = '{partition.DiskLabel}'"))
+		{
+			diskId = reader.GetInt32(0);
+			break;
+		}
+		
+		if (diskId == null) throw new Exception("Error in parsing disk data!");
+		
+		var payload = await ExecuteInsertQuery<PartitionInput, PartitionInput, PartitionOutputBase>(
+			reader =>
+			{
+				var log = _db.ParsePartitionRecord(reader);
+				return new PartitionInput(partition.DiskLabel, log.Uuid, log.FilesystemName, log.FilesystemVersion, log.Label, log.MountPath);
+			},
+			objects =>
+			{
+				if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
+				var obj = objects.First();
+				return new PartitionOutputBase(obj.Uuid, obj.FilesystemName, obj.FilesystemVersion, obj.PartitionLabel, obj.Mountpath);
+			},
+			"INSERT INTO partition(diskid, uuid, filesystemname, filesystemversion, label, mountpath) " + 
+			$"VALUES({diskId}, '{partition.Uuid}', '{partition.FilesystemName}', '{partition.FilesystemVersion}', '{partition.PartitionLabel}', '{partition.Mountpath}')",
+			"SELECT uuid, filesystemname, filesystemversion, label, mountpath " + 
+			$"FROM partition"
+		);
+		return payload;
+	}
 	private static string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
 }

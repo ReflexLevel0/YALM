@@ -34,20 +34,19 @@ CREATE TABLE disk
     id    SERIAL,
     serverid integer NOT NULL,
     label VARCHAR(256),
-    PRIMARY KEY(id, serverid)
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE partition
 (
-    serverId integer,
     diskId            SERIAL      NOT NULL,
     uuid              varchar(64) NOT NULL,
     filesystemName    varchar(64),
     filesystemVersion varchar(64),
     label             varchar(256),
     mountpath         varchar(1024),
-    PRIMARY KEY (serverId, uuid),
-    FOREIGN KEY (serverId, diskId) REFERENCES disk
+    PRIMARY KEY (diskId, uuid),
+    FOREIGN KEY (diskId) REFERENCES disk
 );
 
 CREATE TABLE partitionLog

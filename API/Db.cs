@@ -68,4 +68,14 @@ public class Db : IDb
 		double usedPercentage = reader.GetDouble(5);
 		return new PartitionDbLog(serverId, date, logInterval, uuid, bytesTotal, usedPercentage);
 	}
+
+	public PartitionDb ParsePartitionRecord(NpgsqlDataReader reader)
+	{
+		string uuid = reader.GetString(1);
+		string filesystemName = reader.GetString(2);
+		string filesystemVersion = reader.GetString(3);
+		string label = reader.GetString(4);
+		string mountPath = reader.GetString(4);
+		return new PartitionDb(uuid, filesystemName, filesystemVersion, label, mountPath);
+	}
 }

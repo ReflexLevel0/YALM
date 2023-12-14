@@ -47,4 +47,11 @@ public interface IDb
 	/// <param name="reader"></param>
 	/// <returns></returns>
 	PartitionDbLog ParsePartitionLogRecord(NpgsqlDataReader reader);
+
+	/// <summary>
+	/// Parses a database record and turns it into <see cref="PartitionDb"/>
+	/// </summary>
+	/// <param name="reader"></param>
+	/// <returns></returns>
+	PartitionDb ParsePartitionRecord(NpgsqlDataReader reader);
 }
