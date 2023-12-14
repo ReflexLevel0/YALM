@@ -102,7 +102,7 @@ public class Mutation
 			reader =>
 			{
 				var log = _db.ParsePartitionLogRecord(reader);
-				return new PartitionLogInput(log.ServerId, log.Date, log.Interval, log.UUID, log.Bytes, log.UsedPercentage);
+				return new PartitionLogInput(log.DiskId, log.Date, log.Interval, log.UUID, log.Bytes, log.UsedPercentage);
 			},
 			objects =>
 			{
@@ -110,10 +110,10 @@ public class Mutation
 				var obj = objects.First();
 				return new PartitionLog(obj.Date, obj.Bytes, obj.UsedPercentage);
 			},
-			"INSERT INTO partitionlog(serverid, uuid, date, interval, bytestotal, usage) " + 
-			$"VALUES({partitionLog.ServerId}, '{partitionLog.Uuid}', '{date}', {partitionLog.Interval}, {partitionLog.Bytes}, {partitionLog.UsedPercentage})",
-			"SELECT serverId, uuid, date, interval, bytestotal, usage " + 
-			$"FROM partitionlog WHERE serverid = {partitionLog.ServerId} AND uuid = '{partitionLog.Uuid}' AND date = '{date}'");
+			"INSERT INTO partitionlog(diskid, uuid, date, interval, bytestotal, usage) " + 
+			$"VALUES({partitionLog.DiskId}, '{partitionLog.Uuid}', '{date}', {partitionLog.Interval}, {partitionLog.Bytes}, {partitionLog.UsedPercentage})",
+			"SELECT diskid, uuid, date, interval, bytestotal, usage " + 
+			$"FROM partitionlog WHERE diskid = {partitionLog.DiskId} AND uuid = '{partitionLog.Uuid}' AND date = '{date}'");
 		return payload;
 	}
 	

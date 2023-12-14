@@ -60,13 +60,13 @@ public class Db : IDb
 
 	public PartitionDbLog ParsePartitionLogRecord(NpgsqlDataReader reader)
 	{
-		int serverId = reader.GetInt32(0);
+		int diskId = reader.GetInt32(0);
 		string uuid = reader.GetString(1);
 		var date = reader.GetDateTime(2);
 		int logInterval = reader.GetInt32(3);
 		long bytesTotal = reader.GetInt64(4);
 		double usedPercentage = reader.GetDouble(5);
-		return new PartitionDbLog(serverId, date, logInterval, uuid, bytesTotal, usedPercentage);
+		return new PartitionDbLog(diskId, date, logInterval, uuid, bytesTotal, usedPercentage);
 	}
 
 	public PartitionDb ParsePartitionRecord(NpgsqlDataReader reader)

@@ -31,11 +31,11 @@ CREATE TABLE memory
 
 CREATE TABLE disk
 (
-    id    SERIAL,
+    id       SERIAL,
     serverid integer NOT NULL,
-    label VARCHAR(256),
-    PRIMARY KEY(id),
-    UNIQUE(serverid, label)
+    label    VARCHAR(256),
+    PRIMARY KEY (id),
+    UNIQUE (serverid, label)
 );
 
 CREATE TABLE partition
@@ -52,14 +52,14 @@ CREATE TABLE partition
 
 CREATE TABLE partitionLog
 (
-    serverId   integer     NOT NULL,
+    diskId     SERIAL      NOT NULL,
     uuid       varchar(64) NOT NULL,
     date       timestamp   NOT NULL,
     interval   integer     NOT NULL,
     bytestotal bigint,
     usage      decimal(3, 2),
-    PRIMARY KEY (serverid, date, uuid),
-    FOREIGN KEY (serverId, uuid) REFERENCES partition
+    PRIMARY KEY (diskId, date, uuid),
+    FOREIGN KEY (diskId, uuid) REFERENCES partition
 );
 
 CREATE TABLE servicename

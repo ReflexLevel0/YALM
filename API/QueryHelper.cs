@@ -24,6 +24,9 @@ public class QueryHelper
 			result.Append($"date <= '{endDateTime}'");
 		}
 
+		//Making where always true if all parameters are null
+		if (string.IsNullOrWhiteSpace(result.ToString())) result.Append("1 = 1");
+		
 		return result.ToString();
 	}
 

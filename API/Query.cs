@@ -83,4 +83,58 @@ public class Query
 
 		return memoryOutput;
 	}
+	
+	/// <summary>
+	/// Returns disk data
+	/// </summary>
+	public async IAsyncEnumerable<DiskOutput> Disk(string? startDateTime, string? endDateTime, int? interval, string? method)
+	{
+		DiskOutput? disk = null;
+		string getPartitionQuery = "SELECT disk.serverid, disk.label as diskLabel, uuid, filesystemname, filesystemversion, partition.label as partitionLabel, mountpath " +
+		                           "FROM disk JOIN partition ON disk.id = partition.diskid " + 
+		                           "ORDER BY diskid";
+		
+		//Going through every partition and getting logs for it
+		await foreach (var reader in _db.ExecuteReaderAsync(getPartitionQuery))
+		{
+			int id = reader.GetInt32(0);
+			string diskLabel = reader.GetString(1);
+			string uuid = reader.GetString(2);
+			string filesystemName = reader.GetString(3);
+			string filesystemVersion = reader.GetString(4);
+			string partitionLabel = reader.GetString(5);
+			string mountPath = reader.GetString(6);
+			if (disk == null || string.CompareOrdinal(disk.Label, diskLabel) != 0)
+			{
+				if(disk != null) yield return disk;
+				disk = new DiskOutput(id, diskLabel);
+			}
+
+			var partition = new PartitionOutput(uuid, filesystemName, filesystemVersion, partitionLabel, mountPath);
+			disk.Partitions.Add(partition);
+			
+			//Getting logs for the partition
+			string selectQuery = "SELECT diskid, uuid, date, interval, bytestotal, usage " + 
+			                     "FROM partitionlog " +
+			                     $"WHERE {QueryHelper.LimitSqlByParameters(null, startDateTime, endDateTime)} " +
+			                     "ORDER BY date";
+			
+			Func<IList<PartitionDbLog>, PartitionLog> combineLogsFunc = logs =>
+			{
+				long bytes = (int)QueryHelper.CombineValues(method, logs.Select(l => l.Bytes).ToList());
+				int usage = (int)QueryHelper.CombineValues(method, logs.Select(l => l.UsedPercentage).ToList());
+				return new PartitionLog(logs.First().Date, bytes, usage);
+			};
+		
+			Func<NpgsqlDataReader, PartitionDbLog> parseRecordFunc = r => _db.ParsePartitionLogRecord(r);
+			var getEmptyRecordFunc = () => new PartitionLog(DateTime.Now, 0, 0);
+			
+			await foreach(var log in QueryHelper.GetLogs(_db, "PartitionLog", selectQuery, combineLogsFunc, parseRecordFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+			{
+				partition.Logs.Add(log);
+			}
+		}
+
+		if (disk != null) yield return disk;
+	}
 }
