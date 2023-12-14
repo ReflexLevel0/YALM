@@ -75,27 +75,29 @@ public class Mutation
 		return payload;
 	}
 
-	// public async Task<Payload<MemoryOutput>> AddMemoryLog(MemoryInput memory)
-	// {
-	// 	string date = DateToString(memory.Date);
-	// 	var payload = await AddLog<MemoryInput, MemoryInput, MemoryOutput>(reader =>
-	// 		{
-	// 			var log = _db.ParseMemoryRecord(reader);
-	// 			return new MemoryInput(log.ServerId, log.Date, log.Interval, log.MbUsed, log.MbTotal);
-	// 		},
-	// 		objects =>
-	// 		{
-	// 			if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
-	// 			var obj = objects.First();
-	// 			return new MemoryOutput(obj.ServerId, obj.Date, obj.MbUsed, obj.MbTotal);
-	// 		},
-	// 		$"INSERT INTO Memory(serverId, date, interval, mbUsed, mbTotal)" +
-	// 		$"VALUES({memory.ServerId}, '{date}', {memory.Interval}, {memory.MbUsed}, {memory.MbTotal})",
-	// 		$"SELECT serverid, date, interval, mbUsed, mbTotal " +
-	// 		$"FROM Memory WHERE serverId = {memory.ServerId} AND date = '{date}'");
-	// 	return payload;
-	// }
-	//
+	public async Task<Payload<MemoryOutput>> AddMemoryLog(MemoryInput memory)
+	{
+		string date = DateToString(memory.Date);
+		var payload = await AddLog<MemoryInput, MemoryInput, MemoryOutput>(reader =>
+			{
+				var log = _db.ParseMemoryRecord(reader);
+				return new MemoryInput(log.ServerId, log.Interval, log.Date, log.MbUsed, log.MbTotal);
+			},
+			objects =>
+			{
+				if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
+				var obj = objects.First();
+				var memoryOutput = new MemoryOutput(memory.ServerId);
+				memoryOutput.Logs.Add(new MemoryLog(obj.Date, obj.MbUsed, obj.MbTotal));
+				return memoryOutput;
+			},
+			$"INSERT INTO Memory(serverId, date, interval, mbUsed, mbTotal)" +
+			$"VALUES({memory.ServerId}, '{date}', {memory.Interval}, {memory.MbUsed}, {memory.MbTotal})",
+			$"SELECT serverid, date, interval, mbUsed, mbTotal " +
+			$"FROM Memory WHERE serverId = {memory.ServerId} AND date = '{date}'");
+		return payload;
+	}
+	
 	// public async Task<Payload<StorageOutput>> AddStorageLog(StorageInput storage)
 	// {
 	// 	string date = DateToString(storage.Date);
