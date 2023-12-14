@@ -39,7 +39,7 @@ internal class Monitor
 				                              error
 				                          },
 				                          """);
-				variables.cpu = new CpuInput(0, config.IntervalInMinutes, date, log.CpuLog.Usage, log.CpuLog.NumberOfTasks);
+				variables.CpuLog = new CpuLogInput(0, config.IntervalInMinutes, date, log.CpuLog.Usage, log.CpuLog.NumberOfTasks);
 			}
 
 			if (log.MemoryLog != null)
@@ -50,7 +50,7 @@ internal class Monitor
 				                              error
 				                          },
 				                          """);
-				variables.memory = new MemoryInput(0, config.IntervalInMinutes, date, (int)log.MemoryLog.UsedMemoryMb, (int)log.MemoryLog.TotalMemoryMb);
+				variables.MemoryLog = new MemoryLogInput(0, config.IntervalInMinutes, date, (int)log.MemoryLog.UsedMemoryMb, (int)log.MemoryLog.TotalMemoryMb);
 			}
 
 			// if (log.StorageLogs != null && log.StorageLogs.Count != 0)
@@ -79,7 +79,7 @@ internal class Monitor
 			try
 			{
 				//Sending the request and printing out result/errors
-				var payload = await graphQlClient.SendMutationAsync<Payload<CpuInput>>(request);
+				var payload = await graphQlClient.SendMutationAsync<Payload<CpuLogInput>>(request);
 				if (payload.Errors != null && payload.Errors.Length != 0) throw new Exception(payload.Errors[0].Message);
 				if (payload.Data.Error != null) Console.WriteLine($"ERROR: {payload.Data.Error}");
 				Console.WriteLine(payload.Data.Log);

@@ -37,7 +37,7 @@ public class Query
 			return new CpuLog(logs.First().Date, usageProcessed, numberOfTasksProcessed);
 		};
 		
-		Func<NpgsqlDataReader, CpuDbLog> parseRecordFunc = reader => _db.ParseCpuRecord(reader);
+		Func<NpgsqlDataReader, CpuDbLog> parseRecordFunc = reader => _db.ParseCpuLogRecord(reader);
 		var getEmptyRecordFunc = () => new CpuLog(DateTime.Now, 0, 0);
 
 		var cpuOutput = new CpuOutput(serverId);
@@ -72,7 +72,7 @@ public class Query
 			return new MemoryLog(logs.First().Date, mbused, mbtotal);
 		};
 		
-		Func<NpgsqlDataReader, MemoryDbLog> parseRecordFunc = reader => _db.ParseMemoryRecord(reader);
+		Func<NpgsqlDataReader, MemoryDbLog> parseRecordFunc = reader => _db.ParseMemoryLogRecord(reader);
 		var getEmptyRecordFunc = () => new MemoryLog(DateTime.Now, 0, 0);
 
 		var memoryOutput = new MemoryOutput(serverId);

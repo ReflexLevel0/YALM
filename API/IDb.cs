@@ -32,19 +32,19 @@ public interface IDb
 	/// </summary>
 	/// <param name="reader"></param>
 	/// <returns></returns>
-	CpuDbLog ParseCpuRecord(NpgsqlDataReader reader);
+	CpuDbLog ParseCpuLogRecord(NpgsqlDataReader reader);
 
 	/// <summary>
 	/// Parses a database record and turns it into <see cref="MemoryDbLog"/>
 	/// </summary>
 	/// <param name="reader"></param>
 	/// <returns></returns>
-	MemoryDbLog ParseMemoryRecord(NpgsqlDataReader reader);
+	MemoryDbLog ParseMemoryLogRecord(NpgsqlDataReader reader);
 
 	/// <summary>
-	/// Parses a database record and turns it into <see cref="StorageDbLog"/>
+	/// Parses a database record and turns it into <see cref="PartitionDbLog"/>
 	/// </summary>
 	/// <param name="reader"></param>
 	/// <returns></returns>
-	StorageDbLog ParseStorageRecord(NpgsqlDataReader reader);
+	PartitionDbLog ParsePartitionLogRecord(NpgsqlDataReader reader);
 }

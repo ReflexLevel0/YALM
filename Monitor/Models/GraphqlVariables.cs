@@ -4,7 +4,7 @@ namespace Monitor.Models;
 
 public class GraphqlVariables
 {
-	public CpuInput cpu;
-	public MemoryInput memory;
-	public StorageInput storage;
+	public CpuLogInput CpuLog;
+	public MemoryLogInput MemoryLog;
+	public PartitionLogInput PartitionLog;
 }

@@ -1,11 +1,11 @@
 namespace Common.Models.Graphql.Logs;
 
-public class StorageLog : LogBase
+public class PartitionLog : LogBase
 {
 	public long? Bytes { get; }
 	public double? UsedPercentage { get; }
 
-	public StorageLog(DateTime date, long? bytes, double? usedPercentage) : base(date)
+	public PartitionLog(DateTime date, long? bytes, double? usedPercentage) : base(date)
 	{
 		Bytes = bytes;
 		UsedPercentage = usedPercentage;

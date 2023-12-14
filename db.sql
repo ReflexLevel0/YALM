@@ -1,4 +1,4 @@
-DROP SCHEMA public CASCADE ;
+DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 CREATE TABLE cpu
 (
@@ -29,24 +29,37 @@ CREATE TABLE memory
     PRIMARY KEY (serverid, date)
 );
 
-CREATE TABLE partition(
-    uuid varchar(64) NOT NULL,
-    filesystemName varchar(64),
-    filesystemVersion varchar(64),
-    label varchar(256),
-    PRIMARY KEY (uuid)
+CREATE TABLE disk
+(
+    id    SERIAL,
+    serverid integer NOT NULL,
+    label VARCHAR(256),
+    PRIMARY KEY(id, serverid)
 );
 
-CREATE TABLE storageLog
+CREATE TABLE partition
 (
-    serverid   integer      NOT NULL,
-    date       timestamp    NOT NULL,
-    uuid       varchar(64)  NOT NULL,
-    interval   integer      NOT NULL,
+    serverId integer,
+    diskId            SERIAL      NOT NULL,
+    uuid              varchar(64) NOT NULL,
+    filesystemName    varchar(64),
+    filesystemVersion varchar(64),
+    label             varchar(256),
+    mountpath         varchar(1024),
+    PRIMARY KEY (serverId, uuid),
+    FOREIGN KEY (serverId, diskId) REFERENCES disk
+);
+
+CREATE TABLE partitionLog
+(
+    serverId   integer     NOT NULL,
+    uuid       varchar(64) NOT NULL,
+    date       timestamp   NOT NULL,
+    interval   integer     NOT NULL,
     bytestotal bigint,
-    usage  decimal(3,2),
-    mountpath varchar(1024),
-    PRIMARY KEY (serverid, date, uuid)
+    usage      decimal(3, 2),
+    PRIMARY KEY (serverid, date, uuid),
+    FOREIGN KEY (serverId, uuid) REFERENCES partition
 );
 
 CREATE TABLE servicename

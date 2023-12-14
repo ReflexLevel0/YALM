@@ -38,7 +38,7 @@ public class Db : IDb
 		return await cmd.ExecuteScalarAsync();
 	}
 
-	public CpuDbLog ParseCpuRecord(NpgsqlDataReader reader)
+	public CpuDbLog ParseCpuLogRecord(NpgsqlDataReader reader)
 	{
 		int id = reader.GetInt32(0);
 		var date = reader.GetDateTime(1);
@@ -48,7 +48,7 @@ public class Db : IDb
 		return new CpuDbLog(id, date, logInterval, usage, numberOfTasks);
 	}
 
-	public MemoryDbLog ParseMemoryRecord(NpgsqlDataReader reader)
+	public MemoryDbLog ParseMemoryLogRecord(NpgsqlDataReader reader)
 	{
 		int id = reader.GetInt32(0);
 		var date = reader.GetDateTime(1);
@@ -58,18 +58,14 @@ public class Db : IDb
 		return new MemoryDbLog(id, date, logInterval, mbUsed, mbTotal);
 	}
 
-	public StorageDbLog ParseStorageRecord(NpgsqlDataReader reader)
+	public PartitionDbLog ParsePartitionLogRecord(NpgsqlDataReader reader)
 	{
-		int id = reader.GetInt32(0);
-		var date = reader.GetDateTime(1);
-		int logInterval = reader.GetInt32(2);
-		string uuid = reader.GetString(3);
-		string label = reader.GetString(4);
-		string filesystemName = reader.GetString(5);
-		string filesystemVersion = reader.GetString(6);
-		string mountpath = reader.GetString(7);
-		long bytesTotal = reader.GetInt64(8);
-		double usedPercentage = reader.GetDouble(9);
-		return new StorageDbLog(id, date, logInterval, uuid, label, filesystemName, filesystemVersion, mountpath, bytesTotal, usedPercentage);
+		int serverId = reader.GetInt32(0);
+		string uuid = reader.GetString(1);
+		var date = reader.GetDateTime(2);
+		int logInterval = reader.GetInt32(3);
+		long bytesTotal = reader.GetInt64(4);
+		double usedPercentage = reader.GetDouble(5);
+		return new PartitionDbLog(serverId, date, logInterval, uuid, bytesTotal, usedPercentage);
 	}
 }

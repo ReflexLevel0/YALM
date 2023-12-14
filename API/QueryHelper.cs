@@ -1,6 +1,5 @@
 using System.Text;
 using Common.Models;
-using Common.Models.Graphql;
 using Npgsql;
 
 namespace API;
