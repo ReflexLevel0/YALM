@@ -119,6 +119,7 @@ public class Mutation
 	
 	public async Task<Payload<PartitionOutputBase>> AddPartition(PartitionInput partition)
 	{
+		//Getting disk id for the specified disk label
 		int? diskId = null;
 		await foreach (var reader in _db.ExecuteReaderAsync($"SELECT id FROM disk WHERE label = '{partition.DiskLabel}'"))
 		{
@@ -128,6 +129,7 @@ public class Mutation
 		
 		if (diskId == null) throw new Exception("Error in parsing disk data!");
 		
+		//Adding partition to the database
 		var payload = await ExecuteInsertQuery<PartitionInput, PartitionInput, PartitionOutputBase>(
 			reader =>
 			{
@@ -147,5 +149,26 @@ public class Mutation
 		);
 		return payload;
 	}
+	
+	public async Task<Payload<DiskOutputBase>> AddDisk(DiskInput disk)
+	{
+		var payload = await ExecuteInsertQuery<DiskInput, DiskOutputBase, DiskOutputBase>(
+			reader =>
+			{
+				var log = _db.ParseDiskRecord(reader);
+				return new DiskOutputBase(log.ServerId, log.Label);
+			},
+			objects =>
+			{
+				if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
+				return objects.First();
+			},
+			"INSERT INTO disk(serverid, label) " + 
+			$"VALUES({disk.ServerId}, '{disk.Label}')",
+			"SELECT serverId, label " + 
+			$"FROM disk WHERE serverid = {disk.ServerId} AND label = '{disk.Label}'");
+		return payload;
+	}
+	
 	private static string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
 }

@@ -78,4 +78,11 @@ public class Db : IDb
 		string mountPath = reader.GetString(4);
 		return new PartitionDb(uuid, filesystemName, filesystemVersion, label, mountPath);
 	}
+
+	public DiskDb ParseDiskRecord(NpgsqlDataReader reader)
+	{
+		int serverId = reader.GetInt32(0);
+		string label = reader.GetString(1);
+		return new DiskDb(serverId, label);
+	}
 }

@@ -34,7 +34,8 @@ CREATE TABLE disk
     id    SERIAL,
     serverid integer NOT NULL,
     label VARCHAR(256),
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    UNIQUE(serverid, label)
 );
 
 CREATE TABLE partition

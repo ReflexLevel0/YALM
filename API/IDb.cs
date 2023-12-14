@@ -54,4 +54,11 @@ public interface IDb
 	/// <param name="reader"></param>
 	/// <returns></returns>
 	PartitionDb ParsePartitionRecord(NpgsqlDataReader reader);
+
+	/// <summary>
+	/// Parsed a database record and turns it into <see cref="DiskDb"/>
+	/// </summary>
+	/// <param name="reader"></param>
+	/// <returns></returns>
+	DiskDb ParseDiskRecord(NpgsqlDataReader reader);
 }
