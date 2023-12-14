@@ -1,7 +1,7 @@
 namespace Common.Models.Graphql;
 
-public record Payload<TLog>
+public record Payload<TData>
 {
-	public TLog? Log { get; set; }
+	public TData? Data { get; set; }
 	public string? Error { get; set; }
 }

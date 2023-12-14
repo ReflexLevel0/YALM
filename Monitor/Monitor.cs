@@ -82,7 +82,7 @@ internal class Monitor
 				var payload = await graphQlClient.SendMutationAsync<Payload<CpuLogInput>>(request);
 				if (payload.Errors != null && payload.Errors.Length != 0) throw new Exception(payload.Errors[0].Message);
 				if (payload.Data.Error != null) Console.WriteLine($"ERROR: {payload.Data.Error}");
-				Console.WriteLine(payload.Data.Log);
+				Console.WriteLine(payload.Data.Data);
 			}
 			catch (Exception ex)
 			{

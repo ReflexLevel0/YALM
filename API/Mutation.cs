@@ -48,7 +48,7 @@ public class Mutation
 		}
 
 		var log = objectsToOutput(objects);
-		return new Payload<TOutput> { Log = log };
+		return new Payload<TOutput> { Data = log };
 	}
 
 	public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
