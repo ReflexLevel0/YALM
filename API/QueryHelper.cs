@@ -100,22 +100,22 @@ public class QueryHelper
 	/// <param name="startDateTime">Start date for the data (if null, start is unlimited)</param>
 	/// <param name="endDateTime">End date for the data (if null, end is unlimited)</param>
 	/// <param name="interval">Interval between different log points (multiple points withing the interval are combined into one; if null then it is calculated dynamically)</param>
-	/// <typeparam name="TLog">Type of logs returned from the database</typeparam>
-	/// <typeparam name="TGraphqlLog">Types of the logs returned to the user by the API</typeparam>
+	/// <typeparam name="TDbLog">Type of logs returned from the database</typeparam>
+	/// <typeparam name="TLog">Types of the logs returned to the user by the API</typeparam>
 	/// <returns></returns>
-	public static async IAsyncEnumerable<TGraphqlLog> GetLogs<TLog, TGraphqlLog>(
+	public static async IAsyncEnumerable<TLog> GetLogs<TDbLog, TLog>(
 		IDb db,
 		string tableName,
 		string sqlSelectQuery,
-		Func<IList<TLog>, TGraphqlLog> combineLogsFunc,
-		Func<NpgsqlDataReader, TLog> parseRecordFunc,
-		Func<TGraphqlLog> getEmptyLogFunc,
-		Func<TLog, string> calculateHash,
+		Func<IList<TDbLog>, TLog> combineLogsFunc,
+		Func<NpgsqlDataReader, TDbLog> parseRecordFunc,
+		Func<TLog> getEmptyLogFunc,
+		Func<TDbLog, string> calculateHash,
 		string? startDateTime,
 		string? endDateTime,
-		int? interval) where TLog : IDbLogBase where TGraphqlLog : GraphqlModelBase
+		int? interval) where TDbLog : IDbLogBase where TLog : LogBase
 	{
-		var limits = new List<DatasetHelper<TLog, TGraphqlLog>>();
+		var limits = new List<DatasetHelper<TDbLog, TLog>>();
 		
 		//Dynamically calculating the interval
 		interval ??= await CalculateInterval(db, startDateTime, endDateTime, tableName);
@@ -128,7 +128,7 @@ public class QueryHelper
 			var limit = limits.FirstOrDefault(l => string.Compare(l.Hash, hash, StringComparison.Ordinal) == 0);
 			if (limit == null)
 			{
-				limit = new DatasetHelper<TLog, TGraphqlLog>(combineLogsFunc, getEmptyLogFunc, hash);
+				limit = new DatasetHelper<TDbLog, TLog>(combineLogsFunc, getEmptyLogFunc, hash);
 				limits.Add(limit);
 			}
 

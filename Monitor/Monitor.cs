@@ -39,7 +39,7 @@ internal class Monitor
 				                              error
 				                          },
 				                          """);
-				variables.cpu = new CpuInput(0, date, config.IntervalInMinutes, log.CpuLog.Usage, log.CpuLog.NumberOfTasks);
+				variables.cpu = new CpuInput(0, config.IntervalInMinutes, date, log.CpuLog.Usage, log.CpuLog.NumberOfTasks);
 			}
 
 			if (log.MemoryLog != null)
@@ -50,7 +50,7 @@ internal class Monitor
 				                              error
 				                          },
 				                          """);
-				variables.memory = new MemoryInput(0, date, config.IntervalInMinutes, (int)log.MemoryLog.UsedMemoryMb, (int)log.MemoryLog.TotalMemoryMb);
+				variables.memory = new MemoryInput(0, config.IntervalInMinutes, date, (int)log.MemoryLog.UsedMemoryMb, (int)log.MemoryLog.TotalMemoryMb);
 			}
 
 			// if (log.StorageLogs != null && log.StorageLogs.Count != 0)

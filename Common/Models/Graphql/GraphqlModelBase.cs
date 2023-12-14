@@ -1,13 +1,12 @@
 namespace Common.Models.Graphql;
 
-public abstract class GraphqlModelBase
+public abstract class GraphqlModelBase<T> where T : LogBase
 {
 	public int ServerId { get; }
-	public DateTime Date { get; set; }
+	public List<T> Logs { get; } = new();
 
-	protected GraphqlModelBase(int serverId, DateTime date)
+	protected GraphqlModelBase(int serverId)
 	{
 		ServerId = serverId;
-		Date = date;
 	}
 }

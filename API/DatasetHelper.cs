@@ -1,19 +1,18 @@
 using Common.Models;
-using Common.Models.Graphql;
 
 namespace API;
 
-public class DatasetHelper<TLog, TGraphqlLog> where TLog : IDbLogBase where TGraphqlLog : GraphqlModelBase
+public class DatasetHelper<TDbLog, TLog> where TDbLog : IDbLogBase where TLog : LogBase
 {
 	public string Hash { get; }
 	private DateTime? _nextDate;
-	private readonly List<TLog> _logs = new();
+	private readonly List<TDbLog> _logs = new();
 	private int _intervalSum;
 	private bool _break;
-	private readonly Func<IList<TLog>, TGraphqlLog> _combineLogsFunc;
-	private readonly Func<TGraphqlLog> _getEmptyLogFunc;
+	private readonly Func<IList<TDbLog>, TLog> _combineLogsFunc;
+	private readonly Func<TLog> _getEmptyLogFunc;
 	
-	public DatasetHelper(Func<IList<TLog>, TGraphqlLog> combineLogsFunc, Func<TGraphqlLog> getEmptyLogFunc, string hash)
+	public DatasetHelper(Func<IList<TDbLog>, TLog> combineLogsFunc, Func<TLog> getEmptyLogFunc, string hash)
 	{
 		_combineLogsFunc = combineLogsFunc;
 		_getEmptyLogFunc = getEmptyLogFunc;
@@ -26,7 +25,7 @@ public class DatasetHelper<TLog, TGraphqlLog> where TLog : IDbLogBase where TGra
 	/// <param name="log"></param>
 	/// <param name="interval"></param>
 	/// <returns></returns>
-	public IEnumerable<TGraphqlLog?> AddLog(TLog log, int? interval)
+	public IEnumerable<TLog?> AddLog(TDbLog log, int? interval)
 	{
 		//Combining logs and adding additional logs if there has been some kind of a break
 		//between the last log and the current one so that the charts goes to 0 in case of break
@@ -62,7 +61,7 @@ public class DatasetHelper<TLog, TGraphqlLog> where TLog : IDbLogBase where TGra
 	/// Combines multiple logs into one
 	/// </summary>
 	/// <returns></returns>
-	public TGraphqlLog? CombineLogs()
+	public TLog? CombineLogs()
 	{
 		if (_logs.Count == 0) return null;
 		var log = _combineLogsFunc(_logs);

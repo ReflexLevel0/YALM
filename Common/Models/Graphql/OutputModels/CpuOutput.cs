@@ -1,13 +1,10 @@
+using Common.Models.Graphql.Logs;
+
 namespace Common.Models.Graphql.OutputModels;
 
-public class CpuOutput : GraphqlModelBase
+public class CpuOutput : GraphqlModelBase<CpuLog>
 {
-	public double Usage { get; }
-	public int NumberOfTasks { get; }
-	
-	public CpuOutput(int serverId, DateTime date, double usage, int numberOfTasks) : base(serverId, date)
+	public CpuOutput(int serverId) : base(serverId)
 	{
-		Usage = usage;
-		NumberOfTasks = numberOfTasks;
 	}
 }

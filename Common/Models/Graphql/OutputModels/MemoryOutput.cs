@@ -1,13 +1,10 @@
+using Common.Models.Graphql.Logs;
+
 namespace Common.Models.Graphql.OutputModels;
 
-public class MemoryOutput : GraphqlModelBase
+public class MemoryOutput : GraphqlModelBase<MemoryLog>
 {
-	public int MbUsed { get; }
-	public int MbTotal { get; }
-	
-	public MemoryOutput(int serverId, DateTime date, int mbUsed, int mbTotal) : base(serverId, date)
+	public MemoryOutput(int serverId) : base(serverId)
 	{
-		MbUsed = mbUsed;
-		MbTotal = mbTotal;
 	}
 }
