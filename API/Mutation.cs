@@ -54,7 +54,8 @@ public class Mutation
 	public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
 	{
 		string date = DateToString(cpuLog.Date);
-		var payload = await ExecuteInsertQuery<CpuLogInput, CpuLogInput, CpuLog>(reader =>
+		var payload = await ExecuteInsertQuery<CpuLogInput, CpuLogInput, CpuLog>(
+			reader =>
 			{
 				var log = _db.ParseCpuLogRecord(reader);
 				return new CpuLogInput(log.ServerId, log.Interval, log.Date, log.Usage, log.NumberOfTasks);
@@ -75,7 +76,8 @@ public class Mutation
 	public async Task<Payload<MemoryLog>> AddMemoryLog(MemoryLogInput memoryLog)
 	{
 		string date = DateToString(memoryLog.Date);
-		var payload = await ExecuteInsertQuery<MemoryLogInput, MemoryLogInput, MemoryLog>(reader =>
+		var payload = await ExecuteInsertQuery<MemoryLogInput, MemoryLogInput, MemoryLog>(
+			reader =>
 			{
 				var log = _db.ParseMemoryLogRecord(reader);
 				return new MemoryLogInput(log.ServerId, log.Interval, log.Date, log.MbUsed, log.MbTotal);
@@ -90,6 +92,28 @@ public class Mutation
 			$"VALUES({memoryLog.ServerId}, '{date}', {memoryLog.Interval}, {memoryLog.MbUsed}, {memoryLog.MbTotal})",
 			$"SELECT serverid, date, interval, mbUsed, mbTotal " +
 			$"FROM Memory WHERE serverId = {memoryLog.ServerId} AND date = '{date}'");
+		return payload;
+	}
+	
+	public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput partitionLog)
+	{
+		string date = DateToString(partitionLog.Date);
+		var payload = await ExecuteInsertQuery<PartitionLogInput, PartitionLogInput, PartitionLog>(
+			reader =>
+			{
+				var log = _db.ParsePartitionLogRecord(reader);
+				return new PartitionLogInput(log.ServerId, log.Date, log.Interval, log.UUID, log.Bytes, log.UsedPercentage);
+			},
+			objects =>
+			{
+				if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
+				var obj = objects.First();
+				return new PartitionLog(obj.Date, obj.Bytes, obj.UsedPercentage);
+			},
+			"INSERT INTO partitionlog(serverid, uuid, date, interval, bytestotal, usage) " + 
+			$"VALUES({partitionLog.ServerId}, '{partitionLog.Uuid}', '{date}', {partitionLog.Interval}, {partitionLog.Bytes}, {partitionLog.UsedPercentage})",
+			"SELECT serverId, uuid, date, interval, bytestotal, usage " + 
+			$"FROM partitionlog WHERE serverid = {partitionLog.ServerId} AND uuid = '{partitionLog.Uuid}' AND date = '{date}'");
 		return payload;
 	}
 	
