@@ -47,7 +47,7 @@ CREATE TABLE partition
     label             varchar(256),
     mountpath         varchar(1024),
     PRIMARY KEY (diskId, uuid),
-    FOREIGN KEY (diskId) REFERENCES disk
+    FOREIGN KEY (diskId) REFERENCES disk ON DELETE CASCADE 
 );
 
 CREATE TABLE partitionLog
@@ -59,7 +59,7 @@ CREATE TABLE partitionLog
     bytestotal bigint,
     usage      decimal(3, 2),
     PRIMARY KEY (diskId, date, uuid),
-    FOREIGN KEY (diskId, uuid) REFERENCES partition
+    FOREIGN KEY (diskId, uuid) REFERENCES partition ON DELETE CASCADE
 );
 
 CREATE TABLE servicename
