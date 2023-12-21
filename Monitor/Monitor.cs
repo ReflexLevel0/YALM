@@ -1,13 +1,13 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Common.Models.Graphql;
-using Common.Models.Graphql.InputModels;
 using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
-using Monitor.Models;
+using YALM.Common.Models.Graphql;
+using YALM.Common.Models.Graphql.InputModels;
+using YALM.Monitor.Models;
 
-namespace Monitor;
+namespace YALM.Monitor;
 
 internal class Monitor
 {

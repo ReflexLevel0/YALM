@@ -1,4 +1,4 @@
-namespace Monitor.Models;
+namespace YALM.Monitor.Models;
 
 public class ProcessMemoryLog
 {

@@ -1,6 +1,6 @@
-using Common.Models.Graphql.InputModels;
+using YALM.Common.Models.Graphql.InputModels;
 
-namespace Monitor.Models;
+namespace YALM.Monitor.Models;
 
 public class GraphqlVariables
 {

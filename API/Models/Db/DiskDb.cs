@@ -1,4 +1,4 @@
-namespace API.Models.Db;
+namespace YALM.API.Models.Db;
 
 public class DiskDb
 {

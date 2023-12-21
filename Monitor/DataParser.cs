@@ -1,9 +1,9 @@
 using System.Diagnostics;
-using Monitor.Models;
-using Monitor.Models.StorageJSON;
 using Newtonsoft.Json;
+using YALM.Monitor.Models;
+using YALM.Monitor.Models.StorageJSON;
 
-namespace Monitor;
+namespace YALM.Monitor;
 
 public class DataParser
 {

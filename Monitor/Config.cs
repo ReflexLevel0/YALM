@@ -1,4 +1,4 @@
-namespace Monitor;
+namespace YALM.Monitor;
 
 public class Config
 {

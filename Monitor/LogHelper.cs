@@ -1,6 +1,6 @@
-using Monitor.Models;
+using YALM.Monitor.Models;
 
-namespace Monitor;
+namespace YALM.Monitor;
 
 public class LogHelper
 {

@@ -1,4 +1,4 @@
-namespace Common.Models.Graphql.OutputModels;
+namespace YALM.Common.Models.Graphql.OutputModels;
 
 public class DiskOutput : DiskOutputBase
 {

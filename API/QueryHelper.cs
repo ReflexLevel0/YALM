@@ -1,8 +1,8 @@
 using System.Text;
-using Common.Models;
 using Npgsql;
+using YALM.Common.Models;
 
-namespace API;
+namespace YALM.API;
 
 public class QueryHelper
 {

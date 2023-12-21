@@ -1,4 +1,4 @@
-namespace Common.Models;
+namespace YALM.Common.Models;
 
 public interface IDbLogBase
 { 

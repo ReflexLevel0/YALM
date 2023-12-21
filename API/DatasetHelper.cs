@@ -1,6 +1,6 @@
-using Common.Models;
+using YALM.Common.Models;
 
-namespace API;
+namespace YALM.API;
 
 public class DatasetHelper<TDbLog, TLog> where TDbLog : IDbLogBase where TLog : LogBase
 {

@@ -1,11 +1,11 @@
 using System.Data.Common;
-using Common.Models.Graphql;
-using Common.Models.Graphql.InputModels;
-using Common.Models.Graphql.Logs;
-using Common.Models.Graphql.OutputModels;
 using Npgsql;
+using YALM.Common.Models.Graphql;
+using YALM.Common.Models.Graphql.InputModels;
+using YALM.Common.Models.Graphql.Logs;
+using YALM.Common.Models.Graphql.OutputModels;
 
-namespace API;
+namespace YALM.API;
 
 public class Mutation
 {

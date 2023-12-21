@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Monitor.Models.StorageJSON;
+namespace YALM.Monitor.Models.StorageJSON;
 
 public class BlockDeviceChild
 {

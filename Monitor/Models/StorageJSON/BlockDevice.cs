@@ -1,4 +1,4 @@
-namespace Monitor.Models.StorageJSON;
+namespace YALM.Monitor.Models.StorageJSON;
 
 public class BlockDevice : BlockDeviceChild
 {

@@ -1,4 +1,4 @@
-namespace Common.Models.Graphql;
+namespace YALM.Common.Models.Graphql;
 
 public record Payload<TData>
 {

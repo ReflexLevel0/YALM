@@ -1,4 +1,4 @@
-namespace Common.Models.Graphql.Logs;
+namespace YALM.Common.Models.Graphql.Logs;
 
 public class PartitionLog : LogBase
 {

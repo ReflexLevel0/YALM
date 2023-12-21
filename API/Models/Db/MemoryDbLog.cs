@@ -1,6 +1,6 @@
-using Common.Models;
+using YALM.Common.Models;
 
-namespace API.Models.Db;
+namespace YALM.API.Models.Db;
 
 public class MemoryDbLog : DbLogBase
 {

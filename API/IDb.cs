@@ -1,7 +1,7 @@
-using API.Models.Db;
 using Npgsql;
+using YALM.API.Models.Db;
 
-namespace API;
+namespace YALM.API;
 
 public interface IDb
 {

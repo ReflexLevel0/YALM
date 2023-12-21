@@ -1,6 +1,6 @@
-using Common.Models.Graphql.Logs;
+using YALM.Common.Models.Graphql.Logs;
 
-namespace Common.Models.Graphql.OutputModels;
+namespace YALM.Common.Models.Graphql.OutputModels;
 
 public class MemoryOutput : MemoryOutputBase, ILoggingBase<MemoryLog>
 {

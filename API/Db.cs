@@ -1,8 +1,7 @@
-using API.Models.Db;
-
-namespace API;
-
 using Npgsql;
+using YALM.API.Models.Db;
+
+namespace YALM.API;
 
 public class Db : IDb
 {

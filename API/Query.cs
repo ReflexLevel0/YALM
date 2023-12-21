@@ -1,9 +1,9 @@
-using API.Models.Db;
-using Common.Models.Graphql.Logs;
-using Common.Models.Graphql.OutputModels;
 using Npgsql;
+using YALM.API.Models.Db;
+using YALM.Common.Models.Graphql.Logs;
+using YALM.Common.Models.Graphql.OutputModels;
 
-namespace API;
+namespace YALM.API;
 
 public class Query
 {
