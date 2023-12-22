@@ -2,23 +2,16 @@ using YALM.Common.Models;
 
 namespace YALM.API;
 
-public class DatasetHelper<TDbLog, TLog> where TDbLog : IDbLogBase where TLog : LogBase
+public class DatasetHelper<TDbLog, TLog>(Func<IList<TDbLog>, TLog> combineLogsFunc, Func<TLog> getEmptyLogFunc, string hash)
+	where TDbLog : ILog
+	where TLog : LogBase
 {
-	public string Hash { get; }
+	public string Hash { get; } = hash;
 	private DateTime? _nextDate;
 	private readonly List<TDbLog> _logs = new();
 	private int _intervalSum;
 	private bool _break;
-	private readonly Func<IList<TDbLog>, TLog> _combineLogsFunc;
-	private readonly Func<TLog> _getEmptyLogFunc;
-	
-	public DatasetHelper(Func<IList<TDbLog>, TLog> combineLogsFunc, Func<TLog> getEmptyLogFunc, string hash)
-	{
-		_combineLogsFunc = combineLogsFunc;
-		_getEmptyLogFunc = getEmptyLogFunc;
-		Hash = hash;
-	}
-	
+
 	/// <summary>
 	/// Adds a log to the list of logs so that it can later on be combined into a singular log
 	/// </summary>
@@ -32,7 +25,7 @@ public class DatasetHelper<TDbLog, TLog> where TDbLog : IDbLogBase where TLog : 
 		if (_nextDate != null && log.Date != _nextDate)
 		{
 			if (_logs.Count != 0) yield return CombineLogs();
-			var emptyLog = _getEmptyLogFunc();
+			var emptyLog = getEmptyLogFunc();
 			emptyLog.Date = _nextDate.Value;
 			yield return emptyLog;
 			_break = true;
@@ -41,7 +34,7 @@ public class DatasetHelper<TDbLog, TLog> where TDbLog : IDbLogBase where TLog : 
 		//Returning a log if a break happened
 		if (_break)
 		{
-			var emptyLog = _getEmptyLogFunc();
+			var emptyLog = getEmptyLogFunc();
 			emptyLog.Date = log.Date.AddSeconds(-1);
 			yield return emptyLog;
 			_break = false;
@@ -64,7 +57,7 @@ public class DatasetHelper<TDbLog, TLog> where TDbLog : IDbLogBase where TLog : 
 	public TLog? CombineLogs()
 	{
 		if (_logs.Count == 0) return null;
-		var log = _combineLogsFunc(_logs);
+		var log = combineLogsFunc(_logs);
 		_logs.Clear();
 		_intervalSum = 0;
 		return log;

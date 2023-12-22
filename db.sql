@@ -1,6 +1,17 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
+
 CREATE TABLE cpu
+(
+    serverid     integer PRIMARY KEY,
+    name         varchar(256),
+    architecture varchar(256),
+    cores        integer,
+    threads      integer,
+    frequencyMHz integer
+);
+
+CREATE TABLE cpuLog
 (
     serverid      integer   NOT NULL,
     date          timestamp NOT NULL,
@@ -10,7 +21,7 @@ CREATE TABLE cpu
     PRIMARY KEY (serverid, date)
 );
 
-CREATE TABLE program
+CREATE TABLE programLog
 (
     serverid                    integer   NOT NULL,
     date                        timestamp NOT NULL,
@@ -21,11 +32,20 @@ CREATE TABLE program
 
 CREATE TABLE memory
 (
-    serverid integer   NOT NULL,
-    date     timestamp NOT NULL,
-    interval integer   NOT NULL,
-    mbused   integer,
-    mbtotal  integer,
+    serverid    integer PRIMARY KEY,
+    totalKb     integer,
+    swapTotalKb integer
+);
+
+CREATE TABLE memoryLog
+(
+    serverid       integer   NOT NULL,
+    date           timestamp NOT NULL,
+    interval       integer   NOT NULL,
+    usedKb         integer,
+    swapUsedKb     integer,
+    cachedKb       integer,
+    usedPercentage decimal(5, 4),
     PRIMARY KEY (serverid, date)
 );
 
@@ -47,7 +67,7 @@ CREATE TABLE partition
     label             varchar(256),
     mountpath         varchar(1024),
     PRIMARY KEY (diskId, uuid),
-    FOREIGN KEY (diskId) REFERENCES disk ON DELETE CASCADE 
+    FOREIGN KEY (diskId) REFERENCES disk ON DELETE CASCADE
 );
 
 CREATE TABLE partitionLog

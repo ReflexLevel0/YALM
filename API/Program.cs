@@ -1,8 +1,13 @@
+using DataModel;
+using LinqToDB;
 using YALM.API;
+using YALM.API.Models.Db;
 
+string connectionString = File.ReadAllText("dbConnectionString.txt");
+var dataOptions = new DataOptions<MonitoringDb>(new DataOptions().UsePostgreSQL(connectionString));
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-	.AddSingleton<IDb>(new Db(File.ReadAllText("dbConnectionString.txt")))
+	.AddSingleton<IDb>(new MonitoringDb(dataOptions))
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
 	.AddMutationType<Mutation>();

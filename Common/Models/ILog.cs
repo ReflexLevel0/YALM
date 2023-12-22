@@ -1,6 +1,6 @@
 namespace YALM.Common.Models;
 
-public interface IDbLogBase
+public interface ILog
 { 
 	DateTime Date { get; }
 	int Interval { get; }

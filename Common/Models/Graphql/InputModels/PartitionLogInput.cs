@@ -2,16 +2,9 @@ using YALM.Common.Models.Graphql.Logs;
 
 namespace YALM.Common.Models.Graphql.InputModels;
 
-public class PartitionLogInput : PartitionLog, IDbLogBase
+public class PartitionLogInput : PartitionLog, ILog
 {
-	public int DiskId { get; }
-	public int Interval { get; }
-	public string Uuid { get; }
-
-	public PartitionLogInput(int diskId, DateTime date, int interval, string uuid, long? bytes, double? usedPercentage) : base(date, bytes, usedPercentage)
-	{
-		DiskId = diskId;
-		Interval = interval;
-		Uuid = uuid;
-	}
+	public int DiskId { get; set; }
+	public int Interval { get; set; }
+	public string Uuid { get; set; }
 }
