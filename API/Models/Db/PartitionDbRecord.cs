@@ -7,6 +7,7 @@
 
 using LinqToDB.Mapping;
 using System.Collections.Generic;
+using YALM.Common.Models.Graphql.OutputModels;
 
 #pragma warning disable 1573, 1591
 #nullable enable
@@ -14,7 +15,7 @@ using System.Collections.Generic;
 namespace DataModel
 {
 	[Table("partition")]
-	public class PartitionDbRecord
+	public class PartitionDbRecord : IConvertible
 	{
 		[Column("diskid"           , IsPrimaryKey = true , PrimaryKeyOrder = 0   , IsIdentity      = true, SkipOnInsert = true, SkipOnUpdate = true)] public int     DiskId            { get; set; } // integer
 		[Column("uuid"             , CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 1                                             )] public string  Uuid              { get; set; } = null!; // character varying(64)
@@ -36,5 +37,94 @@ namespace DataModel
 		[Association(ThisKey = nameof(DiskId) + "," + nameof(Uuid), OtherKey = nameof(PartitionLogDbRecord.DiskId) + "," + nameof(PartitionLogDbRecord.Uuid))]
 		public IEnumerable<PartitionLogDbRecord> Partitionlogs { get; set; } = null!;
 		#endregion
+
+		public TypeCode GetTypeCode()
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool ToBoolean(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public byte ToByte(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public char ToChar(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public DateTime ToDateTime(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public decimal ToDecimal(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public double ToDouble(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public short ToInt16(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int ToInt32(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public long ToInt64(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public sbyte ToSByte(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public float ToSingle(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string ToString(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public object ToType(Type conversionType, IFormatProvider? provider)
+		{
+			if (conversionType == typeof(PartitionOutputBase)) 
+				return new PartitionOutputBase(Uuid, FilesystemName, FilesystemVersion, Label, MountPath);
+			if(conversionType == typeof(PartitionOutput))
+				return new PartitionOutputBase(Uuid, FilesystemName, FilesystemVersion, Label, MountPath);
+			throw new NotImplementedException();
+		}
+
+		public ushort ToUInt16(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public uint ToUInt32(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public ulong ToUInt64(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

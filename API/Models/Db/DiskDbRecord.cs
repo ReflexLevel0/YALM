@@ -7,6 +7,7 @@
 
 using LinqToDB.Mapping;
 using System.Collections.Generic;
+using YALM.Common.Models.Graphql.OutputModels;
 
 #pragma warning disable 1573, 1591
 #nullable enable
@@ -14,7 +15,7 @@ using System.Collections.Generic;
 namespace DataModel
 {
 	[Table("disk")]
-	public class DiskDbRecord
+	public class DiskDbRecord : IConvertible
 	{
 		[Column("id"      , IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)] public int     Id       { get; set; } // integer
 		[Column("serverid"                                                                                  )] public int     ServerId { get; set; } // integer
@@ -27,5 +28,92 @@ namespace DataModel
 		[Association(ThisKey = nameof(Id), OtherKey = nameof(PartitionDbRecord.DiskId))]
 		public IEnumerable<PartitionDbRecord> Partitions { get; set; } = null!;
 		#endregion
+
+		public TypeCode GetTypeCode()
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool ToBoolean(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public byte ToByte(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public char ToChar(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public DateTime ToDateTime(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public decimal ToDecimal(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public double ToDouble(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public short ToInt16(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int ToInt32(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public long ToInt64(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public sbyte ToSByte(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public float ToSingle(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string ToString(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public object ToType(Type conversionType, IFormatProvider? provider)
+		{
+			if(conversionType == typeof(DiskOutputBase)) return new DiskOutputBase(ServerId, Label);
+			if (conversionType == typeof(DiskOutput)) return new DiskOutput(ServerId, Label);
+			throw new NotImplementedException();
+		}
+
+		public ushort ToUInt16(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public uint ToUInt32(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public ulong ToUInt64(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

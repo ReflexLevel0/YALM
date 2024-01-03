@@ -29,33 +29,23 @@ public class QueryHelper
 
 		return result.ToString();
 	}
-
-	public static double CombineValues<T>(string? method, IList<T> values)
+	
+	public static decimal CombineValues<T>(string? method, IEnumerable<T> values)
 	{
-		bool longMode = values.All(v => v is long);
-		bool intMode = values.All(v => v is int);
-		double result;
+		var decimalValues = values.Select(v => Convert.ToDecimal(v));
+		decimal result;
 		switch (method)
 		{
 			case null:
 			case "avg":
 			case "average":
-				result = longMode ? 
-					values.Cast<long>().Average() : 
-					intMode ? values.Cast<int>().Average() : 
-					values.Cast<double>().Average();
+				result = decimalValues.Average();
 				break;
 			case "min":
-				result = longMode ? 
-					values.Cast<long>().Min() : 
-					intMode ? values.Cast<int>().Min() : 
-					values.Cast<double>().Min();
+				result = decimalValues.Min();
 				break;
 			case "max":
-				result = longMode ?
-					values.Cast<long>().Max() : 
-					intMode ? values.Cast<int>().Max() : 
-					values.Cast<double>().Max();
+				result = decimalValues.Max();
 				break;
 			default:
 				throw new Exception($"Invalid method '{method}'");

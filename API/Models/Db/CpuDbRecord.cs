@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------------------------------
 
 using LinqToDB.Mapping;
+using YALM.Common.Models.Graphql.OutputModels;
 
 #pragma warning disable 1573, 1591
 #nullable enable
@@ -13,7 +14,7 @@ using LinqToDB.Mapping;
 namespace DataModel
 {
 	[Table("cpu")]
-	public class CpuDbRecord
+	public class CpuDbRecord : IConvertible
 	{
 		[Column("serverid"    , IsPrimaryKey = true)] public int     ServerId     { get; set; } // integer
 		[Column("name"                             )] public string? Name         { get; set; } // character varying(256)
@@ -21,5 +22,91 @@ namespace DataModel
 		[Column("cores"                            )] public int?    Cores        { get; set; } // integer
 		[Column("threads"                          )] public int?    Threads      { get; set; } // integer
 		[Column("frequencymhz"                     )] public int?    FrequencyMhz { get; set; } // integer
+		public TypeCode GetTypeCode()
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool ToBoolean(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public byte ToByte(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public char ToChar(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public DateTime ToDateTime(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public decimal ToDecimal(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public double ToDouble(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public short ToInt16(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int ToInt32(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public long ToInt64(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public sbyte ToSByte(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public float ToSingle(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string ToString(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public object ToType(Type conversionType, IFormatProvider? provider)
+		{
+			if (conversionType == typeof(CpuOutputBase)) return new CpuOutputBase(ServerId);
+			if (conversionType == typeof(CpuOutput)) return new CpuOutput(ServerId);
+			throw new NotImplementedException();
+		}
+
+		public ushort ToUInt16(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public uint ToUInt32(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public ulong ToUInt64(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

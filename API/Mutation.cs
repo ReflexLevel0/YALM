@@ -6,139 +6,147 @@ using YALM.API.Models.Db;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
+using YALM.Common.Models.Graphql.OutputModels;
 
 namespace YALM.API;
 
 public class Mutation(IDb db)
-{ 
+{
 	public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
 	{
-		var errorPayload = new Payload<CpuLog> { Error = GenerateInsertError(typeof(CpuLogDbRecord)) };
-		
-		int affectedRecords = await db.InsertAsync(new CpuLogDbRecord
+		var dbModel = new CpuLogDbRecord
 		{
 			Date = cpuLog.Date,
 			Interval = cpuLog.Interval,
 			Usage = cpuLog.Usage,
 			ServerId = cpuLog.ServerId,
 			NumberOfTasks = cpuLog.NumberOfTasks
-		});
-		
-		if (affectedRecords == 0) return errorPayload;
-		
-		var query = 
-			from l in db.CpuLogs 
-			where l.ServerId == cpuLog.ServerId && l.Date == cpuLog.Date 
+		};
+
+		var query =
+			from l in db.CpuLogs
+			where l.ServerId == cpuLog.ServerId && l.Date == cpuLog.Date
 			select l;
+
+		return await InsertRecordIntoDbAsync<CpuLogDbRecord, CpuLog>(db.InsertAsync(dbModel), query);
+	}
+
+	public async Task<Payload<MemoryLog>> AddMemoryLog(MemoryLogInput memoryLog)
+	{
+		var query =
+			from l in db.MemoryLogs
+			where l.ServerId == memoryLog.ServerId && l.Date == memoryLog.Date
+			select l;
+
+		var insertTask = db.MemoryLogs
+			.Value(l => l.Date, memoryLog.Date)
+			.Value(l => l.ServerId, memoryLog.ServerId)
+			.Value(l => l.UsedPercentage, memoryLog.UsedPercentage)
+			.Value(l => l.Interval, memoryLog.Interval)
+			.Value(l => l.SwapUsedKb, memoryLog.SwapUsedKb)
+			.Value(l => l.CachedKb, memoryLog.CachedKb)
+			.Value(l => l.UsedKb, memoryLog.UsedKb)
+			.InsertAsync();
 		
-		var log = (await query.ToListAsync()).FirstOrDefault();
-		return log == null ? errorPayload : new Payload<CpuLog> {Data = (CpuLog)log };
+		return await InsertRecordIntoDbAsync<MemoryLogDbRecord, MemoryLog>(insertTask, query);
 	}
 	
-	// public async Task<Payload<MemoryLog>> AddMemoryLog(MemoryLogInput memoryLog)
-	// {
-	// 	string date = DateToString(memoryLog.Date);
-	// 	var payload = await ExecuteInsertQuery<MemoryLogInput, MemoryLogInput, MemoryLog>(
-	// 		reader =>
-	// 		{
-	// 			var log = db.ParseMemoryLogRecord(reader);
-	// 			return new MemoryLogInput(log.ServerId, log.Interval, log.Date, log.MbUsed, log.MbTotal);
-	// 		},
-	// 		objects =>
-	// 		{
-	// 			if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
-	// 			var obj = objects.First();
-	// 			return new MemoryLog(obj.Date, obj.MbUsed, obj.MbTotal);
-	// 		},
-	// 		$"INSERT INTO Memory(serverId, date, interval, mbUsed, mbTotal)" +
-	// 		$"VALUES({memoryLog.ServerId}, '{date}', {memoryLog.Interval}, {memoryLog.MbUsed}, {memoryLog.MbTotal})",
-	// 		$"SELECT serverid, date, interval, mbUsed, mbTotal " +
-	// 		$"FROM Memory WHERE serverId = {memoryLog.ServerId} AND date = '{date}'");
-	// 	return payload;
-	// }
-	//
-	// public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput partitionLog)
-	// {
-	// 	string date = DateToString(partitionLog.Date);
-	// 	var payload = await ExecuteInsertQuery<PartitionLogInput, PartitionLogInput, PartitionLog>(
-	// 		reader =>
-	// 		{
-	// 			var log = db.ParsePartitionLogRecord(reader);
-	// 			return new PartitionLogInput(log.DiskId, log.Date, log.Interval, log.UUID, log.Bytes, log.UsedPercentage);
-	// 		},
-	// 		objects =>
-	// 		{
-	// 			if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
-	// 			var obj = objects.First();
-	// 			return new PartitionLog(obj.Date, obj.Bytes, obj.UsedPercentage);
-	// 		},
-	// 		"INSERT INTO partitionlog(diskid, uuid, date, interval, bytestotal, usage) " + 
-	// 		$"VALUES({partitionLog.DiskId}, '{partitionLog.Uuid}', '{date}', {partitionLog.Interval}, {partitionLog.Bytes}, {partitionLog.UsedPercentage})",
-	// 		"SELECT diskid, uuid, date, interval, bytestotal, usage " + 
-	// 		$"FROM partitionlog WHERE diskid = {partitionLog.DiskId} AND uuid = '{partitionLog.Uuid}' AND date = '{date}'");
-	// 	return payload;
-	// }
-	//
-	// public async Task<Payload<PartitionOutputBase>> AddPartition(PartitionInput partition)
-	// {
-	// 	//Getting disk id for the specified disk label
-	// 	int? diskId = null;
-	// 	await foreach (var reader in db.ExecuteReaderAsync($"SELECT id FROM disk WHERE label = '{partition.DiskLabel}'"))
-	// 	{
-	// 		diskId = reader.GetInt32(0);
-	// 		break;
-	// 	}
-	// 	
-	// 	if (diskId == null) throw new Exception("Error in parsing disk data!");
-	// 	
-	// 	//Adding partition to the database
-	// 	var payload = await ExecuteInsertQuery<PartitionInput, PartitionInput, PartitionOutputBase>(
-	// 		reader =>
-	// 		{
-	// 			var log = db.ParsePartitionRecord(reader);
-	// 			return new PartitionInput(partition.DiskLabel, log.Uuid, log.FilesystemName, log.FilesystemVersion, log.Label, log.MountPath);
-	// 		},
-	// 		objects =>
-	// 		{
-	// 			if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
-	// 			var obj = objects.First();
-	// 			return new PartitionOutputBase(obj.Uuid, obj.FilesystemName, obj.FilesystemVersion, obj.PartitionLabel, obj.Mountpath);
-	// 		},
-	// 		"INSERT INTO partition(diskid, uuid, filesystemname, filesystemversion, label, mountpath) " + 
-	// 		$"VALUES({diskId}, '{partition.Uuid}', '{partition.FilesystemName}', '{partition.FilesystemVersion}', '{partition.PartitionLabel}', '{partition.Mountpath}')",
-	// 		"SELECT uuid, filesystemname, filesystemversion, label, mountpath " + 
-	// 		$"FROM partition"
-	// 	);
-	// 	return payload;
-	// }
-	//
-	// public async Task<Payload<DiskOutputBase>> AddDisk(DiskInput disk)
-	// {
-	// 	var payload = await ExecuteInsertQuery<DiskInput, DiskOutputBase, DiskOutputBase>(
-	// 		reader =>
-	// 		{
-	// 			var log = db.ParseDiskRecord(reader);
-	// 			return new DiskOutputBase(log.ServerId, log.Label);
-	// 		},
-	// 		objects =>
-	// 		{
-	// 			if (objects.Count != 1) throw new Exception($"Error: reader count is {objects.Count}");
-	// 			return objects.First();
-	// 		},
-	// 		"INSERT INTO disk(serverid, label) " + 
-	// 		$"VALUES({disk.ServerId}, '{disk.Label}')",
-	// 		"SELECT serverId, label " + 
-	// 		$"FROM disk WHERE serverid = {disk.ServerId} AND label = '{disk.Label}'");
-	// 	return payload;
-	// }
+	public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput partitionLog)
+	{
+		var query =
+			from l in db.PartitionLogs
+			where l.Uuid == partitionLog.Uuid && l.Date == partitionLog.Date
+			select l;
 
-	private static string GenerateInsertError(MemberInfo type) => $"Failed to insert {type.Name}";
+		var insertTask = db.PartitionLogs
+			.Value(l => l.Date, partitionLog.Date)
+			.Value(l => l.Interval, partitionLog.Interval)
+			.Value(l => l.Uuid, partitionLog.Uuid)
+			.Value(l => l.DiskId, partitionLog.DiskId)
+			.Value(l => l.Usage, partitionLog.UsedPercentage)
+			.Value(l => l.BytesTotal, partitionLog.Bytes)
+			.InsertAsync();
+		
+		return await InsertRecordIntoDbAsync<PartitionLogDbRecord, PartitionLog>(insertTask, query);
+	}
+
+	public async Task<Payload<PartitionOutputBase>> AddPartition(PartitionInput partition)
+	{
+		int? diskId = await (
+			from d in db.Disks
+			where string.CompareOrdinal(d.Label, partition.DiskLabel) == 0
+			select d.Id).FirstOrDefaultAsync();
+		if (diskId == null) throw new Exception("Disk ID not found");
+		
+		var dbModel = new PartitionDbRecord
+		{
+			DiskId = (int)diskId,
+			Uuid = partition.Uuid,
+			Label = partition.PartitionLabel,
+			FilesystemName = partition.FilesystemName,
+			FilesystemVersion = partition.FilesystemVersion,
+			MountPath = partition.Mountpath
+		};
 	
+		var query =
+			from p in db.Partitions
+			where p.DiskId == diskId && string.CompareOrdinal(p.Uuid, partition.Uuid) == 0
+			select p;
+	
+		var insertTask = db.Partitions
+			.Value(p => p.FilesystemName, dbModel.FilesystemName)
+			.Value(p => p.FilesystemVersion, dbModel.FilesystemVersion)
+			.Value(p => p.Uuid, dbModel.Uuid)
+			.Value(p => p.DiskId, diskId)
+			.Value(p => p.Label, dbModel.Label)
+			.Value(p => p.MountPath, dbModel.MountPath)
+			.InsertAsync();
+		
+		return await InsertRecordIntoDbAsync<PartitionDbRecord, PartitionOutputBase>(insertTask, query);
+	}
+
+	public async Task<Payload<DiskOutputBase>> AddDisk(DiskInput disk)
+	{
+		var dbModel = new DiskDbRecord
+		{
+			Label = disk.Label,
+			ServerId = disk.ServerId
+		};
+
+		var query =
+			from d in db.Disks
+			where d.ServerId == disk.ServerId && string.CompareOrdinal(d.Label, disk.Label) == 0
+			select d;
+
+		return await InsertRecordIntoDbAsync<DiskDbRecord, DiskOutputBase>(db.InsertAsync(dbModel), query);
+	}
+
+	private async Task<Payload<TOutput>> InsertRecordIntoDbAsync<TDbModel, TOutput>(Task<int> insertTask, IQueryable<TDbModel> selectQuery) where TDbModel : notnull
+	{
+		var tableAttr = typeof(TDbModel).GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault() as TableAttribute;
+		var errorPayload = new Payload<TOutput> { Error = GenerateInsertError(tableAttr?.Name) };
+
+		//Inserting data into the database
+		int affectedRecords = await insertTask;
+		if (affectedRecords == 0) return errorPayload;
+
+		//Getting the inserted record and returning it (or returning error if data couldn't be fetched)
+		var log = (await selectQuery.ToListAsync()).FirstOrDefault();
+		return log == null
+			? errorPayload
+			: new Payload<TOutput>
+			{
+				Data = (TOutput)Convert.ChangeType(log, typeof(TOutput))
+			};
+	}
+
+	private static string GenerateInsertError(string? type) => $"Failed to insert {type ?? "object"}";
+
 	private static string? GetTableNameFromType(ICustomAttributeProvider type)
 	{
 		var tableAttr = type.GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault() as TableAttribute;
 		return tableAttr?.Name;
 	}
-	
+
 	private static string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
 }
