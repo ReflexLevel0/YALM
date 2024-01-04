@@ -13,14 +13,14 @@ internal class Monitor
 {
 	private static async Task Main()
 	{
-		var config = JsonSerializer.Deserialize<Config>(File.ReadAllText("config.json"));
+		var config = JsonSerializer.Deserialize<Config>(await File.ReadAllTextAsync("config.json"));
 		if (config == null) throw new Exception("Configuration invalid!");
 		var graphQlClient = new GraphQLHttpClient(config.ApiUrl, new NewtonsoftJsonSerializer());
 		var logHelper = new LogHelper(config);
 
 		while (true)
 		{
-			var log = logHelper.Log();
+			var log = await logHelper.Log();
 
 			//Removing seconds from the date
 			var date = DateTime.Now;
@@ -30,8 +30,8 @@ internal class Monitor
 			var variables = new GraphqlVariables();
 			var variableStringBuilder = new StringBuilder(256);
 			var queryStringBuilder = new StringBuilder(1024);
-			
-            if (log.CpuLog != null)
+
+			if (log.CpuLog != null)
 			{
 				variableStringBuilder.Append("$cpu: CpuInput!,");
 				queryStringBuilder.Append("""
@@ -39,20 +39,30 @@ internal class Monitor
 				                              error
 				                          },
 				                          """);
-				variables.CpuLog = new CpuLogInput(0, config.IntervalInMinutes, date, log.CpuLog.Usage, log.CpuLog.NumberOfTasks);
+				variables.CpuLog = new CpuLogInput
+				{
+					ServerId = 0,
+					Interval = config.IntervalInMinutes,
+					Date = date,
+					Usage = log.CpuLog.Usage,
+					NumberOfTasks = log.CpuLog.NumberOfTasks
+				};
 			}
 
-			if (log.MemoryLog != null)
-			{
-				variableStringBuilder.Append("$memory: MemoryInput!,");
-				queryStringBuilder.Append("""
-				                          addMemoryLog(memory: $memory){
-				                              error
-				                          },
-				                          """);
-				variables.MemoryLog = new MemoryLogInput(0, config.IntervalInMinutes, date, (int)log.MemoryLog.UsedMemoryMb, (int)log.MemoryLog.TotalMemoryMb);
-			}
-
+			// if (log.MemoryLog != null)
+			// {
+			// 	variableStringBuilder.Append("$memory: MemoryInput!,");
+			// 	queryStringBuilder.Append("""
+			// 	                          addMemoryLog(memory: $memory){
+			// 	                              error
+			// 	                          },
+			// 	                          """);
+			// 	variables.MemoryLog = new MemoryLogInput
+			// 	{
+			// 		ServerId = 0, Interval = config.IntervalInMinutes, Date = date, (int)log.MemoryLog.MemoryFreeKb, (int)log.MemoryLog.MemoryTotalKb
+			// 	};
+			// }
+			//
 			// if (log.StorageLogs != null && log.StorageLogs.Count != 0)
 			// {
 			// 	variableStringBuilder.Append("$storage: StorageLogInput!,");
@@ -69,13 +79,15 @@ internal class Monitor
 			// 		sorageVolumes = log.StorageLogs
 			// 	};
 			// }
-			
+
+			Console.WriteLine(log);
+
 			//Configuring the request
 			var request = new GraphQLRequest(
 				$"mutation({variableStringBuilder}){{{queryStringBuilder}}}",
 				variables: variables
 			);
-			
+
 			try
 			{
 				//Sending the request and printing out result/errors

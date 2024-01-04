@@ -1,9 +1,10 @@
-using YALM.Monitor.Models;
+using YALM.Monitor.Models.LogInfo;
 
 namespace YALM.Monitor;
 
 public class LogHelper
 {
+	private readonly DataHelper _dataHelper = new();
 	private readonly Config _config;
 	private DateTime? _lastLogDate;
 	private const string LastLogDateFilename = "log_date.txt";
@@ -17,23 +18,28 @@ public class LogHelper
 		}
 	}
 	
-	public LogBase Log()
+	public async Task<LogBase> Log()
 	{
 		var log = new LogBase(DateTime.Now);
 
 		if (_config.Cpu)
 		{
-			log.CpuLog = DataParser.GetCpuInfo();
+			log.CpuInfo = await _dataHelper.GetCpuInfo();
 		}
 		
 		if (_config.Memory)
 		{
-			log.MemoryLog = DataParser.GetMemoryInfo();
+			log.MemoryInfo = await _dataHelper.GetMemoryInfo();
+		}
+
+		if (_config.Process)
+		{
+			log.ProcessLogs = await _dataHelper.GetProcessInfo();
 		}
 
 		if (_config.Storage)
 		{
-			log.StorageLogs = DataParser.GetStorageInfo().ToList();
+			log.StorageLogs = _dataHelper.GetStorageInfo().ToList();
 		}
 
 		if (_config.Network)
@@ -43,9 +49,9 @@ public class LogHelper
 		
 		if (_config.Services != null)
 		{
-			var serviceLogs = _config.Services.Select(s => DataParser.GetServiceInfo(s, _lastLogDate)).ToList();
+			var serviceLogs = _config.Services.Select(s => _dataHelper.GetServiceInfo(s, _lastLogDate)).ToList();
 			log.ServiceLogs = serviceLogs;
-			File.WriteAllText(LastLogDateFilename, DateTime.Now.ToString("u"));
+			await File.WriteAllTextAsync(LastLogDateFilename, DateTime.Now.ToString("u"));
 			_lastLogDate = DateTime.Now;
 		}
 		

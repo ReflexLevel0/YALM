@@ -3,6 +3,7 @@
   "IntervalInMinutes": 1,
   "Cpu": true,
   "Memory": true,
+  "Process": true,
   "Storage": true,
   "Services": [
     "postgresql",

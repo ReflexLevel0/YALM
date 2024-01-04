@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace YALM.Monitor.Models;
+namespace YALM.Monitor.Models.LogInfo;
 
 public class ServiceLog
 {
