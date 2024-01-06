@@ -105,11 +105,11 @@ namespace DataModel
 
 		public object ToType(Type conversionType, IFormatProvider? provider)
 		{
-			if (conversionType == typeof(PartitionOutputBase)) 
-				return new PartitionOutputBase(Uuid, FilesystemName, FilesystemVersion, Label, MountPath);
-			if(conversionType == typeof(PartitionOutput))
-				return new PartitionOutputBase(Uuid, FilesystemName, FilesystemVersion, Label, MountPath);
-			throw new NotImplementedException();
+			if (conversionType != typeof(PartitionOutputBase) && conversionType != typeof(PartitionOutput))
+			{
+				throw new NotImplementedException();
+			}
+			return new PartitionOutput(Uuid, FilesystemName, FilesystemVersion, Label, MountPath);
 		}
 
 		public ushort ToUInt16(IFormatProvider? provider)

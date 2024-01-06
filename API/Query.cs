@@ -89,23 +89,17 @@ public class Query(IDb db)
 			return new PartitionLog { Date = logs.First().Date, Bytes = bytes, UsedPercentage = usage };
 		};
 
-		//Getting all the disks
-		var disks = new List<DiskOutput>();
-		foreach (var disk in db.Disks)
+		//Going through every disk and getting data for it
+		var disks = await db.Disks.ToListAsync();
+		foreach (var d in disks)
 		{
-			var diskOutput = new DiskOutput(disk.ServerId, disk.Label);
-			disks.Add(diskOutput);
-		}
+			var partitions = await 
+				(from p in db.Partitions 
+				where p.DiskId == d.Id
+				select p).ToListAsync();
 
-		//Getting all partitions
-		foreach (var disk in disks)
-		{
-			var partitionQuery = 
-				from p in db.Partitions 
-				where p.DiskId == disk.ServerId 
-				select p; 
-			
-			foreach (var partition in partitionQuery)
+			var disk = new DiskOutput(d.ServerId, d.Label);
+			foreach (var partition in partitions)
 			{
 				var partitionOutput = (PartitionOutput)Convert.ChangeType(partition, typeof(PartitionOutput));
 				disk.Partitions.Add(partitionOutput);
