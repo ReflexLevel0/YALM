@@ -73,6 +73,15 @@ public class Mutation(IDb db)
 	
 	public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput partitionLog)
 	{
+		int? diskId = await
+			(from p in db.Partitions 
+				join d in db.Disks on p.DiskId equals d.Id 
+				where partitionLog.ServerId == d.ServerId && string.CompareOrdinal(partitionLog.Uuid, p.Uuid) == 0 
+				select d.Id)
+			.FirstOrDefaultAsync();
+
+		if(diskId == null) throw new Exception("Partition not found!");
+		
 		var query =
 			from l in db.PartitionLogs
 			where l.Uuid == partitionLog.Uuid && l.Date == partitionLog.Date
@@ -82,7 +91,7 @@ public class Mutation(IDb db)
 			.Value(l => l.Date, partitionLog.Date)
 			.Value(l => l.Interval, partitionLog.Interval)
 			.Value(l => l.Uuid, partitionLog.Uuid)
-			.Value(l => l.DiskId, partitionLog.DiskId)
+			.Value(l => l.DiskId, diskId)
 			.Value(l => l.Usage, partitionLog.UsedPercentage)
 			.Value(l => l.BytesTotal, partitionLog.Bytes)
 			.InsertAsync();
