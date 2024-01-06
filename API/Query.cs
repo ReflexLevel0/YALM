@@ -1,4 +1,5 @@
 using DataModel;
+using LinqToDB;
 using YALM.API.Models.Db;
 using YALM.Common.Models.Graphql.Logs;
 using YALM.Common.Models.Graphql.OutputModels;
@@ -26,8 +27,17 @@ public class Query(IDb db)
 			int numberOfTasks = (int)QueryHelper.CombineValues(method, numberOfTasksValues.ToList());
 			return new CpuLog { Date = logs.First().Date, Usage = usageProcessed, NumberOfTasks = numberOfTasks };
 		};
-
+		
 		var cpuOutput = new CpuOutput(serverId);
+		var cpu = await (from c in db.Cpus where c.ServerId == serverId select c).FirstOrDefaultAsync();
+		if (cpu != null)
+		{
+			cpuOutput.Name = cpu.Name;
+			cpuOutput.Architecture = cpu.Architecture;
+			cpuOutput.Cores = cpu.Cores;
+			cpuOutput.Threads = cpu.Threads;
+			cpuOutput.Frequency = cpu.FrequencyMhz;
+		} 
 		await foreach (var log in QueryHelper.GetLogs(db.CpuLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
 		{
 			cpuOutput.Logs.Add(log);

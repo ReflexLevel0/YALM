@@ -12,6 +12,26 @@ namespace YALM.API;
 
 public class Mutation(IDb db)
 {
+	public async Task<Payload<CpuOutputBase>> AddCpu(CpuInput cpu)
+	{
+		var dbModel = new CpuDbRecord
+		{
+			ServerId = cpu.ServerId,
+			Architecture = cpu.Architecture,
+			Name = cpu.Name,
+			Cores = cpu.Cores,
+			Threads = cpu.Threads,
+			FrequencyMhz = cpu.FrequencyMhz
+		};
+		
+		var query =
+			from c in db.Cpus
+			where c.ServerId == cpu.ServerId
+			select c;
+		
+		return await InsertRecordIntoDbAsync<CpuDbRecord, CpuOutputBase>(db.InsertAsync(dbModel), query);
+	}
+	
 	public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
 	{
 		var dbModel = new CpuLogDbRecord

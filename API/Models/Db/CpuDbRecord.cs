@@ -89,8 +89,10 @@ namespace DataModel
 
 		public object ToType(Type conversionType, IFormatProvider? provider)
 		{
-			if (conversionType == typeof(CpuOutputBase)) return new CpuOutputBase(ServerId);
-			if (conversionType == typeof(CpuOutput)) return new CpuOutput(ServerId);
+			if (conversionType == typeof(CpuOutputBase) || conversionType == typeof(CpuOutput))
+			{
+				return new CpuOutput(ServerId, Name, Architecture, Cores, Threads, FrequencyMhz);
+			}
 			throw new NotImplementedException();
 		}
 
