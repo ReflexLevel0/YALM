@@ -7,42 +7,14 @@ namespace YALM.Monitor;
 
 public class DataHelper
 {
-	internal readonly RealTimeInfo RealTimeInfo = new();
-
+	private ProcessInfoWrapper _processInfoWrapper = new();
+	
 	public async Task<CpuInfo?> GetCpuInfo()
 	{
 		var cpuInfo = new CpuInfo();
-
-		//Getting cpu info from "top" command
-		var process = ProcessHelper.StartProcess("top", "-bn1");
-		string[] lines = (await process.StandardOutput.ReadToEndAsync()).Split('\n');
-		foreach (string line in lines)
-		{
-			if (line.StartsWith("Tasks:"))
-			{
-				foreach (var value in ParseTopLine(line))
-				{
-					if (string.CompareOrdinal(value.Item1, "total") != 0) continue;
-					cpuInfo.NumberOfTasks = (int)value.Item2;
-					break;
-				}
-			}
-			else if (line.StartsWith("%Cpu(s):"))
-			{
-				foreach (var value in ParseTopLine(line))
-				{
-					if (string.CompareOrdinal(value.Item1, "id") != 0) continue;
-					cpuInfo.CpuUsage = (100 - value.Item2) / 100;
-					break;
-				}
-				break;
-			}
-		}
-
-		await process.WaitForExitAsync();
-
+		
 		//Getting additional cpu info from "lscpu" command
-		process = ProcessHelper.StartProcess("lscpu", "-B -J");
+		var process = ProcessHelper.StartProcess("lscpu", "-B -J");
 		var cpuJson = JsonConvert.DeserializeObject<LscpuJson>(await process.StandardOutput.ReadToEndAsync());
 		if (cpuJson?.Fields == null) throw new Exception("Invalid CPU info data!");
 		foreach (var field in cpuJson.Fields)
@@ -73,116 +45,14 @@ public class DataHelper
 
 	public async Task<MemoryInfo?> GetMemoryInfo()
 	{
-		var memoryInfo = new MemoryInfo();
-
-		//Getting memory information from the "top" command
-		var process = ProcessHelper.StartProcess("top", "-bn1");
-		string[] lines = (await process.StandardOutput.ReadToEndAsync()).Split('\n');
-		foreach (string line in lines)
-		{
-			if (line.StartsWith("MiB Mem : "))
-			{
-				foreach (var value in ParseTopLine(line))
-				{
-					ulong kbValue = (ulong)(value.Item2 * 1024);
-					switch (value.Item1)
-					{
-						case "total":
-							memoryInfo.MemoryTotalKb = kbValue;
-							break;
-						case "free":
-							memoryInfo.MemoryFreeKb = kbValue;
-							break;
-						case "used":
-							memoryInfo.MemoryUsedKb = kbValue;
-							break;
-						case "buff/cache":
-							memoryInfo.CachedKb = kbValue;
-							break;
-					}
-				}
-			}
-			else if (line.StartsWith("MiB Swap:"))
-			{
-				foreach (var value in ParseTopLine(line))
-				{
-					ulong kbValue = (ulong)(value.Item2 * 1024);
-					switch (value.Item1)
-					{
-						case "total":
-							memoryInfo.SwapTotalKb = kbValue;
-							break;
-						case "free":
-							memoryInfo.SwapFreeKb = kbValue;
-							break;
-						case "used":
-							memoryInfo.SwapUsedKb = kbValue;
-							break;
-						case "Mem":
-							memoryInfo.AvailableMemoryKb = kbValue;
-							break;
-					}
-				}	
-				break;
-			}
-		}
-
-		await process.WaitForExitAsync();
-		return memoryInfo;
+		await _processInfoWrapper.RefreshProcessInfo();
+		return new MemoryInfo { MemoryTotalKb = _processInfoWrapper.MemoryTotalKb, SwapTotalKb = _processInfoWrapper.SwapTotalKb };
 	}
 
-	public async Task<List<ProcessLog>?> GetProcessInfo()
+	public async Task<ProcessInfo> GetProcessInfo()
 	{
-		var processLogs = new List<ProcessLog>();
-
-		//Spawning "top" process and skipping first batch of data (top is printing data for 2 seconds, and first one is being ignored, for some reason the measurements are more correct this way)
-		var process = ProcessHelper.StartProcess("top", "-bn2 --sort-override \"%CPU\" -w 400");
-		var lines = (await process.StandardOutput.ReadToEndAsync()).Split('\n').ToList();
-		int startIndex = lines.FindIndex(1, s => s.StartsWith("top -"));
-		lines = lines.Skip(startIndex).ToList();
-
-		//Parsing data from "top" process
-		bool commandListStart = false;
-		foreach (string line in lines)
-		{
-			if (line.Trim().StartsWith("PID"))
-			{
-				commandListStart = true;
-			}
-			else if (commandListStart)
-			{
-				if (line.Length == 0)
-				{
-					break;
-				}
-
-				string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-				double cpuPercentage = double.Parse(parts[8]) / 100;
-				double memPercentage = double.Parse(parts[9]) / 100;
-				string command = parts[11];
-				if (cpuPercentage == 0 || memPercentage == 0) continue;
-
-				//Adding the process to the list of processes (or updating process CPU usage if it already exists)
-				var proc = processLogs.FirstOrDefault(p => string.CompareOrdinal(p.Name, command) == 0);
-				if (proc != null)
-				{
-					proc.CpuUsage += cpuPercentage;
-					proc.MemoryUsage += memPercentage;
-				}
-				else
-				{
-					processLogs.Add(new ProcessLog { Name = command, CpuUsage = cpuPercentage, MemoryUsage = memPercentage });
-				}
-			}
-		}
-		
-		await process.WaitForExitAsync();
-		
-		//A process will be stored only if it is top 10 cpu/memory using process
-		var topCpuProcessLogs = processLogs.OrderByDescending(p => p.CpuUsage).Take(10).ToList();
-		var topMemoryProcessLogs = processLogs.OrderByDescending(p => p.MemoryUsage).Take(10).ToList();
-		processLogs = processLogs.Where(p => topCpuProcessLogs.Contains(p) || topMemoryProcessLogs.Contains(p)).ToList();
-		return processLogs;
+		await _processInfoWrapper.RefreshProcessInfo();
+		return _processInfoWrapper;
 	}
 
 	public ServiceLog GetServiceInfo(string serviceName, DateTime? lastLogDate)
@@ -264,16 +134,6 @@ public class DataHelper
 					UsedPercentage = used
 				};
 			}
-		}
-	}
-	
-	private IEnumerable<Tuple<string, double>> ParseTopLine(string line)
-	{
-		line = line.Replace("used.", "used,");
-		foreach (string value in line.Split(new[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries).Skip(1))
-		{
-			string[] valueParts = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-			yield return new Tuple<string, double>(valueParts.Last(), double.Parse(valueParts.First().Trim()));
 		}
 	}
 }

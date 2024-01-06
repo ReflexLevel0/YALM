@@ -34,7 +34,7 @@ public class LogHelper
 
 		if (_config.Process)
 		{
-			log.ProcessLogs = await _dataHelper.GetProcessInfo();
+			log.ProcessInfo = await _dataHelper.GetProcessInfo();
 		}
 
 		if (_config.Storage)

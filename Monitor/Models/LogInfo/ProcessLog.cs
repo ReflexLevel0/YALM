@@ -8,6 +8,6 @@ public class ProcessLog
 
 	public override string ToString()
 	{
-		return $"{Name} {CpuUsage} CPU%, {MemoryUsage:P} MEM%";
+		return $"{Name} {CpuUsage:P} CPU%, {MemoryUsage:P} MEM%";
 	}
 }
