@@ -34,8 +34,8 @@ public class Mutation(IDb db)
 
 	public async Task<Payload<CpuOutputBase>> UpdateCpu(CpuKeyInput? oldCpuId, CpuInput newCpu)
 	{
-		//If no oldCpuId is specified, new processor will be created
-		if (oldCpuId == null)
+		//If no oldCpuId is specified or if the new , new processor will be created
+		if (oldCpuId == null || await db.Cpus.Where(c => c.ServerId == oldCpuId.ServerId).CountAsync() == 0)
 		{
 			var dbModel = CpuInputToDbModel(newCpu);
 			return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(db.InsertAsync(dbModel), _getCpuQuery(newCpu));
