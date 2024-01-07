@@ -43,12 +43,6 @@ public class DataHelper
 		return cpuInfo;
 	}
 
-	public async Task<MemoryInfo?> GetMemoryInfo()
-	{
-		await _processInfoWrapper.RefreshProcessInfo();
-		return new MemoryInfo { MemoryTotalKb = _processInfoWrapper.MemoryTotalKb, SwapTotalKb = _processInfoWrapper.SwapTotalKb };
-	}
-
 	public async Task<ProcessInfo> GetProcessInfo()
 	{
 		await _processInfoWrapper.RefreshProcessInfo();

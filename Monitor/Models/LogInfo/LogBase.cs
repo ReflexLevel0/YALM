@@ -6,8 +6,6 @@ public class LogBase(DateTime logTime)
 {
 	public DateTime LogTime { get; } = logTime;
 	public CpuInfo? CpuInfo { get; set; }
-	public CpuLog? CpuLog { get; set; }
-	public MemoryInfo? MemoryInfo { get; set; }
 	public ProcessInfo? ProcessInfo { get; set; }
 	public List<StorageLog>? StorageLogs { get; set; }
 	public List<ServiceLog>? ServiceLogs { get; set; }
@@ -17,8 +15,6 @@ public class LogBase(DateTime logTime)
 		var builder = new StringBuilder(2048);
 		builder.AppendLine($"Log time: {LogTime}\n");
 		if (CpuInfo != null) builder.AppendLine(CpuInfo.ToString());
-		if (CpuLog != null) builder.AppendLine(CpuLog.ToString());
-		if (MemoryInfo != null) builder.AppendLine(MemoryInfo.ToString());
 		if (ProcessInfo != null) builder.AppendLine(ProcessInfo.ToString());
 		if (StorageLogs != null)
 		{

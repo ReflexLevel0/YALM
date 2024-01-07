@@ -51,38 +51,6 @@ internal class Monitor
 				};
 			}
 			
-			// if (log.CpuLog != null)
-			// {
-			// 	variableStringBuilder.Append("$cpuLog: CpuLogInput!,");
-			// 	queryStringBuilder.Append("""
-			// 	                          addCpuLog(cpuLog: $cpuLog){
-			// 	                              error
-			// 	                          },
-			// 	                          """);
-			// 	variables.CpuLog = new CpuLogInput
-			// 	{
-			// 		ServerId = 0,
-			// 		Interval = config.IntervalInMinutes,
-			// 		Date = date,
-			// 		Usage = log.CpuLog.Usage,
-			// 		NumberOfTasks = log.CpuLog.NumberOfTasks
-			// 	};
-			// }
-
-			// if (log.MemoryLog != null)
-			// {
-			// 	variableStringBuilder.Append("$memory: MemoryInput!,");
-			// 	queryStringBuilder.Append("""
-			// 	                          addMemoryLog(memory: $memory){
-			// 	                              error
-			// 	                          },
-			// 	                          """);
-			// 	variables.MemoryLog = new MemoryLogInput
-			// 	{
-			// 		ServerId = 0, Interval = config.IntervalInMinutes, Date = date, (int)log.MemoryLog.MemoryFreeKb, (int)log.MemoryLog.MemoryTotalKb
-			// 	};
-			// }
-			//
 			// if (log.StorageLogs != null && log.StorageLogs.Count != 0)
 			// {
 			// 	variableStringBuilder.Append("$storage: StorageLogInput!,");

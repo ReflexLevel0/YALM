@@ -26,11 +26,6 @@ public class LogHelper
 		{
 			log.CpuInfo = await _dataHelper.GetCpuInfo();
 		}
-		
-		if (_config.Memory)
-		{
-			log.MemoryInfo = await _dataHelper.GetMemoryInfo();
-		}
 
 		if (_config.Process)
 		{

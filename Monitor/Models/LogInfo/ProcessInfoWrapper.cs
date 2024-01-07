@@ -3,8 +3,6 @@ namespace YALM.Monitor.Models.LogInfo;
 public class ProcessInfoWrapper : ProcessInfo
 {
 	public DateTime? LastRefreshedDateTime { get; set; }
-	public ulong MemoryTotalKb { get; set; }
-	public ulong SwapTotalKb { get; set; }
 
 	public async Task RefreshProcessInfo()
 	{
@@ -18,6 +16,8 @@ public class ProcessInfoWrapper : ProcessInfo
 
 		//Parsing data from "top" process
 		bool commandListStart = false;
+		CpuLog = new CpuLog();
+		MemoryLog = new MemoryLog();
 		foreach (string line in lines)
 		{
 			if (line.StartsWith("Tasks:"))
@@ -25,7 +25,7 @@ public class ProcessInfoWrapper : ProcessInfo
 				foreach (var value in ParseTopLine(line))
 				{
 					if (string.CompareOrdinal(value.Item1, "total") != 0) continue;
-					NumberOfTasks = (int)value.Item2;
+					CpuLog.NumberOfTasks = (int)value.Item2;
 					break;
 				}
 			}
@@ -34,7 +34,7 @@ public class ProcessInfoWrapper : ProcessInfo
 				foreach (var value in ParseTopLine(line))
 				{
 					if (string.CompareOrdinal(value.Item1, "id") != 0) continue;
-					CpuUsage = (100 - value.Item2) / 100;
+					CpuLog.Usage = (100 - value.Item2) / 100;
 					break;
 				}
 			}
@@ -46,16 +46,16 @@ public class ProcessInfoWrapper : ProcessInfo
 					switch (value.Item1)
 					{
 						case "total":
-							MemoryTotalKb = kbValue;
+							MemoryLog.MemoryTotalKb = kbValue;
 							break;
 						case "free":
-							MemoryFreeKb = kbValue;
+							MemoryLog.MemoryFreeKb = kbValue;
 							break;
 						case "used":
-							MemoryUsedKb = kbValue;
+							MemoryLog.MemoryUsedKb = kbValue;
 							break;
 						case "buff/cache":
-							CachedKb = kbValue;
+							MemoryLog.CachedKb = kbValue;
 							break;
 					}
 				}
@@ -68,16 +68,16 @@ public class ProcessInfoWrapper : ProcessInfo
 					switch (value.Item1)
 					{
 						case "total":
-							SwapTotalKb = kbValue;
+							MemoryLog.SwapTotalKb = kbValue;
 							break;
 						case "free":
-							SwapFreeKb = kbValue;
+							MemoryLog.SwapFreeKb = kbValue;
 							break;
 						case "used":
-							SwapUsedKb = kbValue;
+							MemoryLog.SwapUsedKb = kbValue;
 							break;
 						case "Mem":
-							AvailableMemoryKb = kbValue;
+							MemoryLog.AvailableMemoryKb = kbValue;
 							break;
 					}
 				}
