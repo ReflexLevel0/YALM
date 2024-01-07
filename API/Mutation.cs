@@ -32,7 +32,7 @@ public class Mutation(IDb db)
 		}
 	}
 
-	public async Task<Payload<CpuOutputBase>> UpdateCpu(CpuKeyInput? oldCpuId, CpuInput newCpu)
+	public async Task<Payload<CpuOutputBase>> UpdateCpu(CpuIdInput? oldCpuId, CpuInput newCpu)
 	{
 		//If no oldCpuId is specified or if the new , new processor will be created
 		if (oldCpuId == null || await db.Cpus.Where(c => c.ServerId == oldCpuId.ServerId).CountAsync() == 0)
@@ -61,7 +61,7 @@ public class Mutation(IDb db)
 		}
 	}
 
-	public async Task<Payload<CpuOutputBase>> DeleteCpu(CpuKeyInput cpuId)
+	public async Task<Payload<CpuOutputBase>> DeleteCpu(CpuIdInput cpuId)
 	{
 		var cpu = await
 			(from c in db.Cpus

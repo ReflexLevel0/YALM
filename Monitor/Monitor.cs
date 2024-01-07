@@ -31,23 +31,43 @@ internal class Monitor
 			var variableStringBuilder = new StringBuilder(256);
 			var queryStringBuilder = new StringBuilder(1024);
 
-			if (log.CpuLog != null)
+			if (log.CpuInfo != null)
 			{
-				variableStringBuilder.Append("$cpu: CpuInput!,");
+				variableStringBuilder.Append("$oldCpu: CpuIdInput!, $cpu: CpuInput!,");
 				queryStringBuilder.Append("""
-				                          addCpuLog(cpu: $cpu){
+				                            updateCpu(oldCpuId: $oldCpu, newCpu: $cpu){
 				                              error
-				                          },
+				                            },
 				                          """);
-				variables.CpuLog = new CpuLogInput
+				variables.OldCpu = new CpuIdInput { ServerId = 0 };
+				variables.Cpu = new CpuInput
 				{
 					ServerId = 0,
-					Interval = config.IntervalInMinutes,
-					Date = date,
-					Usage = log.CpuLog.Usage,
-					NumberOfTasks = log.CpuLog.NumberOfTasks
+					Architecture = log.CpuInfo.Architecture,
+					Name = log.CpuInfo.Name,
+					FrequencyMhz = log.CpuInfo.Frequency,
+					Threads = log.CpuInfo.Threads,
+					Cores = log.CpuInfo.Cores
 				};
 			}
+			
+			// if (log.CpuLog != null)
+			// {
+			// 	variableStringBuilder.Append("$cpuLog: CpuLogInput!,");
+			// 	queryStringBuilder.Append("""
+			// 	                          addCpuLog(cpuLog: $cpuLog){
+			// 	                              error
+			// 	                          },
+			// 	                          """);
+			// 	variables.CpuLog = new CpuLogInput
+			// 	{
+			// 		ServerId = 0,
+			// 		Interval = config.IntervalInMinutes,
+			// 		Date = date,
+			// 		Usage = log.CpuLog.Usage,
+			// 		NumberOfTasks = log.CpuLog.NumberOfTasks
+			// 	};
+			// }
 
 			// if (log.MemoryLog != null)
 			// {
@@ -83,10 +103,9 @@ internal class Monitor
 			Console.WriteLine(log);
 
 			//Configuring the request
-			var request = new GraphQLRequest(
-				$"mutation({variableStringBuilder}){{{queryStringBuilder}}}",
-				variables: variables
-			);
+			string requestString = $"mutation({variableStringBuilder}){{\n{queryStringBuilder}\n}}";
+			Console.WriteLine(requestString);
+			var request = new GraphQLRequest(requestString, variables: variables);
 
 			try
 			{
