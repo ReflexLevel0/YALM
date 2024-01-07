@@ -17,10 +17,19 @@ public class Mutation(IDb db)
 		where c.ServerId == cpu.ServerId
 		select c;
 
+	private const string GenericDatabaseErrorString = "Database error";
+
 	public async Task<Payload<CpuOutputBase>> AddCpu(CpuInput cpu)
 	{
 		var dbModel = CpuInputToDbModel(cpu);
-		return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(db.InsertAsync(dbModel), _getCpuQuery(cpu));
+		try
+		{
+			return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(db.InsertAsync(dbModel), _getCpuQuery(cpu));
+		}
+		catch
+		{
+			return new Payload<CpuOutputBase> { Error = GenericDatabaseErrorString };
+		}
 	}
 
 	public async Task<Payload<CpuOutputBase>> UpdateCpu(CpuKeyInput? oldCpuId, CpuInput newCpu)
@@ -41,7 +50,15 @@ public class Mutation(IDb db)
 			.Set(c => c.Threads, newCpu.Threads)
 			.Set(c => c.FrequencyMhz, newCpu.FrequencyMhz)
 			.UpdateAsync();
-		return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(task, _getCpuQuery(newCpu));
+
+		try
+		{
+			return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(task, _getCpuQuery(newCpu));
+		}
+		catch
+		{
+			return new Payload<CpuOutputBase> { Error = GenericDatabaseErrorString };
+		}
 	}
 
 	public async Task<Payload<CpuOutputBase>> DeleteCpu(CpuKeyInput cpuId)
@@ -52,7 +69,15 @@ public class Mutation(IDb db)
 				select c).FirstOrDefaultAsync();
 		if (cpu == null) return new Payload<CpuOutputBase> { Error = "Cpu not found" };
 		var selectQuery = from c in db.Cpus where c.ServerId == cpuId.ServerId select c;
-		return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(db.DeleteAsync(cpu), selectQuery);
+
+		try
+		{
+			return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(db.DeleteAsync(cpu), selectQuery);
+		}
+		catch
+		{
+			return new Payload<CpuOutputBase> { Error = GenericDatabaseErrorString };
+		}
 	}
 
 	public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
@@ -71,7 +96,14 @@ public class Mutation(IDb db)
 			where l.ServerId == cpuLog.ServerId && l.Date == cpuLog.Date
 			select l;
 
-		return await UpdateDbRecord<CpuLogDbRecord, CpuLog>(db.InsertAsync(dbModel), query);
+		try
+		{
+			return await UpdateDbRecord<CpuLogDbRecord, CpuLog>(db.InsertAsync(dbModel), query);
+		}
+		catch
+		{
+			return new Payload<CpuLog> { Error = GenericDatabaseErrorString };
+		}
 	}
 
 	public async Task<Payload<MemoryLog>> AddMemoryLog(MemoryLogInput memoryLog)
@@ -91,7 +123,14 @@ public class Mutation(IDb db)
 			.Value(l => l.UsedKb, memoryLog.UsedKb)
 			.InsertAsync();
 
-		return await UpdateDbRecord<MemoryLogDbRecord, MemoryLog>(insertTask, query);
+		try
+		{
+			return await UpdateDbRecord<MemoryLogDbRecord, MemoryLog>(insertTask, query);
+		}
+		catch
+		{
+			return new Payload<MemoryLog> { Error = GenericDatabaseErrorString };
+		}
 	}
 
 	public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput partitionLog)
@@ -119,7 +158,14 @@ public class Mutation(IDb db)
 			.Value(l => l.BytesTotal, partitionLog.Bytes)
 			.InsertAsync();
 
-		return await UpdateDbRecord<PartitionLogDbRecord, PartitionLog>(insertTask, query);
+		try
+		{
+			return await UpdateDbRecord<PartitionLogDbRecord, PartitionLog>(insertTask, query);
+		}
+		catch
+		{
+			return new Payload<PartitionLog> { Error = GenericDatabaseErrorString };
+		}
 	}
 
 	public async Task<Payload<PartitionOutputBase>> AddPartition(PartitionInput partition)
@@ -154,7 +200,14 @@ public class Mutation(IDb db)
 			.Value(p => p.MountPath, dbModel.MountPath)
 			.InsertAsync();
 
-		return await UpdateDbRecord<PartitionDbRecord, PartitionOutputBase>(insertTask, query);
+		try
+		{
+			return await UpdateDbRecord<PartitionDbRecord, PartitionOutputBase>(insertTask, query);
+		}
+		catch
+		{
+			return new Payload<PartitionOutputBase> { Error = GenericDatabaseErrorString };
+		}
 	}
 
 	public async Task<Payload<DiskOutputBase>> AddDisk(DiskInput disk)
@@ -170,7 +223,14 @@ public class Mutation(IDb db)
 			where d.ServerId == disk.ServerId && string.CompareOrdinal(d.Label, disk.Label) == 0
 			select d;
 
-		return await UpdateDbRecord<DiskDbRecord, DiskOutputBase>(db.InsertAsync(dbModel), query);
+		try
+		{
+			return await UpdateDbRecord<DiskDbRecord, DiskOutputBase>(db.InsertAsync(dbModel), query);
+		}
+		catch
+		{
+			return new Payload<DiskOutputBase> { Error = GenericDatabaseErrorString };
+		}
 	}
 
 	private async Task<Payload<TOutput>> UpdateDbRecord<TDbModel, TOutput>(Task<int> task, IQueryable<TDbModel> selectUpdatedObjectsQuery) where TDbModel : notnull
