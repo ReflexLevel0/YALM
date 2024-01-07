@@ -34,7 +34,7 @@ internal class Monitor
 			if (log.CpuInfo != null)
 			{
 				variableStringBuilder.Append("$oldCpu: CpuIdInput!, $cpu: CpuInput!,");
-				queryStringBuilder.Append("""
+				queryStringBuilder.AppendLine("""
 				                            updateCpu(oldCpuId: $oldCpu, newCpu: $cpu){
 				                              error
 				                            },
@@ -48,6 +48,24 @@ internal class Monitor
 					FrequencyMhz = log.CpuInfo.Frequency,
 					Threads = log.CpuInfo.Threads,
 					Cores = log.CpuInfo.Cores
+				};
+			}
+
+			if (log.ProcessInfo?.CpuLog != null)
+			{
+				variableStringBuilder.Append("$cpuLog: CpuLogInput!, ");
+				queryStringBuilder.AppendLine("""
+				                                addCpuLog(cpuLog: $cpuLog){
+				                                  error
+				                                }
+				                              """);
+				variables.CpuLog = new CpuLogInput
+				{
+					ServerId = 0,
+					NumberOfTasks = log.ProcessInfo.CpuLog.NumberOfTasks,
+					Interval = config.IntervalInMinutes,
+					Date = date,
+					Usage = log.ProcessInfo.CpuLog.Usage
 				};
 			}
 			
@@ -71,7 +89,7 @@ internal class Monitor
 			Console.WriteLine(log);
 
 			//Configuring the request
-			string requestString = $"mutation({variableStringBuilder}){{\n{queryStringBuilder}\n}}";
+			string requestString = $"mutation({variableStringBuilder}){{\n{queryStringBuilder}}}";
 			Console.WriteLine(requestString);
 			var request = new GraphQLRequest(requestString, variables: variables);
 
