@@ -30,22 +30,19 @@ CREATE TABLE programLog
     memoryutilizationpercentage numeric
 );
 
-CREATE TABLE memory
-(
-    serverid    integer PRIMARY KEY,
-    totalKb     integer,
-    swapTotalKb integer
-);
-
 CREATE TABLE memoryLog
 (
     serverid       integer   NOT NULL,
     date           timestamp NOT NULL,
-    interval       integer   NOT NULL,
-    usedKb         integer,
-    swapUsedKb     integer,
-    cachedKb       integer,
-    usedPercentage decimal(5, 4),
+    interval       bigint    NOT NULL,
+    totalKb        bigint, --memory size (excluding swap size) 
+    freeKb         bigint, --memory that isn't used or cached
+    usedKb         bigint, --used memory
+    swapTotalKb    bigint, --swap memory size
+    swapFreeKb     bigint, --swap memory that isn't used or cached
+    swapUsedKb     bigint, --used swap memory
+    availableKb    bigint, --memory that isn't used (including unused swap memory)
+    cachedKb       bigint, --cached memory
     PRIMARY KEY (serverid, date)
 );
 

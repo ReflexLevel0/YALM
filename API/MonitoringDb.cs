@@ -42,7 +42,6 @@ namespace DataModel
 		public ITable<CpuDbRecord>           Cpus            => this.GetTable<CpuDbRecord>();
 		public ITable<CpuLogDbRecord>        CpuLogs         => this.GetTable<CpuLogDbRecord>();
 		public ITable<DiskDbRecord>          Disks           => this.GetTable<DiskDbRecord>();
-		public ITable<MemoryDbRecord>        Memories        => this.GetTable<MemoryDbRecord>();
 		public ITable<MemoryLogDbRecord>     MemoryLogs      => this.GetTable<MemoryLogDbRecord>();
 		public ITable<PartitionDbRecord>     Partitions      => this.GetTable<PartitionDbRecord>();
 		public ITable<PartitionLogDbRecord>  PartitionLogs   => this.GetTable<PartitionLogDbRecord>();
@@ -84,16 +83,6 @@ namespace DataModel
 		public static Task<DiskDbRecord?> FindAsync(this ITable<DiskDbRecord> table, int id, CancellationToken cancellationToken = default)
 		{
 			return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-		}
-
-		public static MemoryDbRecord? Find(this ITable<MemoryDbRecord> table, int serverid)
-		{
-			return table.FirstOrDefault(e => e.ServerId == serverid);
-		}
-
-		public static Task<MemoryDbRecord?> FindAsync(this ITable<MemoryDbRecord> table, int serverid, CancellationToken cancellationToken = default)
-		{
-			return table.FirstOrDefaultAsync(e => e.ServerId == serverid, cancellationToken);
 		}
 
 		public static MemoryLogDbRecord? Find(this ITable<MemoryLogDbRecord> table, int serverid, DateTime date)

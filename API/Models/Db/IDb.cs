@@ -8,7 +8,6 @@ public interface IDb : IDataContext
 	public ITable<CpuDbRecord> Cpus { get; }
 	public ITable<CpuLogDbRecord> CpuLogs { get; }
 	public ITable<DiskDbRecord> Disks { get; }
-	public ITable<MemoryDbRecord> Memories { get; }
 	public ITable<MemoryLogDbRecord> MemoryLogs { get; }
 	public ITable<PartitionDbRecord> Partitions { get; }
 	public ITable<PartitionLogDbRecord> PartitionLogs { get; }

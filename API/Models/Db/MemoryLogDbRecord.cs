@@ -22,10 +22,14 @@ namespace DataModel
 		[Column("serverid"      , IsPrimaryKey = true, PrimaryKeyOrder = 0)] public int      ServerId       { get; set; } // integer
 		[Column("date"          , IsPrimaryKey = true, PrimaryKeyOrder = 1)] public DateTime Date           { get; set; } // timestamp (6) without time zone
 		[Column("interval"                                                )] public int      Interval       { get; set; } // integer
-		[Column("usedkb"                                                  )] public int?     UsedKb         { get; set; } // integer
-		[Column("swapusedkb"                                              )] public int?     SwapUsedKb     { get; set; } // integer
-		[Column("cachedkb"                                                )] public int?     CachedKb       { get; set; } // integer
-		[Column("usedpercentage"                                          )] public decimal? UsedPercentage { get; set; } // numeric(5,4)
+		[Column("totalkb")] public long? TotalKb { get; set; } // bigint
+		[Column("freekb")] public long? FreeKb { get; set; } // bigint
+		[Column("usedkb")] public long? UsedKb { get; set; } // bigint
+		[Column("swaptotalkb")] public long? SwapTotalKb { get; set; } // bigint
+		[Column("swapfreekb")] public long? SwapFreeKb { get; set; } // bigint
+		[Column("swapusedkb")] public long? SwapUsedKb { get; set; } // bigint
+		[Column("cachedkb")] public long? CachedKb { get; set; } // bigint
+		[Column("availablekb")] public long? AvailableKb { get; set; } // bigint
 
 		public TypeCode GetTypeCode()
 		{
@@ -95,13 +99,17 @@ namespace DataModel
 		public object ToType(Type conversionType, IFormatProvider? provider)
 		{
 			if(conversionType != typeof(MemoryLog)) throw new NotImplementedException();
-			return new MemoryLog()
+			return new MemoryLog
 			{
-				UsedPercentage = UsedPercentage,
 				Date = Date,
-				CachedKb = CachedKb,
+				TotalKb = TotalKb,
+				FreeKb = FreeKb,
 				UsedKb = UsedKb,
-				SwapUsedKb = SwapUsedKb
+				SwapTotalKb = SwapTotalKb,
+				SwapFreeKb = SwapFreeKb,
+				SwapUsedKb = SwapUsedKb,
+				CachedKb = CachedKb,
+				AvailableKb = AvailableKb 
 			};
 		}
 

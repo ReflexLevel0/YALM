@@ -60,11 +60,26 @@ public class Query(IDb db)
 		var getEmptyRecordFunc = () => new MemoryLog { Date = DateTime.Now };
 		Func<IList<MemoryLogDbRecord>, MemoryLog> combineLogsFunc = logs =>
 		{
-			decimal usedPercentage = QueryHelper.CombineValues(method, logs.Where(l => l.UsedPercentage != null).Select(l => (decimal)l.UsedPercentage!));
-			int usedKb = (int)QueryHelper.CombineValues(method, logs.Where(l => l.UsedKb != null).Select(l => (int)l.UsedKb!));
-			int swapUsedKb = (int)QueryHelper.CombineValues(method, logs.Where(l => l.SwapUsedKb != null).Select(l => (int)l.SwapUsedKb!));
-			int cachedKb = (int)QueryHelper.CombineValues(method, logs.Where(l => l.CachedKb != null).Select(l => (int)l.CachedKb!));
-			return new MemoryLog { Date = logs.First().Date, UsedPercentage = usedPercentage, UsedKb = usedKb, SwapUsedKb = swapUsedKb, CachedKb = cachedKb };
+			long totalKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.TotalKb));
+			long freeKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.FreeKb));
+			long usedKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.UsedKb));
+			long swapTotalKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.SwapTotalKb));
+			long swapFreeKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.SwapFreeKb));
+			long swapUsedKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.SwapUsedKb));
+			long cachedKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.CachedKb));
+			long availableKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.AvailableKb));
+			return new MemoryLog
+			{
+				Date = logs.First().Date,
+				TotalKb = totalKb,
+				FreeKb = freeKb,
+				UsedKb = usedKb,
+				SwapTotalKb = swapTotalKb,
+				SwapFreeKb = swapFreeKb,
+				SwapUsedKb = swapUsedKb, 
+				CachedKb = cachedKb,
+				AvailableKb = availableKb
+			};
 		};
 
 		var memoryOutput = new MemoryOutput(serverId);

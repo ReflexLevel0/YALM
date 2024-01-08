@@ -6,4 +6,9 @@ public class MemoryLogInput : MemoryLog, ILog
 {
 	public int ServerId { get; set; }
 	public int Interval { get; set; }
+
+	public MemoryLogInput(int serverId)
+	{
+		ServerId = serverId;
+	}
 }

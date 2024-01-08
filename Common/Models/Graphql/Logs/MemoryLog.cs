@@ -2,8 +2,12 @@ namespace YALM.Common.Models.Graphql.Logs;
 
 public class MemoryLog : LogBase
 {
-	public int? UsedKb { get; set; }
-	public decimal? UsedPercentage { get; set; }
-	public int? SwapUsedKb { get; set; }
-	public int? CachedKb { get; set; }
+	public long? TotalKb { get; set; }
+	public long? FreeKb { get; set; }
+	public long? UsedKb { get; set; }
+	public long? SwapTotalKb { get; set; }
+	public long? SwapFreeKb { get; set; }
+	public long? SwapUsedKb { get; set; }
+	public long? AvailableKb { get; set; }
+	public long? CachedKb { get; set; }
 }

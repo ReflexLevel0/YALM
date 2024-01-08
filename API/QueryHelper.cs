@@ -32,7 +32,8 @@ public class QueryHelper
 	
 	public static decimal CombineValues<T>(string? method, IEnumerable<T> values)
 	{
-		var decimalValues = values.Select(v => Convert.ToDecimal(v));
+		var filteredValues = values.Where(v => v != null);
+		var decimalValues = filteredValues.Select(v => Convert.ToDecimal(v));
 		decimal result;
 		switch (method)
 		{

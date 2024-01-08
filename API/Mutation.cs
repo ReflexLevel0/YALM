@@ -114,13 +114,17 @@ public class Mutation(IDb db)
 			select l;
 
 		var insertTask = db.MemoryLogs
-			.Value(l => l.Date, memoryLog.Date)
 			.Value(l => l.ServerId, memoryLog.ServerId)
-			.Value(l => l.UsedPercentage, memoryLog.UsedPercentage)
+			.Value(l => l.Date, memoryLog.Date)
 			.Value(l => l.Interval, memoryLog.Interval)
+			.Value(l => l.TotalKb, memoryLog.TotalKb)
+			.Value(l => l.FreeKb, memoryLog.FreeKb)
+			.Value(l => l.UsedKb, memoryLog.UsedKb)
+			.Value(l => l.SwapTotalKb, memoryLog.SwapTotalKb)
+			.Value(l => l.SwapFreeKb, memoryLog.SwapFreeKb)
 			.Value(l => l.SwapUsedKb, memoryLog.SwapUsedKb)
 			.Value(l => l.CachedKb, memoryLog.CachedKb)
-			.Value(l => l.UsedKb, memoryLog.UsedKb)
+			.Value(l => l.AvailableKb, memoryLog.AvailableKb)
 			.InsertAsync();
 
 		try
