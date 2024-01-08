@@ -42,7 +42,7 @@ public class ProcessInfoWrapper : ProcessInfo
 			{
 				foreach (var value in ParseTopLine(line))
 				{
-					ulong kbValue = (ulong)(value.Item2 * 1024);
+					long kbValue = (long)(value.Item2 * 1024);
 					switch (value.Item1)
 					{
 						case "total":
@@ -64,7 +64,7 @@ public class ProcessInfoWrapper : ProcessInfo
 			{
 				foreach (var value in ParseTopLine(line))
 				{
-					ulong kbValue = (ulong)(value.Item2 * 1024);
+					long kbValue = (long)(value.Item2 * 1024);
 					switch (value.Item1)
 					{
 						case "total":

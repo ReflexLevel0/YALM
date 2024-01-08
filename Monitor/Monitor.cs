@@ -68,6 +68,29 @@ internal class Monitor
 					Usage = log.ProcessInfo.CpuLog.Usage
 				};
 			}
+
+			if (log.ProcessInfo?.MemoryLog != null)
+			{
+				variableStringBuilder.AppendLine("$memoryLog: MemoryLogInput!, ");
+				queryStringBuilder.AppendLine("""
+				                                addMemoryLog(memoryLog: $memoryLog){
+				                                  error
+				                                }
+				                              """);
+				variables.MemoryLog = new MemoryLogInput(0)
+				{
+					Interval = config.IntervalInMinutes,
+					Date = date,
+					TotalKb = log.ProcessInfo.MemoryLog.MemoryTotalKb,
+					FreeKb = log.ProcessInfo.MemoryLog.MemoryFreeKb,
+					UsedKb = log.ProcessInfo.MemoryLog.MemoryUsedKb,
+					SwapTotalKb = log.ProcessInfo.MemoryLog.SwapTotalKb,
+					SwapFreeKb = log.ProcessInfo.MemoryLog.SwapFreeKb,
+					SwapUsedKb = log.ProcessInfo.MemoryLog.SwapUsedKb,
+					CachedKb = log.ProcessInfo.MemoryLog.CachedKb,
+					AvailableKb = log.ProcessInfo.MemoryLog.AvailableMemoryKb 
+				};
+			}
 			
 			// if (log.StorageLogs != null && log.StorageLogs.Count != 0)
 			// {
