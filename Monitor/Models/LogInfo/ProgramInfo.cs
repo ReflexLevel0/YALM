@@ -2,11 +2,11 @@ using System.Text;
 
 namespace YALM.Monitor.Models.LogInfo;
 
-public class ProcessInfo
+public class ProgramInfo
 {
 	public CpuLog? CpuLog { get; set; }
 	public MemoryLog? MemoryLog {get; set; }
-	public IList<ProcessLog> ProcessLogs { get; set; } = new List<ProcessLog>();
+	public IList<ProgramLog>? ProgramLogs { get; set; }
 	
 	public override string ToString()
 	{
@@ -20,11 +20,15 @@ public class ProcessInfo
 		{
 			builder.AppendLine($"Memory: {MemoryLog.MemoryTotalKb}KB total, {MemoryLog.MemoryFreeKb}KB free, {MemoryLog.MemoryUsedKb}KB used, {MemoryLog.CachedKb}KB cached, {MemoryLog.AvailableMemoryKb}KB available\nSwap: {MemoryLog.SwapTotalKb}KB total, {MemoryLog.SwapFreeKb}KB free, {MemoryLog.SwapUsedKb}KB used");
 		}
-		
-		foreach(var log in ProcessLogs)
+
+		if (ProgramLogs != null)
 		{
-			builder.AppendLine(log.ToString());
+			foreach(var log in ProgramLogs)
+			{
+				builder.AppendLine(log.ToString());
+			}	
 		}
+		
 		builder.AppendLine();
 		return builder.ToString();
 	}

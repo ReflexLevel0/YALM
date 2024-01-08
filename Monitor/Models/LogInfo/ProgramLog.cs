@@ -1,6 +1,6 @@
 namespace YALM.Monitor.Models.LogInfo;
 
-public class ProcessLog
+public class ProgramLog
 {
 	public string? Name { get; set; }
 	public double? MemoryUsage { get; set; }

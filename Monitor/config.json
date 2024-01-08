@@ -2,7 +2,7 @@
   "ApiUrl": "http://localhost:3000/graphql",
   "IntervalInMinutes": 1,
   "Cpu": true,
-  "Process": true,
+  "Program": true,
   "Storage": true,
   "Services": [
     "postgresql",

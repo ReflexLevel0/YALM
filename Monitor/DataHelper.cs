@@ -7,7 +7,7 @@ namespace YALM.Monitor;
 
 public class DataHelper
 {
-	private ProcessInfoWrapper _processInfoWrapper = new();
+	private ProgramInfoWrapper _programInfoWrapper = new();
 	
 	public async Task<CpuInfo?> GetCpuInfo()
 	{
@@ -43,10 +43,10 @@ public class DataHelper
 		return cpuInfo;
 	}
 
-	public async Task<ProcessInfo> GetProcessInfo()
+	public async Task<ProgramInfo> GetProgramInfo()
 	{
-		await _processInfoWrapper.RefreshProcessInfo();
-		return _processInfoWrapper;
+		await _programInfoWrapper.RefreshProgramInfo();
+		return _programInfoWrapper;
 	}
 
 	public ServiceLog GetServiceInfo(string serviceName, DateTime? lastLogDate)

@@ -27,9 +27,9 @@ public class LogHelper
 			log.CpuInfo = await _dataHelper.GetCpuInfo();
 		}
 
-		if (_config.Process)
+		if (_config.Program)
 		{
-			log.ProcessInfo = await _dataHelper.GetProcessInfo();
+			log.ProgramInfo = await _dataHelper.GetProgramInfo();
 		}
 
 		if (_config.Storage)

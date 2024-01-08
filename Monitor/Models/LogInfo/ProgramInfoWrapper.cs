@@ -1,10 +1,10 @@
 namespace YALM.Monitor.Models.LogInfo;
 
-public class ProcessInfoWrapper : ProcessInfo
+public class ProgramInfoWrapper : ProgramInfo
 {
 	public DateTime? LastRefreshedDateTime { get; set; }
 
-	public async Task RefreshProcessInfo()
+	public async Task RefreshProgramInfo()
 	{
 		if (LastRefreshedDateTime != null && DateTime.Now.Subtract((DateTime)LastRefreshedDateTime).TotalMinutes < 1) return;
 		
@@ -18,6 +18,7 @@ public class ProcessInfoWrapper : ProcessInfo
 		bool commandListStart = false;
 		CpuLog = new CpuLog();
 		MemoryLog = new MemoryLog();
+		ProgramLogs = new List<ProgramLog>();
 		foreach (string line in lines)
 		{
 			if (line.StartsWith("Tasks:"))
@@ -100,7 +101,7 @@ public class ProcessInfoWrapper : ProcessInfo
 				if (cpuPercentage == 0 || memPercentage == 0) continue;
 
 				//Adding the process to the list of processes (or updating process CPU usage if it already exists)
-				var proc = ProcessLogs.FirstOrDefault(p => string.CompareOrdinal(p.Name, command) == 0);
+				var proc = ProgramLogs.FirstOrDefault(p => string.CompareOrdinal(p.Name, command) == 0);
 				if (proc != null)
 				{
 					proc.CpuUsage += cpuPercentage;
@@ -108,7 +109,7 @@ public class ProcessInfoWrapper : ProcessInfo
 				}
 				else
 				{
-					ProcessLogs.Add(new ProcessLog { Name = command, CpuUsage = cpuPercentage, MemoryUsage = memPercentage });
+					ProgramLogs.Add(new ProgramLog { Name = command, CpuUsage = cpuPercentage, MemoryUsage = memPercentage });
 				}
 			}
 		}
@@ -116,10 +117,10 @@ public class ProcessInfoWrapper : ProcessInfo
 		await process.WaitForExitAsync();
 		LastRefreshedDateTime = DateTime.Now;
 		
-		//A process will be stored only if it is top 10 cpu/memory using process
-		var topCpuProcessLogs = ProcessLogs.OrderByDescending(p => p.CpuUsage).Take(10).ToList();
-		var topMemoryProcessLogs = ProcessLogs.OrderByDescending(p => p.MemoryUsage).Take(10).ToList();
-		ProcessLogs = ProcessLogs.Where(p => topCpuProcessLogs.Contains(p) || topMemoryProcessLogs.Contains(p)).ToList();
+		//A program will be stored only if it is top 10 cpu/memory using program
+		var topCpuProgramLogs = ProgramLogs.OrderByDescending(p => p.CpuUsage).Take(10).ToList();
+		var topMemoryProgramLogs = ProgramLogs.OrderByDescending(p => p.MemoryUsage).Take(10).ToList();
+		ProgramLogs = ProgramLogs.Where(p => topCpuProgramLogs.Contains(p) || topMemoryProgramLogs.Contains(p)).ToList();
 	}
 	
 	private static IEnumerable<Tuple<string, double>> ParseTopLine(string line)

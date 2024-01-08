@@ -5,6 +5,7 @@ using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
+using YALM.Common.Models.Graphql.Logs;
 using YALM.Monitor.Models;
 
 namespace YALM.Monitor;
@@ -51,7 +52,7 @@ internal class Monitor
 				};
 			}
 
-			if (log.ProcessInfo?.CpuLog != null)
+			if (log.ProgramInfo?.CpuLog != null)
 			{
 				variableStringBuilder.Append("$cpuLog: CpuLogInput!, ");
 				queryStringBuilder.AppendLine("""
@@ -62,14 +63,14 @@ internal class Monitor
 				variables.CpuLog = new CpuLogInput
 				{
 					ServerId = 0,
-					NumberOfTasks = log.ProcessInfo.CpuLog.NumberOfTasks,
+					NumberOfTasks = log.ProgramInfo.CpuLog.NumberOfTasks,
 					Interval = config.IntervalInMinutes,
 					Date = date,
-					Usage = log.ProcessInfo.CpuLog.Usage
+					Usage = log.ProgramInfo.CpuLog.Usage
 				};
 			}
 
-			if (log.ProcessInfo?.MemoryLog != null)
+			if (log.ProgramInfo?.MemoryLog != null)
 			{
 				variableStringBuilder.AppendLine("$memoryLog: MemoryLogInput!, ");
 				queryStringBuilder.AppendLine("""
@@ -81,15 +82,33 @@ internal class Monitor
 				{
 					Interval = config.IntervalInMinutes,
 					Date = date,
-					TotalKb = log.ProcessInfo.MemoryLog.MemoryTotalKb,
-					FreeKb = log.ProcessInfo.MemoryLog.MemoryFreeKb,
-					UsedKb = log.ProcessInfo.MemoryLog.MemoryUsedKb,
-					SwapTotalKb = log.ProcessInfo.MemoryLog.SwapTotalKb,
-					SwapFreeKb = log.ProcessInfo.MemoryLog.SwapFreeKb,
-					SwapUsedKb = log.ProcessInfo.MemoryLog.SwapUsedKb,
-					CachedKb = log.ProcessInfo.MemoryLog.CachedKb,
-					AvailableKb = log.ProcessInfo.MemoryLog.AvailableMemoryKb 
+					TotalKb = log.ProgramInfo.MemoryLog.MemoryTotalKb,
+					FreeKb = log.ProgramInfo.MemoryLog.MemoryFreeKb,
+					UsedKb = log.ProgramInfo.MemoryLog.MemoryUsedKb,
+					SwapTotalKb = log.ProgramInfo.MemoryLog.SwapTotalKb,
+					SwapFreeKb = log.ProgramInfo.MemoryLog.SwapFreeKb,
+					SwapUsedKb = log.ProgramInfo.MemoryLog.SwapUsedKb,
+					CachedKb = log.ProgramInfo.MemoryLog.CachedKb,
+					AvailableKb = log.ProgramInfo.MemoryLog.AvailableMemoryKb 
 				};
+			}
+
+			if (log.ProgramInfo?.ProgramLogs != null)
+			{
+				variableStringBuilder.AppendLine("programLogs: ProgramLogsInput!, ");
+				variables.ProgramLogsInput = new ProgramLogsInput();
+				foreach (var program in log.ProgramInfo.ProgramLogs)
+				{
+					var programLog = new ProcessLog
+					{
+						ServerId = 0,
+						Date = date,
+						Name = program.Name,
+						MemoryUsage = program.MemoryUsage,
+						CpuUsage = program.CpuUsage
+					};
+					variables.ProgramLogsInput.ProgramLogs.Add(programLog);
+				}
 			}
 			
 			// if (log.StorageLogs != null && log.StorageLogs.Count != 0)

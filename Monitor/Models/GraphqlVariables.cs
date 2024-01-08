@@ -9,4 +9,5 @@ public class GraphqlVariables
 	public CpuLogInput? CpuLog;
 	public MemoryLogInput? MemoryLog;
 	public PartitionLogInput? PartitionLog;
+	public ProgramLogsInput? ProgramLogsInput;
 }
