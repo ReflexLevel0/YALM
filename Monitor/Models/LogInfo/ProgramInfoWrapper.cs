@@ -95,8 +95,8 @@ public class ProgramInfoWrapper : ProgramInfo
 				}
 
 				string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-				double cpuPercentage = double.Parse(parts[8]) / 100;
-				double memPercentage = double.Parse(parts[9]) / 100;
+				decimal cpuPercentage = decimal.Parse(parts[8]) / 100;
+				decimal memPercentage = decimal.Parse(parts[9]) / 100;
 				string command = parts[11];
 				if (cpuPercentage == 0 || memPercentage == 0) continue;
 
@@ -109,7 +109,7 @@ public class ProgramInfoWrapper : ProgramInfo
 				}
 				else
 				{
-					ProgramLogs.Add(new ProgramLog { Name = command, CpuUsage = cpuPercentage, MemoryUsage = memPercentage });
+					ProgramLogs.Add(new ProgramLog(command) { CpuUsage = cpuPercentage, MemoryUsage = memPercentage });
 				}
 			}
 		}

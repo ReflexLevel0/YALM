@@ -72,7 +72,7 @@ internal class Monitor
 
 			if (log.ProgramInfo?.MemoryLog != null)
 			{
-				variableStringBuilder.AppendLine("$memoryLog: MemoryLogInput!, ");
+				variableStringBuilder.Append("$memoryLog: MemoryLogInput!, ");
 				queryStringBuilder.AppendLine("""
 				                                addMemoryLog(memoryLog: $memoryLog){
 				                                  error
@@ -93,23 +93,28 @@ internal class Monitor
 				};
 			}
 
-			if (log.ProgramInfo?.ProgramLogs != null)
-			{
-				variableStringBuilder.AppendLine("programLogs: ProgramLogsInput!, ");
-				variables.ProgramLogsInput = new ProgramLogsInput();
-				foreach (var program in log.ProgramInfo.ProgramLogs)
-				{
-					var programLog = new ProcessLog
-					{
-						ServerId = 0,
-						Date = date,
-						Name = program.Name,
-						MemoryUsage = program.MemoryUsage,
-						CpuUsage = program.CpuUsage
-					};
-					variables.ProgramLogsInput.ProgramLogs.Add(programLog);
-				}
-			}
+			// if (log.ProgramInfo?.ProgramLogs != null)
+			// {
+			// 	variableStringBuilder.Append("$programLogs: [ProgramLogInput!]!, ");
+			// 	queryStringBuilder.AppendLine("""
+			// 	                                addProgramLogs(programLogs: $programLogs){
+			// 	                                  error
+			// 	                                }
+			// 	                              """);
+			// 	variables.ProgramLogsInput = new ProgramLogsInput();
+			// 	foreach (var program in log.ProgramInfo.ProgramLogs)
+			// 	{
+			// 		var programLog = new ProgramLog
+			// 		{
+			// 			ServerId = 0,
+			// 			Date = date,
+			// 			Name = program.Name,
+			// 			MemoryUsage = program.MemoryUsage,
+			// 			CpuUsage = program.CpuUsage
+			// 		};
+			// 		variables.ProgramLogsInput.Logs.Add(programLog);
+			// 	}
+			// }
 			
 			// if (log.StorageLogs != null && log.StorageLogs.Count != 0)
 			// {

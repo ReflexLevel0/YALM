@@ -1,10 +1,10 @@
 namespace YALM.Monitor.Models.LogInfo;
 
-public class ProgramLog
+public class ProgramLog(string name)
 {
-	public string? Name { get; set; }
-	public double? MemoryUsage { get; set; }
-	public double? CpuUsage { get; set; }
+	public string Name { get; init; } = name;
+	public decimal? MemoryUsage { get; set; }
+	public decimal? CpuUsage { get; set; }
 
 	public override string ToString()
 	{
