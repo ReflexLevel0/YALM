@@ -4,5 +4,5 @@ namespace YALM.Common.Models.Graphql.InputModels;
 
 public class ProgramLogsInput
 {
-	public List<ProcessLog> ProgramLogs { get; } = new();
+	public List<ProgramLog> ProgramLogs { get; } = new();
 }

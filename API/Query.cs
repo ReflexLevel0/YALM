@@ -92,6 +92,34 @@ public class Query(IDb db)
 	}
 
 	/// <summary>
+	/// Returns program logs
+	/// </summary>
+	public async Task<ProgramOutput> Program(int serverId, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
+	{
+		var getEmptyRecordFunc = () => new ProgramLog { Date = DateTime.Now };
+		Func<IList<ProgramLogDbRecord>, ProgramLog> combineLogsFunc = logs =>
+		{
+			double cpuUsage = (double)QueryHelper.CombineValues(method, logs.Select(l => l.CpuutilizationPercentage));
+			double memoryUsage = (double)QueryHelper.CombineValues(method, logs.Select(l => l.MemoryUtilizationPercentage));
+			return new ProgramLog
+			{
+				Date = logs.First().Date,
+				Name = logs.First().Name,
+				CpuUsage = cpuUsage,
+				MemoryUsage = memoryUsage
+			};
+		};
+
+		var programOutput = new ProgramOutput(serverId);
+		await foreach (var log in QueryHelper.GetLogs(db.ProgramLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+		{
+			programOutput.Logs.Add(log);
+		}
+
+		return programOutput;
+	}
+
+	/// <summary>
 	/// Returns disk data
 	/// </summary>
 	public async IAsyncEnumerable<DiskOutput> Disk(DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)

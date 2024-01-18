@@ -26,6 +26,7 @@ CREATE TABLE programLog
     serverid                    integer   NOT NULL,
     date                        timestamp NOT NULL,
     interval                    integer   NOT NULL,
+    name                        varchar(255),
     cpuutilizationpercentage    numeric,
     memoryutilizationpercentage numeric
 );
