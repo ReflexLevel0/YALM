@@ -25,10 +25,11 @@ CREATE TABLE programLog
 (
     serverid                    integer   NOT NULL,
     date                        timestamp NOT NULL,
+    name                        varchar(255) NOT NULL,
     interval                    integer   NOT NULL,
-    name                        varchar(255),
     cpuutilizationpercentage    numeric,
-    memoryutilizationpercentage numeric
+    memoryutilizationpercentage numeric,
+    PRIMARY KEY (serverid, date, name)
 );
 
 CREATE TABLE memoryLog

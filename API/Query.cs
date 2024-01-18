@@ -96,11 +96,11 @@ public class Query(IDb db)
 	/// </summary>
 	public async Task<ProgramOutput> Program(int serverId, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
 	{
-		var getEmptyRecordFunc = () => new ProgramLog { Date = DateTime.Now };
+		var getEmptyRecordFunc = () => new ProgramLog { Name = "", Date = DateTime.Now };
 		Func<IList<ProgramLogDbRecord>, ProgramLog> combineLogsFunc = logs =>
 		{
-			double cpuUsage = (double)QueryHelper.CombineValues(method, logs.Select(l => l.CpuutilizationPercentage));
-			double memoryUsage = (double)QueryHelper.CombineValues(method, logs.Select(l => l.MemoryUtilizationPercentage));
+			decimal cpuUsage = QueryHelper.CombineValues(method, logs.Select(l => l.CpuutilizationPercentage));
+			decimal memoryUsage = QueryHelper.CombineValues(method, logs.Select(l => l.MemoryUtilizationPercentage));
 			return new ProgramLog
 			{
 				Date = logs.First().Date,

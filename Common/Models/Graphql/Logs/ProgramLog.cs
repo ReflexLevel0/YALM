@@ -2,7 +2,9 @@ namespace YALM.Common.Models.Graphql.Logs;
 
 public class ProgramLog : LogBase
 {
-	public string? Name { get; set; }
-	public double? CpuUsage { get; set; }
-	public double? MemoryUsage { get; set; }
+	public int ServerId { get; set; }
+	public int Interval { get; set; }
+	public required string Name { get; set; }
+	public decimal? CpuUsage { get; set; }
+	public decimal? MemoryUsage { get; set; }
 }

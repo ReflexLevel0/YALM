@@ -237,6 +237,50 @@ public class Mutation(IDb db)
 		}
 	}
 
+	public async Task<Payload<ProgramLog>> AddProgramLog(ProgramLog programLog)
+	{
+		var programModel = new ProgramLogDbRecord
+		{
+			Serverid = programLog.ServerId,
+			Date = programLog.Date,
+			Interval = programLog.Interval,
+			Name = programLog.Name,
+			CpuutilizationPercentage = programLog.CpuUsage,
+			MemoryUtilizationPercentage = programLog.MemoryUsage 
+		};
+
+		var query = 
+			from l in db.ProgramLogs 
+			where l.Serverid == programLog.ServerId && string.CompareOrdinal(l.Name, programLog.Name) == 0 && l.Date == programLog.Date
+			select l;
+
+		try
+		{
+			return await UpdateDbRecord<ProgramLogDbRecord, ProgramLog>(db.InsertAsync(programModel), query);
+		}
+		catch(Exception ex)
+		{
+			return new Payload<ProgramLog> { Error = GenericDatabaseErrorString };
+		}
+	}
+
+	public async Task<Payload<List<ProgramLog>>> AddProgramLogs(List<ProgramLog> programLogs)
+	{
+		var logs = new List<ProgramLog>();
+		foreach (var log in programLogs)
+		{
+			var l = await AddProgramLog(log);
+			if (string.IsNullOrEmpty(l.Error) == false || l.Data == null)
+			{
+				return new Payload<List<ProgramLog>> { Error = GenericDatabaseErrorString };
+			}
+
+			logs.Add(l.Data);
+		}
+
+		return new Payload<List<ProgramLog>> { Data = logs };
+	}
+
 	private async Task<Payload<TOutput>> UpdateDbRecord<TDbModel, TOutput>(Task<int> task, IQueryable<TDbModel> selectUpdatedObjectsQuery) where TDbModel : notnull
 	{
 		var tableAttr = typeof(TDbModel).GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault() as TableAttribute;

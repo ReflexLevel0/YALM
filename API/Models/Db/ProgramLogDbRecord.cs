@@ -9,6 +9,8 @@ using LinqToDB.Mapping;
 using System;
 using YALM.API.Models.Db;
 using YALM.Common.Models;
+using YALM.Common.Models.Graphql.Logs;
+using YALM.Common.Models.Graphql.OutputModels;
 
 #pragma warning disable 1573, 1591
 #nullable enable
@@ -16,13 +18,107 @@ using YALM.Common.Models;
 namespace DataModel
 {
 	[Table("programlog")]
-	public class ProgramLogDbRecord : ILog
+	public class ProgramLogDbRecord : ILog, IConvertible
 	{
 		[Column("serverid"                   )] public int      Serverid                    { get; set; } // integer
 		[Column("date"                       )] public DateTime Date                        { get; set; } // timestamp (6) without time zone
 		[Column("interval"                   )] public int      Interval                    { get; set; } // integer
-		[Column("name"                       )] public string?  Name                        { get; set; } // varchar(255)
+		[Column("name"                       )] public string  Name                        { get; set; } // varchar(255)
 		[Column("cpuutilizationpercentage"   )] public decimal? CpuutilizationPercentage    { get; set; } // numeric
 		[Column("memoryutilizationpercentage")] public decimal? MemoryUtilizationPercentage { get; set; } // numeric
+		
+		public TypeCode GetTypeCode()
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool ToBoolean(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public byte ToByte(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public char ToChar(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public DateTime ToDateTime(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public decimal ToDecimal(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public double ToDouble(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public short ToInt16(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int ToInt32(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public long ToInt64(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public sbyte ToSByte(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public float ToSingle(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string ToString(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public object ToType(Type conversionType, IFormatProvider? provider)
+		{
+			if (conversionType != typeof(ProgramLog)) throw new NotImplementedException();
+			return new ProgramLog
+			{
+				ServerId = Serverid, 
+				Date = Date, 
+				Interval = Interval, 
+				Name = Name, 
+				CpuUsage = CpuutilizationPercentage, 
+				MemoryUsage = MemoryUtilizationPercentage
+			};
+		}
+
+		public ushort ToUInt16(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public uint ToUInt32(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public ulong ToUInt64(IFormatProvider? provider)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
