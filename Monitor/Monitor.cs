@@ -26,6 +26,8 @@ internal class Monitor
 			//Removing seconds from the date
 			var date = DateTime.Now;
 			date = date.AddSeconds(-date.Second);
+			date = date.AddMilliseconds(-date.Millisecond);
+			date = date.AddMicroseconds(-date.Microsecond);
 
 			//Generating query string
 			var variables = new GraphqlVariables();
