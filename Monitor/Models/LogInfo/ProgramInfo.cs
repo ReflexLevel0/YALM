@@ -6,7 +6,7 @@ public class ProgramInfo
 {
 	public CpuLog? CpuLog { get; set; }
 	public MemoryLog? MemoryLog {get; set; }
-	public IList<ProgramLog>? ProgramLogs { get; set; }
+	public List<ProgramLog>? ProgramLogs { get; set; }
 	
 	public override string ToString()
 	{

@@ -97,9 +97,7 @@ namespace DataModel
 			if (conversionType != typeof(ProgramLog)) throw new NotImplementedException();
 			return new ProgramLog
 			{
-				ServerId = Serverid, 
 				Date = Date, 
-				Interval = Interval, 
 				Name = Name, 
 				CpuUsage = CpuutilizationPercentage, 
 				MemoryUsage = MemoryUtilizationPercentage

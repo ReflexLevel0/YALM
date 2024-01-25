@@ -237,7 +237,7 @@ public class Mutation(IDb db)
 		}
 	}
 
-	public async Task<Payload<ProgramLog>> AddProgramLog(ProgramLog programLog)
+	public async Task<Payload<ProgramLog>> AddProgramLog(ProgramLogInput programLog)
 	{
 		var programModel = new ProgramLogDbRecord
 		{
@@ -264,7 +264,7 @@ public class Mutation(IDb db)
 		}
 	}
 
-	public async Task<Payload<List<ProgramLog>>> AddProgramLogs(List<ProgramLog> programLogs)
+	public async Task<Payload<List<ProgramLog>>> AddProgramLogs(List<ProgramLogInput> programLogs)
 	{
 		var logs = new List<ProgramLog>();
 		foreach (var log in programLogs)
