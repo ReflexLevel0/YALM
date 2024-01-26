@@ -18,16 +18,25 @@ internal class Monitor
 		if (config == null) throw new Exception("Configuration invalid!");
 		var graphQlClient = new GraphQLHttpClient(config.ApiUrl, new NewtonsoftJsonSerializer());
 		var logHelper = new LogHelper(config);
-
+		DateTime? previousDate = null;
+		int sleepMillis = config.IntervalInMinutes * 10 * 1000;
+        
 		while (true)
 		{
+			if (previousDate != null && DateTime.Now.Subtract((DateTime)previousDate).TotalMinutes < config.IntervalInMinutes)
+			{
+				Thread.Sleep(sleepMillis);
+				continue;
+			}
+			
 			var log = await logHelper.Log();
-
+			
 			//Removing seconds from the date
 			var date = DateTime.Now;
 			date = date.AddSeconds(-date.Second);
 			date = date.AddMilliseconds(-date.Millisecond);
 			date = date.AddMicroseconds(-date.Microsecond);
+			previousDate = date;
 
 			//Generating query string
 			var variables = new GraphqlVariables();
@@ -155,8 +164,9 @@ internal class Monitor
 				Console.WriteLine($"Error in sending POST request to server: {ex.Message}");
 			}
 
-			//TODO: this could cause issues since it doesnt take into account processing time
-			Thread.Sleep(config.IntervalInMinutes * 60 * 1000);
+			//Sleeping for a section of the interval
+			//(this is done to take into account the processing time necessary for logging and sending the API request)
+			Thread.Sleep(sleepMillis);
 		}
 	}
 }
