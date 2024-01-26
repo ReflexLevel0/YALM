@@ -18,7 +18,8 @@ CREATE TABLE cpuLog
     interval      integer   NOT NULL,
     usage         numeric,
     numberoftasks integer,
-    PRIMARY KEY (serverid, date)
+    PRIMARY KEY (serverid, date),
+    FOREIGN KEY (serverId) REFERENCES cpu(serverId)
 );
 
 CREATE TABLE programLog
