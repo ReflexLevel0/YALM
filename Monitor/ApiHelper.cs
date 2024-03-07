@@ -12,10 +12,12 @@ namespace YALM.Monitor;
 public class ApiHelper
 {
     private readonly Config _config;
+    private readonly int _serverId;
     
-    public ApiHelper(Config config)
+    public ApiHelper(Config config, int serverId)
     {
         _config = config;
+        _serverId = serverId;
     }
     
     public async Task SendLog(LogBase log)
@@ -33,10 +35,10 @@ public class ApiHelper
                                               error
                                             },
                                           """);
-            variables.OldCpu = new CpuIdInput { ServerId = 0 };
+            variables.OldCpu = new CpuIdInput { ServerId = _serverId };
             variables.Cpu = new CpuInput
             {
-                ServerId = 0,
+                ServerId = _serverId,
                 Architecture = log.CpuInfo.Architecture,
                 Name = log.CpuInfo.Name,
                 FrequencyMhz = log.CpuInfo.Frequency,
@@ -55,7 +57,7 @@ public class ApiHelper
                                           """);
             variables.CpuLog = new CpuLogInput
             {
-                ServerId = 0,
+                ServerId = _serverId,
                 NumberOfTasks = log.ProgramInfo.CpuLog.NumberOfTasks,
                 Interval = _config.IntervalInMinutes,
                 Date = log.LogTime,
@@ -71,7 +73,7 @@ public class ApiHelper
                                               error
                                             }
                                           """);
-            variables.MemoryLog = new MemoryLogInput(0)
+            variables.MemoryLog = new MemoryLogInput(_serverId)
             {
                 Interval = _config.IntervalInMinutes,
                 Date = log.LogTime,
@@ -99,7 +101,7 @@ public class ApiHelper
             {
                 var programLog = new ProgramLogInput
                 {
-                    ServerId = 0,
+                    ServerId = _serverId,
                     Date = log.LogTime,
                     Name = program.Name,
                     MemoryUsage = program.MemoryUsage,
@@ -119,7 +121,7 @@ public class ApiHelper
         // 	                          """);
         // 	variables.storage = new
         // 	{
-        // 		serverId = 0,
+        // 		serverId = _serverId,
         // 		date,
         // 		interval = config.IntervalInMinutes,
         // 		storageVolumes = log.StorageLogs
