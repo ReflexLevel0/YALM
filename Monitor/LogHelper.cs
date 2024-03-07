@@ -34,7 +34,11 @@ public class LogHelper
 
 		if (_config.Storage)
 		{
-			log.StorageLogs = _dataHelper.GetStorageInfo().ToList();
+			log.StorageLogs = new List<StorageLog>();
+			await foreach (var l in _dataHelper.GetStorageInfo())
+			{
+				log.StorageLogs.Add(l);
+			}
 		}
 
 		if (_config.Network)
@@ -44,7 +48,11 @@ public class LogHelper
 		
 		if (_config.Services != null)
 		{
-			var serviceLogs = _config.Services.Select(s => _dataHelper.GetServiceInfo(s, _lastLogDate)).ToList();
+			var serviceLogs = new List<ServiceLog>();
+			foreach (var service in _config.Services)
+			{
+				await _dataHelper.GetServiceInfo(service, _lastLogDate);
+			}	
 			log.ServiceLogs = serviceLogs;
 			await File.WriteAllTextAsync(LastLogDateFilename, DateTime.Now.ToString("u"));
 			_lastLogDate = DateTime.Now;

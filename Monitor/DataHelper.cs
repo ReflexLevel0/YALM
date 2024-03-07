@@ -7,14 +7,14 @@ namespace YALM.Monitor;
 
 public class DataHelper
 {
-	private ProgramInfoWrapper _programInfoWrapper = new();
+	private readonly ProgramInfoWrapper _programInfoWrapper = new();
 	
 	public async Task<CpuInfo?> GetCpuInfo()
 	{
 		var cpuInfo = new CpuInfo();
 		
 		//Getting additional cpu info from "lscpu" command
-		var process = ProcessHelper.StartProcess("lscpu", "-B -J");
+		var process = await ProcessHelper.StartProcess("lscpu", "-B -J");
 		var cpuJson = JsonConvert.DeserializeObject<LscpuJson>(await process.StandardOutput.ReadToEndAsync());
 		if (cpuJson?.Fields == null) throw new Exception("Invalid CPU info data!");
 		foreach (var field in cpuJson.Fields)
@@ -49,13 +49,13 @@ public class DataHelper
 		return _programInfoWrapper;
 	}
 
-	public ServiceLog GetServiceInfo(string serviceName, DateTime? lastLogDate)
+	public async Task<ServiceLog> GetServiceInfo(string serviceName, DateTime? lastLogDate)
 	{
 		var service = new ServiceLog { Name = serviceName };
-		var process = ProcessHelper.StartProcess("systemctl", $"status {serviceName}");
+		var process = await ProcessHelper.StartProcess("systemctl", $"status {serviceName}");
 
 		//Getting service status, used memory, etc.
-		var lines = process.StandardOutput.ReadToEnd().Split('\n').Take(17).ToList();
+		var lines = (await process.StandardOutput.ReadToEndAsync()).Split('\n').Take(17).ToList();
 		foreach (string line in lines)
 		{
 			string trimmedLine = line.Trim();
@@ -82,14 +82,14 @@ public class DataHelper
 			}
 		}
 
-		process.WaitForExit();
+		await process.WaitForExitAsync();
 
 		//Getting service logs since the last time logging was executed
 		string arguments = "";
 		if (lastLogDate != null) arguments += $"--since=\"{lastLogDate:yyyy-MM-dd HH:mm:ss}\" ";
 		arguments += $"--output=short-iso -u {serviceName}";
-		process = ProcessHelper.StartProcess("journalctl", arguments);
-		foreach (string logString in process.StandardOutput.ReadToEnd().Split('\n'))
+		process = await ProcessHelper.StartProcess("journalctl", arguments);
+		foreach (string logString in (await process.StandardOutput.ReadToEndAsync()).Split('\n'))
 		{
 			int index = logString.IndexOf(" ", StringComparison.Ordinal);
 			if (index == -1 || logString.StartsWith("--")) continue;
@@ -98,14 +98,14 @@ public class DataHelper
 			service.Logs.Add(log);
 		}
 
-		process.WaitForExit();
+		await process.WaitForExitAsync();
 		return service;
 	}
 
-	public IEnumerable<StorageLog> GetStorageInfo()
+	public async IAsyncEnumerable<StorageLog> GetStorageInfo()
 	{
-		var process = ProcessHelper.StartProcess("lsblk", "-p -f -b --json");
-		var jsonStorage = JsonConvert.DeserializeObject<StorageJson>(process.StandardOutput.ReadToEnd());
+		var process = await ProcessHelper.StartProcess("lsblk", "-p -f -b --json");
+		var jsonStorage = JsonConvert.DeserializeObject<StorageJson>(await process.StandardOutput.ReadToEndAsync());
 		if (jsonStorage == null) throw new Exception("Can't parse storage info!");
 
 		foreach (var blockDevice in jsonStorage.BlockDevices)

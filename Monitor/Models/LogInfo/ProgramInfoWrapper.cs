@@ -9,7 +9,7 @@ public class ProgramInfoWrapper : ProgramInfo
 		if (LastRefreshedDateTime != null && DateTime.Now.Subtract((DateTime)LastRefreshedDateTime).TotalMinutes < 1) return;
 		
 		//Spawning "top" process and skipping first batch of data (top is printing data for 2 seconds, and first one is being ignored, for some reason the measurements are more correct this way)
-		var process = ProcessHelper.StartProcess("top", "-bn2 -w 400");
+		var process = await ProcessHelper.StartProcess("top", "-bn2 -w 400");
 		var lines = (await process.StandardOutput.ReadToEndAsync()).Split('\n').ToList();
 		int startIndex = lines.FindIndex(1, s => s.StartsWith("top -"));
 		lines = lines.Skip(startIndex).ToList();
