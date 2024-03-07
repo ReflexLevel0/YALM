@@ -18,12 +18,15 @@ internal class Monitor
 		if (config == null) throw new Exception("Configuration invalid!");
 		var graphQlClient = new GraphQLHttpClient(config.ApiUrl, new NewtonsoftJsonSerializer());
 		var logHelper = new LogHelper(config);
-		DateTime? previousDate = null;
+		DateTime? nextLogDate = null;
 		int sleepMillis = config.IntervalInMinutes * 10 * 1000;
-        
+		
 		while (true)
 		{
-			if (previousDate != null && DateTime.Now.Subtract((DateTime)previousDate).TotalMinutes < config.IntervalInMinutes)
+			if(nextLogDate != null) Console.WriteLine($"Next log time: {nextLogDate}");
+			
+			//Sleeping for a section of the interval if logging interval hasn't passed yet
+			if (nextLogDate != null && DateTime.Now.Subtract((DateTime)nextLogDate).TotalMinutes < 0)
 			{
 				Thread.Sleep(sleepMillis);
 				continue;
@@ -36,7 +39,6 @@ internal class Monitor
 			date = date.AddSeconds(-date.Second);
 			date = date.AddMilliseconds(-date.Millisecond);
 			date = date.AddMicroseconds(-date.Microsecond);
-			previousDate = date;
 
 			//Generating query string
 			var variables = new GraphqlVariables();
@@ -163,10 +165,17 @@ internal class Monitor
 			{
 				Console.WriteLine($"Error in sending POST request to server: {ex.Message}");
 			}
-
-			//Sleeping for a section of the interval
-			//(this is done to take into account the processing time necessary for logging and sending the API request)
-			Thread.Sleep(sleepMillis);
+			
+			//Calculating the next time a request should be sent
+			//(this is done to take into account processing time while data is being logged and sent to the server)
+			if (nextLogDate == null)
+			{
+				nextLogDate = date.AddMinutes(config.IntervalInMinutes);
+			}
+			while(DateTime.Now.Subtract((DateTime)nextLogDate).TotalMilliseconds > 0)
+			{
+				nextLogDate = nextLogDate.Value.AddMinutes(config.IntervalInMinutes);
+			}
 		}
 	}
 }
