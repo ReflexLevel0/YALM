@@ -1,3 +1,4 @@
+using YALM.Monitor.Exceptions;
 using YALM.Monitor.Models.LogInfo;
 
 namespace YALM.Monitor;
@@ -51,7 +52,14 @@ public class LogHelper
 			var serviceLogs = new List<ServiceLog>();
 			foreach (var service in _config.Services)
 			{
-				await _dataHelper.GetServiceInfo(service, _lastLogDate);
+				try
+				{
+					serviceLogs.Add(await _dataHelper.GetServiceInfo(service, _lastLogDate));
+				}
+				catch(ServiceNotFoundException ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
 			}	
 			log.ServiceLogs = serviceLogs;
 			await File.WriteAllTextAsync(LastLogDateFilename, DateTime.Now.ToString("u"));

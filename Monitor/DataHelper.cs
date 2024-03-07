@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using YALM.Monitor.Exceptions;
 using YALM.Monitor.Models.CpuJSON;
 using YALM.Monitor.Models.LogInfo;
 using YALM.Monitor.Models.StorageJSON;
@@ -49,13 +50,21 @@ public class DataHelper
 		return _programInfoWrapper;
 	}
 
+	/// <summary>
+	/// Gets information about service <paramref name="serviceName"/>
+	/// </summary>
+	/// <param name="serviceName">Name of the service whose status is being returned</param>
+	/// <param name="lastLogDate">Last time data about service was logged</param>
+	/// <returns></returns>
+	/// <exception cref="ServiceNotFoundException"></exception>
 	public async Task<ServiceLog> GetServiceInfo(string serviceName, DateTime? lastLogDate)
 	{
 		var service = new ServiceLog { Name = serviceName };
 		var process = await ProcessHelper.StartProcess("systemctl", $"status {serviceName}");
-
-		//Getting service status, used memory, etc.
 		var lines = (await process.StandardOutput.ReadToEndAsync()).Split('\n').Take(17).ToList();
+		string error = await process.StandardError.ReadToEndAsync();
+		if(string.IsNullOrWhiteSpace(error) == false) throw new ServiceNotFoundException(serviceName);
+		
 		foreach (string line in lines)
 		{
 			string trimmedLine = line.Trim();

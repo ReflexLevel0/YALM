@@ -21,6 +21,7 @@ public class ProcessHelper
 		process = new Process();
 		process.StartInfo.FileName = programPath;
 		process.StartInfo.RedirectStandardOutput = true;
+		process.StartInfo.RedirectStandardError = true;
 		process.StartInfo.Arguments = arguments;
 		process.Start();
 		return process;
