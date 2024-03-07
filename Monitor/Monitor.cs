@@ -12,33 +12,18 @@ namespace YALM.Monitor;
 
 internal class Monitor
 {
+	private const string LastLogDateFilename = "log_date.txt";
+	
 	private static async Task Main()
 	{
 		var config = JsonSerializer.Deserialize<Config>(await File.ReadAllTextAsync("config.json"));
 		if (config == null) throw new Exception("Configuration invalid!");
 		var graphQlClient = new GraphQLHttpClient(config.ApiUrl, new NewtonsoftJsonSerializer());
-		var logHelper = new LogHelper(config);
-		DateTime? nextLogDate = null;
-		int sleepMillis = config.IntervalInMinutes * 10 * 1000;
+		var logHelper = new LogHelper(config, LastLogDateFilename);
 		
 		while (true)
 		{
-			if(nextLogDate != null) Console.WriteLine($"Next log time: {nextLogDate}");
-			
-			//Sleeping for a section of the interval if logging interval hasn't passed yet
-			if (nextLogDate != null && DateTime.Now.Subtract((DateTime)nextLogDate).TotalMinutes < 0)
-			{
-				Thread.Sleep(sleepMillis);
-				continue;
-			}
-			
 			var log = await logHelper.Log();
-			
-			//Removing seconds from the date
-			var date = DateTime.Now;
-			date = date.AddSeconds(-date.Second);
-			date = date.AddMilliseconds(-date.Millisecond);
-			date = date.AddMicroseconds(-date.Microsecond);
 
 			//Generating query string
 			var variables = new GraphqlVariables();
@@ -78,7 +63,7 @@ internal class Monitor
 					ServerId = 0,
 					NumberOfTasks = log.ProgramInfo.CpuLog.NumberOfTasks,
 					Interval = config.IntervalInMinutes,
-					Date = date,
+					Date = log.LogTime,
 					Usage = log.ProgramInfo.CpuLog.Usage
 				};
 			}
@@ -94,7 +79,7 @@ internal class Monitor
 				variables.MemoryLog = new MemoryLogInput(0)
 				{
 					Interval = config.IntervalInMinutes,
-					Date = date,
+					Date = log.LogTime,
 					TotalKb = log.ProgramInfo.MemoryLog.MemoryTotalKb,
 					FreeKb = log.ProgramInfo.MemoryLog.MemoryFreeKb,
 					UsedKb = log.ProgramInfo.MemoryLog.MemoryUsedKb,
@@ -120,7 +105,7 @@ internal class Monitor
 					var programLog = new ProgramLogInput
 					{
 						ServerId = 0,
-						Date = date,
+						Date = log.LogTime,
 						Name = program.Name,
 						MemoryUsage = program.MemoryUsage,
 						CpuUsage = program.CpuUsage
@@ -164,17 +149,6 @@ internal class Monitor
 			catch (Exception ex)
 			{
 				Console.WriteLine($"Error in sending POST request to server: {ex.Message}");
-			}
-			
-			//Calculating the next time a request should be sent
-			//(this is done to take into account processing time while data is being logged and sent to the server)
-			if (nextLogDate == null)
-			{
-				nextLogDate = date.AddMinutes(config.IntervalInMinutes);
-			}
-			while(DateTime.Now.Subtract((DateTime)nextLogDate).TotalMilliseconds > 0)
-			{
-				nextLogDate = nextLogDate.Value.AddMinutes(config.IntervalInMinutes);
 			}
 		}
 	}
