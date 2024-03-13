@@ -2,7 +2,6 @@ using Newtonsoft.Json;
 using YALM.Monitor.Exceptions;
 using YALM.Monitor.Models.CpuJSON;
 using YALM.Monitor.Models.LogInfo;
-using YALM.Monitor.Models.StorageJSON;
 
 namespace YALM.Monitor;
 
@@ -111,32 +110,35 @@ public class DataHelper
 		return service;
 	}
 
-	public async IAsyncEnumerable<StorageLog> GetStorageInfo()
+	public async IAsyncEnumerable<DiskInfo> GetStorageInfo()
 	{
-		var process = await ProcessHelper.StartProcess("lsblk", "-p -f -b --json");
+		var process = await ProcessHelper.StartProcess("lsblk", "--json -p -b -o FSTYPE,FSUSED,LABEL,NAME,PARTTYPENAME,PARTUUID,PATH,PTTYPE,PTUUID,SERIAL,SIZE,STATE,MOUNTPOINT,TYPE,UUID,VENDOR,FSVER,FSAVAIL,FSUSE%");
 		var jsonStorage = JsonConvert.DeserializeObject<StorageJson>(await process.StandardOutput.ReadToEndAsync());
 		if (jsonStorage == null) throw new Exception("Can't parse storage info!");
 
-		foreach (var blockDevice in jsonStorage.BlockDevices)
+		foreach (var disk in jsonStorage.BlockDevices)
 		{
-			//Going through every partition and returning it
-			foreach (var child in blockDevice.Children)
-			{
-				if (child.Uuid == null) continue;
-				string? mountpoint = blockDevice.Mountpoints.Count == 0 ? null : blockDevice.Mountpoints.First();
-				long? fsAvail = blockDevice.FsAvail == null ? null : long.Parse(blockDevice.FsAvail);
-				double? used = child.FsUse == null ? null : double.Parse(child.FsUse.Split('%').First()) / 100;
-				yield return new StorageLog
-				{
-					Uuid = child.Uuid,
-					Label = child.Label,
-					Bytes = fsAvail != null && used != null ? (long)(fsAvail / used) : -1,
-					FilesystemName = child.FsType,
-					FilesystemVersion = child.FsVer,
-					MountPath = mountpoint,
-					UsedPercentage = used
-				};
-			}
+			if (disk.Children == null) continue;
+			
+			// //Going through every partition and returning it
+			// foreach (var partition in disk.Children)
+			// {
+				// if (partition.PartitionUuid == null) continue;
+				// long? fsAvail = disk.FilesystemAvailable == null ? null : long.Parse(disk.FilesystemAvailable);
+				// double? used = partition.UsagePercentage == null ? null : double.Parse(partition.UsagePercentage.Split('%').First()) / 100;
+				// yield return new StorageLog
+				// {
+				// 	DiskUuid = partition.DiskUuid,
+				// 	PartitionUuid = partition.PartitionUuid,
+				// 	Bytes = fsAvail != null && used != null ? (long)(fsAvail / used) : -1,
+				// 	FilesystemType = partition.FilesystemType,
+				// 	FilesystemVersion = partition.FilesystemVersion,
+				// 	Mountpoint = partition.Mountpoint,
+				// 	UsedPercentage = used
+				// };
+			//}
+
+			yield return disk;
 		}
 	}
 }

@@ -16,4 +16,15 @@ public class PartitionInput
 		DiskUuid = diskUuid;
 		Uuid = uuid;
 	}
+
+	public PartitionInput(int serverId, string diskUuid, string uuid, string? filesystemName, string? filesystemVersion, string? partitionLabel, string? mountpath)
+	{
+		ServerId = serverId;
+		DiskUuid = diskUuid;
+		Uuid = uuid;
+		FilesystemName = filesystemName;
+		FilesystemVersion = filesystemVersion;
+		PartitionLabel = partitionLabel;
+		Mountpath = mountpath;
+	}
 }

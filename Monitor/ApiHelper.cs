@@ -29,13 +29,12 @@ public class ApiHelper
 
         if (log.CpuInfo != null)
         {
-            variableStringBuilder.Append("$oldCpu: CpuIdInput!, $cpu: CpuInput!,");
+            variableStringBuilder.Append("$cpu: CpuInput!,");
             queryStringBuilder.AppendLine("""
-                                            updateCpu(oldCpuId: $oldCpu, newCpu: $cpu){
+                                            addOrUpdateCpu(cpu: $cpu){
                                               error
-                                            },
+                                            }
                                           """);
-            variables.OldCpu = new CpuIdInput { ServerId = _serverId };
             variables.Cpu = new CpuInput
             {
                 ServerId = _serverId,
@@ -111,22 +110,40 @@ public class ApiHelper
             }
         }
 
-        // if (log.StorageLogs != null && log.StorageLogs.Count != 0)
-        // {
-        // 	variableStringBuilder.Append("$storage: StorageLogInput!,");
-        // 	queryStringBuilder.Append("""
-        // 	                          addStorageLog(storage: $storage){
-        // 	                              error
-        // 	                          },
-        // 	                          """);
-        // 	variables.storage = new
-        // 	{
-        // 		serverId = _serverId,
-        // 		date,
-        // 		interval = config.IntervalInMinutes,
-        // 		storageVolumes = log.StorageLogs
-        // 	};
-        // }
+        if (log.Disks != null && log.Disks.Count != 0)
+        {
+        	variableStringBuilder.Append("$disks: [DiskInput!]!,");
+            //$partitions: [PartitionInput]!, $partitionLogs: [PartitionLogsInput]!, 
+        	queryStringBuilder.AppendLine("""
+        	                            addOrUpdateDisks(disks: $disks){
+        	                                error
+        	                            }
+        	                          """);
+            
+            // addPartitions(partitions: $partitions){
+            //     error
+            // },
+            // addPartitionLogs(logs: $partitionLogs){
+            //     error
+            // },
+            
+        	variables.Disks = new List<DiskInput>();
+            variables.Partitions = new List<PartitionInput>();
+            foreach (var d in log.Disks)
+            {
+                var disk = new DiskInput(_serverId, d.DiskUuid, d.DiskType, d.Serial, d.Path, d.Vendor, d.Name, d.Bytes);
+                variables.Disks.Add(disk);
+                if (d.Children == null) continue;
+                
+                foreach(var p in d.Children)
+                {
+                    var partition = new PartitionInput(_serverId, p.DiskUuid, p.PartitionUuid, p.FilesystemType, p.FilesystemVersion, p.Label, p.Mountpoint);
+                    variables.Partitions.Add(partition);
+                }
+            }
+        
+            //variables.PartitionLogs = new List<PartitionLogInput>();
+        }
 
         Console.WriteLine(log);
 

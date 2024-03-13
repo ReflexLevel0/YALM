@@ -1,12 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
-using YALM.Common.Models.Graphql;
-using YALM.Common.Models.Graphql.InputModels;
-using YALM.Common.Models.Graphql.Logs;
-using YALM.Monitor.Models;
+﻿using System.Text.Json;
 
 namespace YALM.Monitor;
 
@@ -26,7 +18,7 @@ internal class Monitor
 			await File.WriteAllTextAsync(ServerIdFilename, DateTime.UtcNow.GetHashCode().ToString());
 		}
 
-		int serverId = int.Parse(ServerIdFilename);
+		int serverId = int.Parse(await File.ReadAllTextAsync(ServerIdFilename));
 		var logHelper = new LogHelper(config, LastLogDateFilename);
 		var apiHelper = new ApiHelper(config, serverId);
         

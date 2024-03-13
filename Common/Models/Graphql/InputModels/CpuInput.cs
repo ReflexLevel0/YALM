@@ -1,8 +1,7 @@
 namespace YALM.Common.Models.Graphql.InputModels;
 
-public class CpuInput
+public class CpuInput : CpuIdInput
 {
-	public int ServerId { get; set; }
 	public string? Name { get; set; }
 	public string? Architecture { get; set; }
 	public int? Cores { get; set; }

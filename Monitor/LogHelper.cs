@@ -57,10 +57,10 @@ public class LogHelper
 
 		if (_config.Storage)
 		{
-			log.StorageLogs = new List<StorageLog>();
+			log.Disks = new List<DiskInfo>();
 			await foreach (var l in _dataHelper.GetStorageInfo())
 			{
-				log.StorageLogs.Add(l);
+				log.Disks.Add(l);
 			}
 		}
 

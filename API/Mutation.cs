@@ -12,10 +12,15 @@ namespace YALM.API;
 
 public class Mutation(IDb db)
 {
-	private readonly Func<CpuInput, IQueryable<CpuDbRecord>> _getCpuQuery = cpu =>
+	private readonly Func<CpuIdInput, IQueryable<CpuDbRecord>> _getCpuQuery = cpu =>
 		from c in db.Cpus
 		where c.ServerId == cpu.ServerId
 		select c;
+	
+	private readonly Func<DiskIdInput, IQueryable<DiskDbRecord>> _getDiskQuery = disk =>
+		from d in db.Disks
+		where d.ServerId == disk.ServerId && string.CompareOrdinal(d.Uuid, disk.Uuid) == 0
+		select d;
 
 	private const string GenericDatabaseErrorString = "Database error";
 
@@ -32,28 +37,15 @@ public class Mutation(IDb db)
 		}
 	}
 
-	public async Task<Payload<CpuOutputBase>> UpdateCpu(CpuIdInput? oldCpuId, CpuInput newCpu)
+	public async Task<Payload<CpuOutputBase>> AddOrUpdateCpu(CpuInput cpu)
 	{
-		//If no oldCpuId is specified or if the new , new processor will be created
-		if (oldCpuId == null || await db.Cpus.Where(c => c.ServerId == oldCpuId.ServerId).CountAsync() == 0)
-		{
-			var dbModel = CpuInputToDbModel(newCpu);
-			return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(db.InsertAsync(dbModel), _getCpuQuery(newCpu));
-		}
-
-		//If oldCpuId is specified, the old one is updated
-		var task = db.Cpus.Where(c => c.ServerId == oldCpuId.ServerId)
-			.Set(c => c.ServerId, newCpu.ServerId)
-			.Set(c => c.Architecture, newCpu.Architecture)
-			.Set(c => c.Name, newCpu.Name)
-			.Set(c => c.Cores, newCpu.Cores)
-			.Set(c => c.Threads, newCpu.Threads)
-			.Set(c => c.FrequencyMhz, newCpu.FrequencyMhz)
-			.UpdateAsync();
+		var cpuDbModel = CpuInputToDbModel(cpu);
 
 		try
 		{
-			return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(task, _getCpuQuery(newCpu));
+			await db.InsertOrReplaceAsync(cpuDbModel);
+			var cpuDbRecord = await _getCpuQuery(cpu).FirstAsync();
+			return new Payload<CpuOutputBase> { Data = (CpuOutputBase)Convert.ChangeType(cpuDbRecord, typeof(CpuOutputBase)) };
 		}
 		catch
 		{
@@ -218,31 +210,51 @@ public class Mutation(IDb db)
 
 	public async Task<Payload<DiskOutputBase>> AddDisk(DiskInput disk)
 	{
-		var dbModel = new DiskDbRecord
-		{
-			Uuid = disk.Uuid,
-			ServerId = disk.ServerId,
-			BytesTotal = disk.BytesTotal,
-			Model = disk.Model,
-			Path = disk.Path,
-			Serial = disk.Serial,
-			Type = disk.Type,
-			Vendor = disk.Vendor
-		};
-
-		var query =
-			from d in db.Disks
-			where d.ServerId == disk.ServerId && string.CompareOrdinal(d.Uuid, disk.Uuid) == 0
-			select d;
+		var dbModel = DiskInputToDbModel(disk);
 
 		try
 		{
-			return await UpdateDbRecord<DiskDbRecord, DiskOutputBase>(db.InsertAsync(dbModel), query);
+			return await UpdateDbRecord<DiskDbRecord, DiskOutputBase>(db.InsertAsync(dbModel), _getDiskQuery(new DiskIdInput(disk.ServerId, disk.Uuid)));
 		}
 		catch
 		{
 			return new Payload<DiskOutputBase> { Error = GenericDatabaseErrorString };
 		}
+	}
+
+	public async Task<Payload<DiskOutputBase>> AddOrUpdateDisk(DiskInput disk)
+	{
+		var diskDbModel = DiskInputToDbModel(disk);
+		
+		try
+		{
+			await db.InsertOrReplaceAsync(diskDbModel);
+			var diskDbRecord = await _getDiskQuery(new DiskIdInput(disk.ServerId, disk.Uuid)).FirstAsync();
+			return new Payload<DiskOutputBase> { Data = (DiskOutputBase)Convert.ChangeType(diskDbRecord, typeof(DiskOutputBase)) };
+		}
+		catch
+		{
+			return new Payload<DiskOutputBase> { Error = GenericDatabaseErrorString };
+		}
+	}
+
+	public async Task<Payload<List<DiskOutputBase>>> AddOrUpdateDisks(List<DiskInput> disks)
+	{
+		var payloadList = new List<DiskOutputBase>();
+		string error = "";
+		
+		foreach (var disk in disks)
+		{
+			var payload = await AddOrUpdateDisk(disk);
+			if(payload.Data != null) payloadList.Add(payload.Data);
+
+			if (payload.Error == null) continue;
+			error = payload.Error;
+			payloadList = null;
+			break;
+		}
+
+		return new Payload<List<DiskOutputBase>>{Data = payloadList, Error = error};
 	}
 
 	public async Task<Payload<ProgramLog>> AddProgramLog(ProgramLogInput programLog)
@@ -327,6 +339,23 @@ public class Mutation(IDb db)
 			Cores = cpu.Cores,
 			Threads = cpu.Threads,
 			FrequencyMhz = cpu.FrequencyMhz
+		};
+
+		return dbModel;
+	}
+
+	private static DiskDbRecord DiskInputToDbModel(DiskInput disk)
+	{
+		var dbModel = new DiskDbRecord
+		{
+			Uuid = disk.Uuid,
+			ServerId = disk.ServerId,
+			BytesTotal = disk.BytesTotal,
+			Model = disk.Model,
+			Path = disk.Path,
+			Serial = disk.Serial,
+			Type = disk.Type,
+			Vendor = disk.Vendor
 		};
 
 		return dbModel;
