@@ -50,35 +50,41 @@ CREATE TABLE memoryLog
 
 CREATE TABLE disk
 (
-    id       SERIAL,
-    serverid integer NOT NULL,
-    label    VARCHAR(256),
-    PRIMARY KEY (id),
-    UNIQUE (serverid, label)
+    uuid        VARCHAR(256),       --unique ID of the disk
+    serverid    INTEGER NOT NULL,   --server ID to which the disk belongs
+    type        VARCHAR(32),        --type of the disk (ex: gpt)
+    serial      VARCHAR(256),       --globally unique (generally unique, but not guaranteed) disk ID
+    path        VARCHAR(256),       --disk path (ex: /dev/sda) 
+    vendor      VARCHAR(256),       --manufacturer of the disk (ex: ATA)
+    model       VARCHAR(256),       --disk name (ex: Samsung EVO 970)
+    bytesTotal  BIGINT,             --size of the disk in bytes
+    PRIMARY KEY (uuid, serverid)
 );
 
 CREATE TABLE partition
 (
-    diskId            SERIAL      NOT NULL,
+    diskUuid          varchar(256),
     uuid              varchar(64) NOT NULL,
+    serverId          integer NOT NULL,
     filesystemName    varchar(64),
     filesystemVersion varchar(64),
     label             varchar(256),
     mountpath         varchar(1024),
-    PRIMARY KEY (diskId, uuid),
-    FOREIGN KEY (diskId) REFERENCES disk ON DELETE CASCADE
+    UNIQUE(serverId, uuid),
+    PRIMARY KEY (serverId, uuid),
+    FOREIGN KEY (diskUuid, serverId) REFERENCES disk(uuid, serverId) ON DELETE CASCADE
 );
 
 CREATE TABLE partitionLog
 (
-    diskId     SERIAL      NOT NULL,
-    uuid       varchar(64) NOT NULL,
-    date       timestamp   NOT NULL,
-    interval   integer     NOT NULL,
-    bytestotal bigint,
-    usage      decimal(3, 2),
-    PRIMARY KEY (diskId, date, uuid),
-    FOREIGN KEY (diskId, uuid) REFERENCES partition ON DELETE CASCADE
+    serverId        integer NOT NULL,
+    partitionUuid   varchar(64) NOT NULL,
+    date            timestamp   NOT NULL,
+    interval        integer     NOT NULL,
+    bytestotal      bigint,
+    usage           decimal(3, 2),
+    PRIMARY KEY (serverId, partitionUuid, date),
+    FOREIGN KEY (serverId, partitionUuid) REFERENCES partition(serverId, uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE servicename

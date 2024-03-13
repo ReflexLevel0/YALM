@@ -75,14 +75,14 @@ namespace DataModel
 			return table.FirstOrDefaultAsync(e => e.ServerId == serverid && e.Date == date, cancellationToken);
 		}
 
-		public static DiskDbRecord? Find(this ITable<DiskDbRecord> table, int id)
+		public static DiskDbRecord? Find(this ITable<DiskDbRecord> table, int serverid, string uuid)
 		{
-			return table.FirstOrDefault(e => e.Id == id);
+			return table.FirstOrDefault(e => e.ServerId == serverid && e.Uuid.CompareTo(uuid) == 0);
 		}
 
-		public static Task<DiskDbRecord?> FindAsync(this ITable<DiskDbRecord> table, int id, CancellationToken cancellationToken = default)
+		public static Task<DiskDbRecord?> FindAsync(this ITable<DiskDbRecord> table, int serverid, string uuid, CancellationToken cancellationToken = default)
 		{
-			return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+			return table.FirstOrDefaultAsync(e => e.ServerId == serverid && e.Uuid.CompareTo(uuid) == 0, cancellationToken);
 		}
 
 		public static MemoryLogDbRecord? Find(this ITable<MemoryLogDbRecord> table, int serverid, DateTime date)
@@ -95,24 +95,24 @@ namespace DataModel
 			return table.FirstOrDefaultAsync(e => e.ServerId == serverid && e.Date == date, cancellationToken);
 		}
 
-		public static PartitionDbRecord? Find(this ITable<PartitionDbRecord> table, int diskid, string uuid)
+		public static PartitionDbRecord? Find(this ITable<PartitionDbRecord> table, int serverid, string uuid)
 		{
-			return table.FirstOrDefault(e => e.DiskId == diskid && e.Uuid == uuid);
+			return table.FirstOrDefault(e => e.Serverid == serverid && e.Uuid == uuid);
 		}
 
-		public static Task<PartitionDbRecord?> FindAsync(this ITable<PartitionDbRecord> table, int diskid, string uuid, CancellationToken cancellationToken = default)
+		public static Task<PartitionDbRecord?> FindAsync(this ITable<PartitionDbRecord> table, int serverid, string uuid, CancellationToken cancellationToken = default)
 		{
-			return table.FirstOrDefaultAsync(e => e.DiskId == diskid && e.Uuid == uuid, cancellationToken);
+			return table.FirstOrDefaultAsync(e => e.Serverid == serverid && e.Uuid == uuid, cancellationToken);
 		}
 
-		public static PartitionLogDbRecord? Find(this ITable<PartitionLogDbRecord> table, int diskid, string uuid, DateTime date)
+		public static PartitionLogDbRecord? Find(this ITable<PartitionLogDbRecord> table, int serverid, string partitionuuid, DateTime date)
 		{
-			return table.FirstOrDefault(e => e.DiskId == diskid && e.Uuid == uuid && e.Date == date);
+			return table.FirstOrDefault(e => e.Serverid == serverid && e.Partitionuuid == partitionuuid && e.Date == date);
 		}
 
-		public static Task<PartitionLogDbRecord?> FindAsync(this ITable<PartitionLogDbRecord> table, int diskid, string uuid, DateTime date, CancellationToken cancellationToken = default)
+		public static Task<PartitionLogDbRecord?> FindAsync(this ITable<PartitionLogDbRecord> table, int serverid, string partitionuuid, DateTime date, CancellationToken cancellationToken = default)
 		{
-			return table.FirstOrDefaultAsync(e => e.DiskId == diskid && e.Uuid == uuid && e.Date == date, cancellationToken);
+			return table.FirstOrDefaultAsync(e => e.Serverid == serverid && e.Partitionuuid == partitionuuid && e.Date == date, cancellationToken);
 		}
 
 		public static ServiceDbRecord? Find(this ITable<ServiceDbRecord> table, int serverid, int serviceid, DateTime date)

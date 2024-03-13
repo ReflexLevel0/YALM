@@ -7,6 +7,7 @@
 
 using LinqToDB.Mapping;
 using System.Collections.Generic;
+using YALM.Common.Models.Graphql.Logs;
 using YALM.Common.Models.Graphql.OutputModels;
 
 #pragma warning disable 1573, 1591
@@ -17,16 +18,21 @@ namespace DataModel
 	[Table("disk")]
 	public class DiskDbRecord : IConvertible
 	{
-		[Column("id"      , IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)] public int     Id       { get; set; } // integer
-		[Column("serverid"                                                                                  )] public int     ServerId { get; set; } // integer
-		[Column("label"                                                                                     )] public string? Label    { get; set; } // character varying(256)
+		[Column("uuid"      , CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 0)] public string  Uuid       { get; set; } = null!; // character varying(256)
+		[Column("serverid"  , IsPrimaryKey = true , PrimaryKeyOrder = 1                        )] public int     ServerId   { get; set; } // integer
+		[Column("type"                                                                         )] public string? Type       { get; set; } // character varying(32)
+		[Column("serial"                                                                       )] public string? Serial     { get; set; } // character varying(256)
+		[Column("path"                                                                         )] public string? Path       { get; set; } // character varying(256)
+		[Column("vendor"                                                                       )] public string? Vendor     { get; set; } // character varying(256)
+		[Column("model"                                                                        )] public string? Model      { get; set; } // character varying(256)
+		[Column("bytestotal"                                                                   )] public long?   BytesTotal { get; set; } // bigint
 
 		#region Associations
 		/// <summary>
-		/// partition_diskid_fkey backreference
+		/// partition_diskuuid_serverid_fkey backreference
 		/// </summary>
-		[Association(ThisKey = nameof(Id), OtherKey = nameof(PartitionDbRecord.DiskId))]
-		public IEnumerable<PartitionDbRecord> Partitions { get; set; } = null!;
+		[Association(ThisKey = nameof(Uuid) + "," + nameof(ServerId), OtherKey = nameof(PartitionDbRecord.Diskuuid) + "," + nameof(PartitionDbRecord.Serverid))]
+		public IEnumerable<PartitionLogDbRecord> Partitions { get; set; } = null!;
 		#endregion
 
 		public TypeCode GetTypeCode()
@@ -96,8 +102,8 @@ namespace DataModel
 
 		public object ToType(Type conversionType, IFormatProvider? provider)
 		{
-			if(conversionType == typeof(DiskOutputBase)) return new DiskOutputBase(ServerId, Label);
-			if (conversionType == typeof(DiskOutput)) return new DiskOutput(ServerId, Label);
+			if(conversionType == typeof(DiskOutputBase)) return new DiskOutputBase(ServerId, Uuid, Type, Serial, Path, Vendor, Model, BytesTotal);
+			if (conversionType == typeof(DiskOutput)) return new DiskOutput(ServerId, Uuid, Type, Serial, Path, Vendor, Model, BytesTotal);
 			throw new NotImplementedException();
 		}
 

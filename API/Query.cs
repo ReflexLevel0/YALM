@@ -119,9 +119,9 @@ public class Query(IDb db)
 		return programOutput;
 	}
 
-	/// <summary>
-	/// Returns disk data
-	/// </summary>
+	// /// <summary>
+	// /// Returns disk data
+	// /// </summary>
 	public async IAsyncEnumerable<DiskOutput> Disk(DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
 	{
 		var getEmptyRecordFunc = () => new PartitionLog { Date = DateTime.Now };
@@ -131,29 +131,33 @@ public class Query(IDb db)
 			decimal usage = QueryHelper.CombineValues(method, logs.Select(l => l.Usage).ToList());
 			return new PartitionLog { Date = logs.First().Date, Bytes = bytes, UsedPercentage = usage };
 		};
-
+	
 		//Going through every disk and getting data for it
 		var disks = await db.Disks.ToListAsync();
 		foreach (var d in disks)
 		{
 			var partitions = await 
 				(from p in db.Partitions 
-				where p.DiskId == d.Id
+				where p.Diskuuid == d.Uuid && p.Serverid == d.ServerId
 				select p).ToListAsync();
-
-			var disk = new DiskOutput(d.ServerId, d.Label);
+	
+			var disk = new DiskOutput(d.ServerId, d.Uuid, d.Type, d.Serial, d.Path, d.Vendor, d.Model, d.BytesTotal);
 			foreach (var partition in partitions)
 			{
 				var partitionOutput = (PartitionOutput)Convert.ChangeType(partition, typeof(PartitionOutput));
 				disk.Partitions.Add(partitionOutput);
 				
 				//Getting all logs for this partition
-				await foreach(var log in QueryHelper.GetLogs(db.PartitionLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+				var partitionLogs =
+					from l in db.PartitionLogs
+					where l.Serverid == partition.Serverid && l.Partitionuuid == partition.Uuid
+					select l;
+				await foreach(var log in QueryHelper.GetLogs(partitionLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
 				{
 					partitionOutput.Logs.Add(log);
 				}
 			}
-
+	
 			yield return disk;
 		}
 	}

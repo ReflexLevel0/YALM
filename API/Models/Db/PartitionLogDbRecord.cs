@@ -19,19 +19,19 @@ namespace DataModel
 	[Table("partitionlog")]
 	public class PartitionLogDbRecord : ILog, IConvertible
 	{
-		[Column("diskid"    , IsPrimaryKey = true , PrimaryKeyOrder = 0   , IsIdentity      = true, SkipOnInsert = true, SkipOnUpdate = true)] public int      DiskId     { get; set; } // integer
-		[Column("uuid"      , CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 1                                             )] public string   Uuid       { get; set; } = null!; // character varying(64)
-		[Column("date"      , IsPrimaryKey = true , PrimaryKeyOrder = 2                                                                     )] public DateTime Date       { get; set; } // timestamp (6) without time zone
-		[Column("interval"                                                                                                                  )] public int      Interval   { get; set; } // integer
-		[Column("bytestotal"                                                                                                                )] public long?    BytesTotal { get; set; } // bigint
-		[Column("usage"                                                                                                                     )] public decimal? Usage      { get; set; } // numeric(3,2)
+		[Column("serverid"     , IsPrimaryKey = true , PrimaryKeyOrder = 0                        )] public int      Serverid      { get; set; } // integer
+		[Column("partitionuuid", CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 1)] public string   Partitionuuid { get; set; } = null!; // character varying(64)
+		[Column("date"         , IsPrimaryKey = true , PrimaryKeyOrder = 2                        )] public DateTime Date          { get; set; } // timestamp (6) without time zone
+		[Column("interval"                                                                        )] public int      Interval      { get; set; } // integer
+		[Column("bytestotal"                                                                      )] public long?    BytesTotal    { get; set; } // bigint
+		[Column("usage"                                                                           )] public decimal? Usage         { get; set; } // numeric(3,2)
 
 		#region Associations
 		/// <summary>
-		/// partitionlog_diskid_uuid_fkey
+		/// partitionlog_serverid_partitionuuid_fkey
 		/// </summary>
-		[Association(CanBeNull = false, ThisKey = nameof(DiskId) + "," + nameof(Uuid), OtherKey = nameof(PartitionDbRecord.DiskId) + "," + nameof(PartitionDbRecord.Uuid))]
-		public PartitionDbRecord Diskiduuidfkey { get; set; } = null!;
+		[Association(CanBeNull = false, ThisKey = nameof(Serverid) + "," + nameof(Partitionuuid), OtherKey = nameof(PartitionLogDbRecord.Serverid) + "," + nameof(PartitionLogDbRecord.Partitionuuid))]
+		public PartitionLogDbRecord Serveridpartitionuuidfkey { get; set; } = null!;
 		#endregion
 
 		public TypeCode GetTypeCode()

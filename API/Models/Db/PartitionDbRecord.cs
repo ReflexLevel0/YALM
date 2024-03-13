@@ -17,24 +17,25 @@ namespace DataModel
 	[Table("partition")]
 	public class PartitionDbRecord : IConvertible
 	{
-		[Column("diskid"           , IsPrimaryKey = true , PrimaryKeyOrder = 0   , IsIdentity      = true, SkipOnInsert = true, SkipOnUpdate = true)] public int     DiskId            { get; set; } // integer
-		[Column("uuid"             , CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 1                                             )] public string  Uuid              { get; set; } = null!; // character varying(64)
-		[Column("filesystemname"                                                                                                                   )] public string? FilesystemName    { get; set; } // character varying(64)
-		[Column("filesystemversion"                                                                                                                )] public string? FilesystemVersion { get; set; } // character varying(64)
-		[Column("label"                                                                                                                            )] public string? Label             { get; set; } // character varying(256)
-		[Column("mountpath"                                                                                                                        )] public string? MountPath         { get; set; } // character varying(1024)
+		[Column("diskuuid"                                                                            )] public string? Diskuuid          { get; set; } // character varying(256)
+		[Column("uuid"             , CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 0)] public string  Uuid              { get; set; } = null!; // character varying(64)
+		[Column("serverid"         , IsPrimaryKey = true , PrimaryKeyOrder = 1                        )] public int     Serverid          { get; set; } // integer
+		[Column("filesystemname"                                                                      )] public string? FilesystemName    { get; set; } // character varying(64)
+		[Column("filesystemversion"                                                                   )] public string? FilesystemVersion { get; set; } // character varying(64)
+		[Column("label"                                                                               )] public string? Label             { get; set; } // character varying(256)
+		[Column("mountpath"                                                                           )] public string? MountPath         { get; set; } // character varying(1024)
 
 		#region Associations
 		/// <summary>
-		/// partition_diskid_fkey
+		/// partition_diskuuid_serverid_fkey
 		/// </summary>
-		[Association(CanBeNull = false, ThisKey = nameof(DiskId), OtherKey = nameof(DiskDbRecord.Id))]
-		public DiskDbRecord Diskidfkey { get; set; } = null!;
+		[Association(CanBeNull = false, ThisKey = nameof(Diskuuid) + "," + nameof(Serverid), OtherKey = nameof(DiskDbRecord.Uuid) + "," + nameof(DiskDbRecord.ServerId))]
+		public DiskDbRecord Diskuuidserveridfkey { get; set; } = null!;
 
 		/// <summary>
-		/// partitionlog_diskid_uuid_fkey backreference
+		/// partitionlog_serverid_partitionuuid_fkey backreference
 		/// </summary>
-		[Association(ThisKey = nameof(DiskId) + "," + nameof(Uuid), OtherKey = nameof(PartitionLogDbRecord.DiskId) + "," + nameof(PartitionLogDbRecord.Uuid))]
+		[Association(ThisKey = nameof(Serverid) + "," + nameof(Uuid), OtherKey = nameof(PartitionLogDbRecord.Serverid) + "," + nameof(PartitionLogDbRecord.Partitionuuid))]
 		public IEnumerable<PartitionLogDbRecord> Partitionlogs { get; set; } = null!;
 		#endregion
 
@@ -109,7 +110,7 @@ namespace DataModel
 			{
 				throw new NotImplementedException();
 			}
-			return new PartitionOutput(Uuid, FilesystemName, FilesystemVersion, Label, MountPath);
+			return new PartitionOutput(Serverid, Uuid, FilesystemName, FilesystemVersion, Label, MountPath);
 		}
 
 		public ushort ToUInt16(IFormatProvider? provider)

@@ -62,7 +62,7 @@ public class QueryHelper
 	/// <param name="startDate">Starting date for interval calculation</param>
 	/// <param name="endDate">Ending date for interval calculation</param>
 	/// <returns></returns>
-	public static async Task<int> CalculateInterval(ITable<ILog> table, DateTime? startDate, DateTime? endDate)
+	public static async Task<int> CalculateInterval(IQueryable<ILog> table, DateTime? startDate, DateTime? endDate)
 	{
 		if (startDate == null)
 		{
@@ -93,7 +93,7 @@ public class QueryHelper
 	/// <typeparam name="TLog">Types of the logs returned to the user by the API</typeparam>
 	/// <returns></returns>
 	public static async IAsyncEnumerable<TLog> GetLogs<TDbLog, TLog>(
-		ITable<ILog> table,
+		IQueryable<ILog> table,
 		Func<IList<TDbLog>, TLog> combineLogsFunc,
 		Func<TLog> getEmptyLogFunc,
 		Func<TDbLog, string> calculateHash,

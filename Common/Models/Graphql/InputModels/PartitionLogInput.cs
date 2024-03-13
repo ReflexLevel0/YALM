@@ -6,5 +6,5 @@ public class PartitionLogInput : PartitionLog, ILog
 {
 	public int ServerId { get; set; }
 	public int Interval { get; set; }
-	public string? Uuid { get; set; }
+	public string? PartitionUuid { get; set; }
 }

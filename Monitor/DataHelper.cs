@@ -104,7 +104,7 @@ public class DataHelper
 
 	public IEnumerable<StorageLog> GetStorageInfo()
 	{
-		var process = ProcessHelper.StartProcess("lsblk", "-p -f -b --json");
+		var process = ProcessHelper.StartProcess("lsblk", "--json -p -b -o FSTYPE,FSUSED,LABEL,NAME,PARTTYPENAME,PARTUUID,PATH,PTTYPE,PTUUID,SERIAL,SIZE,STATE,MOUNTPOINT,TYPE,UUID,VENDOR");
 		var jsonStorage = JsonConvert.DeserializeObject<StorageJson>(process.StandardOutput.ReadToEnd());
 		if (jsonStorage == null) throw new Exception("Can't parse storage info!");
 
