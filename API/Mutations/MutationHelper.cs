@@ -16,7 +16,7 @@ public class MutationHelper(IDb db) : IMutationHelper
 		where d.ServerId == disk.ServerId && string.CompareOrdinal(d.Uuid, disk.Uuid) == 0
 		select d;
 
-	public async Task<Payload<TOutput>> AddModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery)
+	public async Task<Payload<TOutput>> AddModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull 
 	{
 		try
 		{
@@ -28,12 +28,12 @@ public class MutationHelper(IDb db) : IMutationHelper
 		}
 	}
 
-	public async Task<Payload<TOutput>> AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> _getModelQuery)
+	public async Task<Payload<TOutput>> AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull
 	{
 		try
 		{
 			await db.InsertOrReplaceAsync(model);
-			var dbRecord = await _getModelQuery(modelId).FirstAsync();
+			var dbRecord = await getModelQuery(modelId).FirstAsync();
 			return new Payload<TOutput> { Data = (TOutput)Convert.ChangeType(dbRecord, typeof(TOutput)) };
 		}
 		catch
@@ -42,11 +42,11 @@ public class MutationHelper(IDb db) : IMutationHelper
 		}
 	}
 
-	public async Task<Payload<TOutput>> DeleteModelAsync<TIdInput, TDbModel, TOutput>(TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> _getModelQuery)
+	public async Task<Payload<TOutput>> DeleteModelAsync<TIdInput, TDbModel, TOutput>(TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull
 	{
 		try
 		{
-			var model = await _getModelQuery(modelId).FirstAsync();
+			var model = await getModelQuery(modelId).FirstAsync();
 			await db.DeleteAsync(model);
 			return new Payload<TOutput> { Data = (TOutput)Convert.ChangeType(model, typeof(TOutput)) };
 		}
@@ -236,7 +236,7 @@ public class MutationHelper(IDb db) : IMutationHelper
 		{
 			return await UpdateDbRecordAsync<ProgramLogDbRecord, ProgramLog>(db.InsertAsync(programModel), query);
 		}
-		catch(Exception ex)
+		catch
 		{
 			return new Payload<ProgramLog> { Error = GetGenericDatabaseErrorString() };
 		}

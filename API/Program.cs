@@ -6,9 +6,11 @@ using YALM.API.Mutations;
 
 string connectionString = File.ReadAllText("dbConnectionString.txt");
 var dataOptions = new DataOptions<MonitoringDb>(new DataOptions().UsePostgreSQL(connectionString));
+var db = new MonitoringDb(dataOptions);
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-	.AddSingleton<IDb>(new MonitoringDb(dataOptions))
+	.AddSingleton<IDb>(db)
+	.AddTransient<IMutationHelper>(_ => new MutationHelper(db))
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
 	.AddMutationType(m => m.Name("Mutation"))
