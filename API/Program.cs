@@ -14,8 +14,9 @@ builder.Services
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
 	.AddMutationType(m => m.Name("Mutation"))
-	.AddType<MutationHelper>()
-	.AddType<CpuMutation>();
+	.AddType<CpuMutation>()
+	.AddType<CpuLogMutation>()
+	.AddType<DiskMutation>();
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAll", b =>

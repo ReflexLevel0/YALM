@@ -11,11 +11,6 @@ namespace YALM.API.Mutations;
 
 public class MutationHelper(IDb db) : IMutationHelper
 {
-	private readonly Func<DiskIdInput, IQueryable<DiskDbRecord>> _getDiskQuery = disk =>
-		from d in db.Disks
-		where d.ServerId == disk.ServerId && string.CompareOrdinal(d.Uuid, disk.Uuid) == 0
-		select d;
-
 	public async Task<Payload<TOutput>> AddModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull 
 	{
 		try
@@ -42,6 +37,25 @@ public class MutationHelper(IDb db) : IMutationHelper
 		}
 	}
 
+	public async Task<Payload<List<TOutput>>> AddOrReplaceModelsAsync<TIdInput, TDbModel, TOutput>(IEnumerable<TDbModel> models, Func<TDbModel, TIdInput> getModelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull
+	{
+		var payloadList = new List<TOutput>();
+		string error = "";
+		
+		foreach (var model in models)
+		{
+			var payload = await AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(model, getModelId(model), getModelQuery);
+			if(payload.Data != null) payloadList.Add(payload.Data);
+	
+			if (payload.Error == null) continue;
+			error = payload.Error;
+			payloadList = null;
+			break;
+		}
+	
+		return new Payload<List<TOutput>>{Data = payloadList, Error = error};
+	}
+	
 	public async Task<Payload<TOutput>> DeleteModelAsync<TIdInput, TDbModel, TOutput>(TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull
 	{
 		try
@@ -166,55 +180,6 @@ public class MutationHelper(IDb db) : IMutationHelper
 		}
 	}
 
-	public async Task<Payload<DiskOutputBase>> AddDisk(DiskInput disk)
-	{
-		var dbModel = DiskInputToDbModel(disk);
-
-		try
-		{
-			return await UpdateDbRecordAsync<DiskDbRecord, DiskOutputBase>(db.InsertAsync(dbModel), _getDiskQuery(new DiskIdInput(disk.ServerId, disk.Uuid)));
-		}
-		catch
-		{
-			return new Payload<DiskOutputBase> { Error = GetGenericDatabaseErrorString() };
-		}
-	}
-
-	public async Task<Payload<DiskOutputBase>> AddOrUpdateDisk(DiskInput disk)
-	{
-		var diskDbModel = DiskInputToDbModel(disk);
-		
-		try
-		{
-			await db.InsertOrReplaceAsync(diskDbModel);
-			var diskDbRecord = await _getDiskQuery(new DiskIdInput(disk.ServerId, disk.Uuid)).FirstAsync();
-			return new Payload<DiskOutputBase> { Data = (DiskOutputBase)Convert.ChangeType(diskDbRecord, typeof(DiskOutputBase)) };
-		}
-		catch
-		{
-			return new Payload<DiskOutputBase> { Error = GetGenericDatabaseErrorString() };
-		}
-	}
-
-	public async Task<Payload<List<DiskOutputBase>>> AddOrUpdateDisks(List<DiskInput> disks)
-	{
-		var payloadList = new List<DiskOutputBase>();
-		string error = "";
-		
-		foreach (var disk in disks)
-		{
-			var payload = await AddOrUpdateDisk(disk);
-			if(payload.Data != null) payloadList.Add(payload.Data);
-
-			if (payload.Error == null) continue;
-			error = payload.Error;
-			payloadList = null;
-			break;
-		}
-
-		return new Payload<List<DiskOutputBase>>{Data = payloadList, Error = error};
-	}
-
 	public async Task<Payload<ProgramLog>> AddProgramLog(ProgramLogInput programLog)
 	{
 		var programModel = new ProgramLogDbRecord
@@ -280,23 +245,6 @@ public class MutationHelper(IDb db) : IMutationHelper
 	}
 
 	private static string GenerateInsertError(string? type) => $"Failed to insert {type ?? "object"}";
-
-	private static DiskDbRecord DiskInputToDbModel(DiskInput disk)
-	{
-		var dbModel = new DiskDbRecord
-		{
-			Uuid = disk.Uuid,
-			ServerId = disk.ServerId,
-			BytesTotal = disk.BytesTotal,
-			Model = disk.Model,
-			Path = disk.Path,
-			Serial = disk.Serial,
-			Type = disk.Type,
-			Vendor = disk.Vendor
-		};
-
-		return dbModel;
-	}
 
 	public string GetGenericDatabaseErrorString() => "Database error";
 	
