@@ -1,27 +1,20 @@
 namespace YALM.Common.Models.Graphql.InputModels;
 
-public class PartitionInput
+public class PartitionInput : PartitionIdInput
 {
-	public int ServerId { get; set; }
-	public string DiskUuid { get; set; }
-	public string Uuid { get; set; }
-	public string? FilesystemName { get; set; }
-	public string? FilesystemVersion { get; set; }
-	public string? PartitionLabel { get; set; }
-	public string? Mountpath { get; set; }
+	public string? DiskUuid { get; }
+	public string? FilesystemName { get; }
+	public string? FilesystemVersion { get; }
+	public string? PartitionLabel { get; }
+	public string? Mountpath { get; }
 
-	public PartitionInput(int serverId, string diskUuid, string uuid)
+	public PartitionInput(int serverId, string uuid) : base(serverId, uuid)
 	{
-		ServerId = serverId;
-		DiskUuid = diskUuid;
-		Uuid = uuid;
 	}
 
-	public PartitionInput(int serverId, string diskUuid, string uuid, string? filesystemName, string? filesystemVersion, string? partitionLabel, string? mountpath)
+	public PartitionInput(int serverId, string diskUuid, string uuid, string? filesystemName, string? filesystemVersion, string? partitionLabel, string? mountpath) : base(serverId, uuid)
 	{
-		ServerId = serverId;
 		DiskUuid = diskUuid;
-		Uuid = uuid;
 		FilesystemName = filesystemName;
 		FilesystemVersion = filesystemVersion;
 		PartitionLabel = partitionLabel;

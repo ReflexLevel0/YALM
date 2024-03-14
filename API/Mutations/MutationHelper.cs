@@ -5,7 +5,6 @@ using YALM.API.Models.Db;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
-using YALM.Common.Models.Graphql.OutputModels;
 
 namespace YALM.API.Mutations;
 
@@ -67,85 +66,6 @@ public class MutationHelper(IDb db) : IMutationHelper
 		catch
 		{
 			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
-		}
-	}
-
-	public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput partitionLog)
-	{
-		string? diskUuid = await
-			(from p in db.Partitions
-				join d in db.Disks on p.Diskuuid equals d.Uuid
-				where partitionLog.ServerId == d.ServerId && string.CompareOrdinal(partitionLog.PartitionUuid, p.Uuid) == 0
-				select d.Uuid)
-			.FirstOrDefaultAsync();
-	
-		if (string.IsNullOrEmpty(diskUuid)) throw new Exception("Partition not found!");
-	
-		var query =
-			from l in db.PartitionLogs
-			where l.Partitionuuid == partitionLog.PartitionUuid && l.Date == partitionLog.Date
-			select l;
-	
-		var insertTask = db.PartitionLogs
-			.Value(l => l.Serverid, partitionLog.ServerId)
-			.Value(l => l.Date, partitionLog.Date)
-			.Value(l => l.Interval, partitionLog.Interval)
-			.Value(l => l.Partitionuuid, partitionLog.PartitionUuid)
-			.Value(l => l.Usage, partitionLog.UsedPercentage)
-			.Value(l => l.BytesTotal, partitionLog.Bytes)
-			.InsertAsync();
-	
-		try
-		{
-			return await UpdateDbRecordAsync<PartitionLogDbRecord, PartitionLog>(insertTask, query);
-		}
-		catch
-		{
-			return new Payload<PartitionLog> { Error = GetGenericDatabaseErrorString() };
-		}
-	}
-	
-	public async Task<Payload<PartitionOutputBase>> AddPartition(PartitionInput partition)
-	{
-		string? diskUuid = await (
-			from d in db.Disks
-			where d.ServerId == partition.ServerId && string.CompareOrdinal(d.Uuid, partition.DiskUuid) == 0
-			select d.Uuid).FirstOrDefaultAsync();
-		if (diskUuid == null) throw new Exception("Disk ID not found");
-	
-		var dbModel = new PartitionDbRecord
-		{
-			Serverid = partition.ServerId,
-			Diskuuid = diskUuid,
-			Uuid = partition.Uuid,
-			Label = partition.PartitionLabel,
-			FilesystemName = partition.FilesystemName,
-			FilesystemVersion = partition.FilesystemVersion,
-			MountPath = partition.Mountpath
-		};
-	
-		var query =
-			from p in db.Partitions
-			where string.CompareOrdinal(p.Diskuuid, diskUuid) == 0 && string.CompareOrdinal(p.Uuid, partition.Uuid) == 0
-			select p;
-	
-		var insertTask = db.Partitions
-			.Value(p => p.Serverid, dbModel.Serverid)
-			.Value(p => p.FilesystemName, dbModel.FilesystemName)
-			.Value(p => p.FilesystemVersion, dbModel.FilesystemVersion)
-			.Value(p => p.Uuid, dbModel.Uuid)
-			.Value(p => p.Diskuuid, diskUuid)
-			.Value(p => p.Label, dbModel.Label)
-			.Value(p => p.MountPath, dbModel.MountPath)
-			.InsertAsync();
-	
-		try
-		{
-			return await UpdateDbRecordAsync<PartitionDbRecord, PartitionOutputBase>(insertTask, query);
-		}
-		catch
-		{
-			return new Payload<PartitionOutputBase> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 

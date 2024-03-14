@@ -64,9 +64,9 @@ CREATE TABLE disk
 
 CREATE TABLE partition
 (
-    diskUuid          varchar(256),
-    uuid              varchar(64) NOT NULL,
-    serverId          integer NOT NULL,
+    diskUuid          varchar(256) NOT NULL,
+    uuid              varchar(64),
+    serverId          integer,
     filesystemName    varchar(64),
     filesystemVersion varchar(64),
     label             varchar(256),
