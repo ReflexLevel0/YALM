@@ -22,6 +22,11 @@ public class MutationHelper(IDb db) : IMutationHelper
 		}
 	}
 
+	public async Task<Payload<List<TOutput>>> AddModelsAsync<TIdInput, TDbModel, TOutput>(List<TDbModel> models, Func<TDbModel, TIdInput> getModelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull
+	{
+		return await BulkAction<TDbModel, TOutput>(models, model => AddModelAsync<TIdInput, TDbModel, TOutput>(model, getModelId(model), getModelQuery));
+	}
+
 	public async Task<Payload<TOutput>> AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull
 	{
 		try
@@ -38,23 +43,8 @@ public class MutationHelper(IDb db) : IMutationHelper
 
 	public async Task<Payload<List<TOutput>>> AddOrReplaceModelsAsync<TIdInput, TDbModel, TOutput>(IEnumerable<TDbModel> models, Func<TDbModel, TIdInput> getModelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull
 	{
-		var payloadList = new List<TOutput>();
-		string error = "";
-		
-		foreach (var model in models)
-		{
-			var payload = await AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(model, getModelId(model), getModelQuery);
-			if(payload.Data != null) payloadList.Add(payload.Data);
-	
-			if (payload.Error == null) continue;
-			error = payload.Error;
-			payloadList = null;
-			break;
-		}
-	
-		return new Payload<List<TOutput>>{Data = payloadList, Error = error};
+		return await BulkAction<TDbModel, TOutput>(models, model => AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(model, getModelId(model), getModelQuery));
 	}
-	
 	public async Task<Payload<TOutput>> DeleteModelAsync<TIdInput, TDbModel, TOutput>(TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull
 	{
 		try
@@ -67,50 +57,6 @@ public class MutationHelper(IDb db) : IMutationHelper
 		{
 			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
 		}
-	}
-
-	public async Task<Payload<ProgramLog>> AddProgramLog(ProgramLogInput programLog)
-	{
-		var programModel = new ProgramLogDbRecord
-		{
-			Serverid = programLog.ServerId,
-			Date = programLog.Date,
-			Interval = programLog.Interval,
-			Name = programLog.Name,
-			CpuutilizationPercentage = programLog.CpuUsage,
-			MemoryUtilizationPercentage = programLog.MemoryUsage 
-		};
-
-		var query = 
-			from l in db.ProgramLogs 
-			where l.Serverid == programLog.ServerId && string.CompareOrdinal(l.Name, programLog.Name) == 0 && l.Date == programLog.Date
-			select l;
-
-		try
-		{
-			return await UpdateDbRecordAsync<ProgramLogDbRecord, ProgramLog>(db.InsertAsync(programModel), query);
-		}
-		catch
-		{
-			return new Payload<ProgramLog> { Error = GetGenericDatabaseErrorString() };
-		}
-	}
-
-	public async Task<Payload<List<ProgramLog>>> AddProgramLogs(List<ProgramLogInput> programLogs)
-	{
-		var logs = new List<ProgramLog>();
-		foreach (var log in programLogs)
-		{
-			var l = await AddProgramLog(log);
-			if (string.IsNullOrEmpty(l.Error) == false || l.Data == null)
-			{
-				return new Payload<List<ProgramLog>> { Error = GetGenericDatabaseErrorString() };
-			}
-
-			logs.Add(l.Data);
-		}
-
-		return new Payload<List<ProgramLog>> { Data = logs };
 	}
 
 	public async Task<Payload<TOutput>> UpdateDbRecordAsync<TDbModel, TOutput>(Task<int> task, IQueryable<TDbModel> selectUpdatedObjectsQuery) where TDbModel : notnull
@@ -133,6 +79,25 @@ public class MutationHelper(IDb db) : IMutationHelper
 		return payload;
 	}
 
+	private async Task<Payload<List<TOutput>>> BulkAction<TDbModel, TOutput>(IEnumerable<TDbModel> models, Func<TDbModel,Task<Payload<TOutput>>> execute) where TDbModel : notnull
+	{
+		var payloadList = new List<TOutput>();
+		string error = "";
+		
+		foreach (var model in models)
+		{
+			var payload = await execute(model).WaitAsync(new CancellationToken());
+			if(payload.Data != null) payloadList.Add(payload.Data);
+	
+			if (payload.Error == null) continue;
+			error = payload.Error;
+			payloadList = null;
+			break;
+		}
+	
+		return new Payload<List<TOutput>>{Data = payloadList, Error = error};
+	}
+	
 	private static string GenerateInsertError(string? type) => $"Failed to insert {type ?? "object"}";
 
 	public string GetGenericDatabaseErrorString() => "Database error";

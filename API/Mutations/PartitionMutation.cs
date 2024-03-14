@@ -16,7 +16,7 @@ public class PartitionMutation(IDb db, IMutationHelper mutationHelper)
 		select p;
 
 	private readonly Func<PartitionDbRecord, PartitionIdInput> _getPartitionId = p => new PartitionIdInput(p.Serverid, p.Uuid);
-	
+
 	public async Task<Payload<PartitionOutputBase>> AddOrReplacePartition(PartitionInput partition)
 	{
 		var model = InputToDbModel(partition);

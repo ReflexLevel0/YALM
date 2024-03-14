@@ -19,6 +19,7 @@ builder.Services
 	.AddType<MemoryLogMutation>()
 	.AddType<PartitionMutation>()
 	.AddType<PartitionLogMutation>()
+	.AddType<ProgramLogMutation>()
 	.AddType<DiskMutation>();
 builder.Services.AddCors(options =>
 {

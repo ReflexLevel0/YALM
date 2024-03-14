@@ -16,6 +16,9 @@ public interface IMutationHelper
     /// <returns></returns>
     Task<Payload<TOutput>> AddModelAsync<TIdInput, TDbModel, TOutput>(
         TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
+
+    Task<Payload<List<TOutput>>> AddModelsAsync<TIdInput, TDbModel, TOutput>(
+        List<TDbModel> models, Func<TDbModel, TIdInput> getModelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
     
     Task<Payload<TOutput>> AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(
         TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
