@@ -19,13 +19,13 @@ public class CpuLogMutation(IDb db, IMutationHelper mutationHelper)
     
     public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
     {
-        var model = CpuLogInputToDbModel(cpuLog);
+        var model = InputToDbModel(cpuLog);
         return await mutationHelper.AddModelAsync<CpuLogIdInput, CpuLogDbRecord, CpuLog>(model, _getCpuLogId(model), _getCpuLogQuery);
     }
 
     public async Task<Payload<CpuLog>> AddOrUpdateCpuLog(CpuLogInput cpuLog)
     {
-        var model = CpuLogInputToDbModel(cpuLog);
+        var model = InputToDbModel(cpuLog);
         return await mutationHelper.AddOrReplaceModelAsync<CpuLogIdInput, CpuLogDbRecord, CpuLog>(model, _getCpuLogId(model), _getCpuLogQuery);
     }
 
@@ -34,7 +34,7 @@ public class CpuLogMutation(IDb db, IMutationHelper mutationHelper)
         return await mutationHelper.DeleteModelAsync<CpuLogIdInput, CpuLogDbRecord, CpuLog>(cpuLogId, _getCpuLogQuery);
     }
 
-    private static CpuLogDbRecord CpuLogInputToDbModel(CpuLogInput cpuLog)
+    private static CpuLogDbRecord InputToDbModel(CpuLogInput cpuLog)
     {
         var dbModel = new CpuLogDbRecord
         {

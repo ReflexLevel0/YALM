@@ -19,13 +19,13 @@ public class CpuMutation(IDb db, IMutationHelper mutationHelper)
     
     public async Task<Payload<CpuOutputBase>> AddCpu(CpuInput cpu)
     {
-        var model = CpuInputToDbModel(cpu);
+        var model = InputToDbModel(cpu);
         return await mutationHelper.AddModelAsync<CpuIdInput, CpuDbRecord, CpuOutputBase>(model, _getCpuId(model), _getCpuQuery);
     }
 
     public async Task<Payload<CpuOutputBase>> AddOrUpdateCpu(CpuInput cpu)
     {
-        var model = CpuInputToDbModel(cpu);
+        var model = InputToDbModel(cpu);
         return await mutationHelper.AddOrReplaceModelAsync<CpuIdInput, CpuDbRecord, CpuOutputBase>(model, _getCpuId(model), _getCpuQuery);
     }
 
@@ -60,7 +60,7 @@ public class CpuMutation(IDb db, IMutationHelper mutationHelper)
     //     }
     // }
 
-    private static CpuDbRecord CpuInputToDbModel(CpuInput cpu)
+    private static CpuDbRecord InputToDbModel(CpuInput cpu)
     {
         var dbModel = new CpuDbRecord
         {

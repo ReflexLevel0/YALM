@@ -19,20 +19,20 @@ public class DiskMutation(IDb db, IMutationHelper mutationHelper)
 	
 	public async Task<Payload<DiskOutputBase>> AddDisk(DiskInput disk)
 	{
-		var model = DiskInputToDbModel(disk);
+		var model = InputToDbModel(disk);
 		return await mutationHelper.AddModelAsync<DiskIdInput, DiskDbRecord, DiskOutputBase>(model, _getDiskId(model), _getDiskQuery);
 	}
 
 	public async Task<Payload<DiskOutputBase>> AddOrUpdateDisk(DiskInput disk)
 	{
-		var model = DiskInputToDbModel(disk);
+		var model = InputToDbModel(disk);
 		return await mutationHelper.AddOrReplaceModelAsync<DiskIdInput, DiskDbRecord, DiskOutputBase>(model, _getDiskId(model), _getDiskQuery);
 	}
 	
 	public async Task<Payload<List<DiskOutputBase>>> AddOrUpdateDisks(List<DiskInput> disks)
 	{
 		var diskModels = new List<DiskDbRecord>();
-		disks.ForEach(d => diskModels.Add(DiskInputToDbModel(d)));
+		disks.ForEach(d => diskModels.Add(InputToDbModel(d)));
 		return await mutationHelper.AddOrReplaceModelsAsync<DiskIdInput, DiskDbRecord, DiskOutputBase>(diskModels, _getDiskId, _getDiskQuery);
 	}
 
@@ -41,7 +41,7 @@ public class DiskMutation(IDb db, IMutationHelper mutationHelper)
 		return await mutationHelper.DeleteModelAsync<DiskIdInput, DiskDbRecord, DiskOutputBase>(diskId, _getDiskQuery);
 	}
 	
-	private static DiskDbRecord DiskInputToDbModel(DiskInput disk)
+	private static DiskDbRecord InputToDbModel(DiskInput disk)
 	{
 		var dbModel = new DiskDbRecord
 		{

@@ -69,37 +69,6 @@ public class MutationHelper(IDb db) : IMutationHelper
 			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
-	
-	public async Task<Payload<MemoryLog>> AddMemoryLog(MemoryLogInput memoryLog)
-	{
-		var query =
-			from l in db.MemoryLogs
-			where l.ServerId == memoryLog.ServerId && l.Date == memoryLog.Date
-			select l;
-
-		var insertTask = db.MemoryLogs
-			.Value(l => l.ServerId, memoryLog.ServerId)
-			.Value(l => l.Date, memoryLog.Date)
-			.Value(l => l.Interval, memoryLog.Interval)
-			.Value(l => l.TotalKb, memoryLog.TotalKb)
-			.Value(l => l.FreeKb, memoryLog.FreeKb)
-			.Value(l => l.UsedKb, memoryLog.UsedKb)
-			.Value(l => l.SwapTotalKb, memoryLog.SwapTotalKb)
-			.Value(l => l.SwapFreeKb, memoryLog.SwapFreeKb)
-			.Value(l => l.SwapUsedKb, memoryLog.SwapUsedKb)
-			.Value(l => l.CachedKb, memoryLog.CachedKb)
-			.Value(l => l.AvailableKb, memoryLog.AvailableKb)
-			.InsertAsync();
-
-		try
-		{
-			return await UpdateDbRecordAsync<MemoryLogDbRecord, MemoryLog>(insertTask, query);
-		}
-		catch
-		{
-			return new Payload<MemoryLog> { Error = GetGenericDatabaseErrorString() };
-		}
-	}
 
 	public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput partitionLog)
 	{
