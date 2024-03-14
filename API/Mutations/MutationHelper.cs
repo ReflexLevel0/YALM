@@ -1,4 +1,3 @@
-using System.Reflection;
 using DataModel;
 using LinqToDB;
 using LinqToDB.Mapping;
@@ -8,96 +7,55 @@ using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
 using YALM.Common.Models.Graphql.OutputModels;
 
-namespace YALM.API;
+namespace YALM.API.Mutations;
 
-public class Mutation(IDb db)
+public class MutationHelper(IDb db) : IMutationHelper
 {
-	private readonly Func<CpuIdInput, IQueryable<CpuDbRecord>> _getCpuQuery = cpu =>
-		from c in db.Cpus
-		where c.ServerId == cpu.ServerId
-		select c;
-	
 	private readonly Func<DiskIdInput, IQueryable<DiskDbRecord>> _getDiskQuery = disk =>
 		from d in db.Disks
 		where d.ServerId == disk.ServerId && string.CompareOrdinal(d.Uuid, disk.Uuid) == 0
 		select d;
 
-	private const string GenericDatabaseErrorString = "Database error";
-
-	public async Task<Payload<CpuOutputBase>> AddCpu(CpuInput cpu)
+	public async Task<Payload<TOutput>> AddModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery)
 	{
-		var dbModel = CpuInputToDbModel(cpu);
 		try
 		{
-			return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(db.InsertAsync(dbModel), _getCpuQuery(cpu));
+			return await UpdateDbRecordAsync<TDbModel, TOutput>(db.InsertAsync(model), getModelQuery(modelId));
 		}
 		catch
 		{
-			return new Payload<CpuOutputBase> { Error = GenericDatabaseErrorString };
+			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 
-	public async Task<Payload<CpuOutputBase>> AddOrUpdateCpu(CpuInput cpu)
+	public async Task<Payload<TOutput>> AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> _getModelQuery)
 	{
-		var cpuDbModel = CpuInputToDbModel(cpu);
-
 		try
 		{
-			await db.InsertOrReplaceAsync(cpuDbModel);
-			var cpuDbRecord = await _getCpuQuery(cpu).FirstAsync();
-			return new Payload<CpuOutputBase> { Data = (CpuOutputBase)Convert.ChangeType(cpuDbRecord, typeof(CpuOutputBase)) };
+			await db.InsertOrReplaceAsync(model);
+			var dbRecord = await _getModelQuery(modelId).FirstAsync();
+			return new Payload<TOutput> { Data = (TOutput)Convert.ChangeType(dbRecord, typeof(TOutput)) };
 		}
 		catch
 		{
-			return new Payload<CpuOutputBase> { Error = GenericDatabaseErrorString };
+			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 
-	public async Task<Payload<CpuOutputBase>> DeleteCpu(CpuIdInput cpuId)
+	public async Task<Payload<TOutput>> DeleteModelAsync<TIdInput, TDbModel, TOutput>(TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> _getModelQuery)
 	{
-		var cpu = await
-			(from c in db.Cpus
-				where c.ServerId == cpuId.ServerId
-				select c).FirstOrDefaultAsync();
-		if (cpu == null) return new Payload<CpuOutputBase> { Error = "Cpu not found" };
-		var selectQuery = from c in db.Cpus where c.ServerId == cpuId.ServerId select c;
-
 		try
 		{
-			return await UpdateDbRecord<CpuDbRecord, CpuOutputBase>(db.DeleteAsync(cpu), selectQuery);
+			var model = await _getModelQuery(modelId).FirstAsync();
+			await db.DeleteAsync(model);
+			return new Payload<TOutput> { Data = (TOutput)Convert.ChangeType(model, typeof(TOutput)) };
 		}
 		catch
 		{
-			return new Payload<CpuOutputBase> { Error = GenericDatabaseErrorString };
+			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
-
-	public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
-	{
-		var dbModel = new CpuLogDbRecord
-		{
-			Date = cpuLog.Date,
-			Interval = cpuLog.Interval,
-			Usage = cpuLog.Usage,
-			ServerId = cpuLog.ServerId,
-			NumberOfTasks = cpuLog.NumberOfTasks
-		};
-
-		var query =
-			from l in db.CpuLogs
-			where l.ServerId == cpuLog.ServerId && l.Date == cpuLog.Date
-			select l;
-
-		try
-		{
-			return await UpdateDbRecord<CpuLogDbRecord, CpuLog>(db.InsertAsync(dbModel), query);
-		}
-		catch
-		{
-			return new Payload<CpuLog> { Error = GenericDatabaseErrorString };
-		}
-	}
-
+	
 	public async Task<Payload<MemoryLog>> AddMemoryLog(MemoryLogInput memoryLog)
 	{
 		var query =
@@ -121,11 +79,11 @@ public class Mutation(IDb db)
 
 		try
 		{
-			return await UpdateDbRecord<MemoryLogDbRecord, MemoryLog>(insertTask, query);
+			return await UpdateDbRecordAsync<MemoryLogDbRecord, MemoryLog>(insertTask, query);
 		}
 		catch
 		{
-			return new Payload<MemoryLog> { Error = GenericDatabaseErrorString };
+			return new Payload<MemoryLog> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 
@@ -156,11 +114,11 @@ public class Mutation(IDb db)
 	
 		try
 		{
-			return await UpdateDbRecord<PartitionLogDbRecord, PartitionLog>(insertTask, query);
+			return await UpdateDbRecordAsync<PartitionLogDbRecord, PartitionLog>(insertTask, query);
 		}
 		catch
 		{
-			return new Payload<PartitionLog> { Error = GenericDatabaseErrorString };
+			return new Payload<PartitionLog> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 	
@@ -200,11 +158,11 @@ public class Mutation(IDb db)
 	
 		try
 		{
-			return await UpdateDbRecord<PartitionDbRecord, PartitionOutputBase>(insertTask, query);
+			return await UpdateDbRecordAsync<PartitionDbRecord, PartitionOutputBase>(insertTask, query);
 		}
 		catch
 		{
-			return new Payload<PartitionOutputBase> { Error = GenericDatabaseErrorString };
+			return new Payload<PartitionOutputBase> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 
@@ -214,11 +172,11 @@ public class Mutation(IDb db)
 
 		try
 		{
-			return await UpdateDbRecord<DiskDbRecord, DiskOutputBase>(db.InsertAsync(dbModel), _getDiskQuery(new DiskIdInput(disk.ServerId, disk.Uuid)));
+			return await UpdateDbRecordAsync<DiskDbRecord, DiskOutputBase>(db.InsertAsync(dbModel), _getDiskQuery(new DiskIdInput(disk.ServerId, disk.Uuid)));
 		}
 		catch
 		{
-			return new Payload<DiskOutputBase> { Error = GenericDatabaseErrorString };
+			return new Payload<DiskOutputBase> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 
@@ -234,7 +192,7 @@ public class Mutation(IDb db)
 		}
 		catch
 		{
-			return new Payload<DiskOutputBase> { Error = GenericDatabaseErrorString };
+			return new Payload<DiskOutputBase> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 
@@ -276,11 +234,11 @@ public class Mutation(IDb db)
 
 		try
 		{
-			return await UpdateDbRecord<ProgramLogDbRecord, ProgramLog>(db.InsertAsync(programModel), query);
+			return await UpdateDbRecordAsync<ProgramLogDbRecord, ProgramLog>(db.InsertAsync(programModel), query);
 		}
 		catch(Exception ex)
 		{
-			return new Payload<ProgramLog> { Error = GenericDatabaseErrorString };
+			return new Payload<ProgramLog> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
 
@@ -292,7 +250,7 @@ public class Mutation(IDb db)
 			var l = await AddProgramLog(log);
 			if (string.IsNullOrEmpty(l.Error) == false || l.Data == null)
 			{
-				return new Payload<List<ProgramLog>> { Error = GenericDatabaseErrorString };
+				return new Payload<List<ProgramLog>> { Error = GetGenericDatabaseErrorString() };
 			}
 
 			logs.Add(l.Data);
@@ -301,7 +259,7 @@ public class Mutation(IDb db)
 		return new Payload<List<ProgramLog>> { Data = logs };
 	}
 
-	private async Task<Payload<TOutput>> UpdateDbRecord<TDbModel, TOutput>(Task<int> task, IQueryable<TDbModel> selectUpdatedObjectsQuery) where TDbModel : notnull
+	public async Task<Payload<TOutput>> UpdateDbRecordAsync<TDbModel, TOutput>(Task<int> task, IQueryable<TDbModel> selectUpdatedObjectsQuery) where TDbModel : notnull
 	{
 		var tableAttr = typeof(TDbModel).GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault() as TableAttribute;
 		var errorPayload = new Payload<TOutput> { Error = GenerateInsertError(tableAttr?.Name) };
@@ -323,27 +281,6 @@ public class Mutation(IDb db)
 
 	private static string GenerateInsertError(string? type) => $"Failed to insert {type ?? "object"}";
 
-	private static string? GetTableNameFromType(ICustomAttributeProvider type)
-	{
-		var tableAttr = type.GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault() as TableAttribute;
-		return tableAttr?.Name;
-	}
-
-	private static CpuDbRecord CpuInputToDbModel(CpuInput cpu)
-	{
-		var dbModel = new CpuDbRecord
-		{
-			ServerId = cpu.ServerId,
-			Architecture = cpu.Architecture,
-			Name = cpu.Name,
-			Cores = cpu.Cores,
-			Threads = cpu.Threads,
-			FrequencyMhz = cpu.FrequencyMhz
-		};
-
-		return dbModel;
-	}
-
 	private static DiskDbRecord DiskInputToDbModel(DiskInput disk)
 	{
 		var dbModel = new DiskDbRecord
@@ -361,5 +298,7 @@ public class Mutation(IDb db)
 		return dbModel;
 	}
 
-	private static string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
+	public string GetGenericDatabaseErrorString() => "Database error";
+	
+	public string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
 }

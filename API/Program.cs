@@ -2,6 +2,7 @@ using DataModel;
 using LinqToDB;
 using YALM.API;
 using YALM.API.Models.Db;
+using YALM.API.Mutations;
 
 string connectionString = File.ReadAllText("dbConnectionString.txt");
 var dataOptions = new DataOptions<MonitoringDb>(new DataOptions().UsePostgreSQL(connectionString));
@@ -10,7 +11,9 @@ builder.Services
 	.AddSingleton<IDb>(new MonitoringDb(dataOptions))
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
-	.AddMutationType<Mutation>();
+	.AddMutationType(m => m.Name("Mutation"))
+	.AddType<MutationHelper>()
+	.AddType<CpuMutation>();
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAll", b =>

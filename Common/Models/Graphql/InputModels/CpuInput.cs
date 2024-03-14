@@ -7,4 +7,8 @@ public class CpuInput : CpuIdInput
 	public int? Cores { get; set; }
 	public int? Threads { get; set; }
 	public int? FrequencyMhz { get; set; }
+
+	public CpuInput(int serverId) : base(serverId)
+	{
+	}
 }

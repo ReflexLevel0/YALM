@@ -35,9 +35,8 @@ public class ApiHelper
                                               error
                                             }
                                           """);
-            variables.Cpu = new CpuInput
+            variables.Cpu = new CpuInput(_serverId)
             {
-                ServerId = _serverId,
                 Architecture = log.CpuInfo.Architecture,
                 Name = log.CpuInfo.Name,
                 FrequencyMhz = log.CpuInfo.Frequency,
