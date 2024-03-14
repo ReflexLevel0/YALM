@@ -23,13 +23,13 @@ public class DiskMutation(IDb db, IMutationHelper mutationHelper)
 		return await mutationHelper.AddModelAsync<DiskIdInput, DiskDbRecord, DiskOutputBase>(model, _getDiskId(model), _getDiskQuery);
 	}
 
-	public async Task<Payload<DiskOutputBase>> AddOrUpdateDisk(DiskInput disk)
+	public async Task<Payload<DiskOutputBase>> AddOrReplaceDisk(DiskInput disk)
 	{
 		var model = InputToDbModel(disk);
 		return await mutationHelper.AddOrReplaceModelAsync<DiskIdInput, DiskDbRecord, DiskOutputBase>(model, _getDiskId(model), _getDiskQuery);
 	}
 	
-	public async Task<Payload<List<DiskOutputBase>>> AddOrUpdateDisks(List<DiskInput> disks)
+	public async Task<Payload<List<DiskOutputBase>>> AddOrReplaceDisks(List<DiskInput> disks)
 	{
 		var diskModels = new List<DiskDbRecord>();
 		disks.ForEach(d => diskModels.Add(InputToDbModel(d)));

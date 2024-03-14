@@ -17,9 +17,9 @@ public class MemoryLogMutation(IDb db, IMutationHelper mutationHelper)
 
 	private readonly Func<MemoryLogDbRecord, MemoryLogIdInput> _getMemoryLogId = memoryLog => new MemoryLogIdInput(memoryLog.ServerId);
 	
-	public async Task<Payload<MemoryLog>> AddMemoryLog(MemoryLogInput memoryLog)
+	public async Task<Payload<MemoryLog>> AddMemoryLog(MemoryLogInput log)
 	{
-		var model = InputToDbModel(memoryLog);
+		var model = InputToDbModel(log);
 		return await mutationHelper.AddModelAsync<MemoryLogIdInput, MemoryLogDbRecord, MemoryLog>(model, _getMemoryLogId(model), _getMemoryLogQuery);
 	}
 

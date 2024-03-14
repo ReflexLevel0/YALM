@@ -23,7 +23,7 @@ public class CpuMutation(IDb db, IMutationHelper mutationHelper)
         return await mutationHelper.AddModelAsync<CpuIdInput, CpuDbRecord, CpuOutputBase>(model, _getCpuId(model), _getCpuQuery);
     }
 
-    public async Task<Payload<CpuOutputBase>> AddOrUpdateCpu(CpuInput cpu)
+    public async Task<Payload<CpuOutputBase>> AddOrReplaceCpu(CpuInput cpu)
     {
         var model = InputToDbModel(cpu);
         return await mutationHelper.AddOrReplaceModelAsync<CpuIdInput, CpuDbRecord, CpuOutputBase>(model, _getCpuId(model), _getCpuQuery);
@@ -33,32 +33,6 @@ public class CpuMutation(IDb db, IMutationHelper mutationHelper)
     {
         return await mutationHelper.DeleteModelAsync<CpuIdInput, CpuDbRecord, CpuOutputBase>(cpuId, _getCpuQuery);
     }
-
-    // public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
-    // {
-    //     var dbModel = new CpuLogDbRecord
-    //     {
-    //         Date = cpuLog.Date,
-    //         Interval = cpuLog.Interval,
-    //         Usage = cpuLog.Usage,
-    //         ServerId = cpuLog.ServerId,
-    //         NumberOfTasks = cpuLog.NumberOfTasks
-    //     };
-    //
-    //     var query =
-    //         from l in db.CpuLogs
-    //         where l.ServerId == cpuLog.ServerId && l.Date == cpuLog.Date
-    //         select l;
-    //
-    //     try
-    //     {
-    //         return await mutationHelper.UpdateDbRecordAsync<CpuLogDbRecord, CpuLog>(db.InsertAsync(dbModel), query);
-    //     }
-    //     catch
-    //     {
-    //         return new Payload<CpuLog> { Error = mutationHelper.GetGenericDatabaseErrorString() };
-    //     }
-    // }
 
     private static CpuDbRecord InputToDbModel(CpuInput cpu)
     {

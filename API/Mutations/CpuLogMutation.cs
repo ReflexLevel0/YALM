@@ -17,32 +17,32 @@ public class CpuLogMutation(IDb db, IMutationHelper mutationHelper)
 
     private readonly Func<CpuLogDbRecord, CpuLogIdInput> _getCpuLogId = cpuLog => new CpuLogIdInput(cpuLog.ServerId, cpuLog.Date);
     
-    public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput cpuLog)
+    public async Task<Payload<CpuLog>> AddCpuLog(CpuLogInput log)
     {
-        var model = InputToDbModel(cpuLog);
+        var model = InputToDbModel(log);
         return await mutationHelper.AddModelAsync<CpuLogIdInput, CpuLogDbRecord, CpuLog>(model, _getCpuLogId(model), _getCpuLogQuery);
     }
 
-    public async Task<Payload<CpuLog>> AddOrUpdateCpuLog(CpuLogInput cpuLog)
+    public async Task<Payload<CpuLog>> AddOrUpdateCpuLog(CpuLogInput log)
     {
-        var model = InputToDbModel(cpuLog);
+        var model = InputToDbModel(log);
         return await mutationHelper.AddOrReplaceModelAsync<CpuLogIdInput, CpuLogDbRecord, CpuLog>(model, _getCpuLogId(model), _getCpuLogQuery);
     }
 
-    public async Task<Payload<CpuLog>> DeleteCpuLog(CpuLogIdInput cpuLogId)
+    public async Task<Payload<CpuLog>> DeleteCpuLog(CpuLogIdInput logId)
     {
-        return await mutationHelper.DeleteModelAsync<CpuLogIdInput, CpuLogDbRecord, CpuLog>(cpuLogId, _getCpuLogQuery);
+        return await mutationHelper.DeleteModelAsync<CpuLogIdInput, CpuLogDbRecord, CpuLog>(logId, _getCpuLogQuery);
     }
 
-    private static CpuLogDbRecord InputToDbModel(CpuLogInput cpuLog)
+    private static CpuLogDbRecord InputToDbModel(CpuLogInput l)
     {
         var dbModel = new CpuLogDbRecord
         {
-            ServerId = cpuLog.ServerId,
-            Date = cpuLog.Date,
-            Interval = cpuLog.Interval, 
-            Usage = cpuLog.Usage,
-            NumberOfTasks = cpuLog.NumberOfTasks
+            ServerId = l.ServerId,
+            Date = l.Date,
+            Interval = l.Interval, 
+            Usage = l.Usage,
+            NumberOfTasks = l.NumberOfTasks
         };
 
         return dbModel;

@@ -31,7 +31,7 @@ public class ApiHelper
         {
             variableStringBuilder.Append("$cpu: CpuInput!,");
             queryStringBuilder.AppendLine("""
-                                            addOrUpdateCpu(cpu: $cpu){
+                                            addOrReplaceCpu(cpu: $cpu){
                                               error
                                             }
                                           """);
@@ -49,7 +49,7 @@ public class ApiHelper
         {
             variableStringBuilder.Append("$cpuLog: CpuLogInput!, ");
             queryStringBuilder.AppendLine("""
-                                            addCpuLog(cpuLog: $cpuLog){
+                                            addCpuLog(log: $cpuLog){
                                               error
                                             }
                                           """);
@@ -62,12 +62,12 @@ public class ApiHelper
                 Usage = log.ProgramInfo.CpuLog.Usage
             };
         }
-
+        
         if (log.ProgramInfo?.MemoryLog != null)
         {
             variableStringBuilder.Append("$memoryLog: MemoryLogInput!, ");
             queryStringBuilder.AppendLine("""
-                                            addMemoryLog(memoryLog: $memoryLog){
+                                            addMemoryLog(log: $memoryLog){
                                               error
                                             }
                                           """);
@@ -85,12 +85,12 @@ public class ApiHelper
                 AvailableKb = log.ProgramInfo.MemoryLog.AvailableMemoryKb
             };
         }
-
+        
         if (log.ProgramInfo?.ProgramLogs != null)
         {
             variableStringBuilder.Append("$programLogs: [ProgramLogInput!]!, ");
             queryStringBuilder.AppendLine("""
-                                            addProgramLogs(programLogs: $programLogs){
+                                            addProgramLogs(logs: $programLogs){
                                               error
                                             }
                                           """);
@@ -108,13 +108,13 @@ public class ApiHelper
                 variables.ProgramLogs.Add(programLog);
             }
         }
-
+        
         if (log.Disks != null && log.Disks.Count != 0)
         {
         	variableStringBuilder.Append("$disks: [DiskInput!]!,");
             //$partitions: [PartitionInput]!, $partitionLogs: [PartitionLogsInput]!, 
         	queryStringBuilder.AppendLine("""
-        	                            addOrUpdateDisks(disks: $disks){
+        	                            addOrReplaceDisks(disks: $disks){
         	                                error
         	                            }
         	                          """);

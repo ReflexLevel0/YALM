@@ -17,9 +17,9 @@ public class PartitionLogMutation(IDb db, IMutationHelper mutationHelper)
 
 	private readonly Func<PartitionLogDbRecord, PartitionLogIdInput> _getPartitionLogId = p => new PartitionLogIdInput(p.Serverid, p.Partitionuuid, p.Date);
 	
-	public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput partitionLog)
+	public async Task<Payload<PartitionLog>> AddPartitionLog(PartitionLogInput log)
 	{
-		var model = InputToDbModel(partitionLog);
+		var model = InputToDbModel(log);
 		return await mutationHelper.AddModelAsync<PartitionLogIdInput, PartitionLogDbRecord, PartitionLog>(model, _getPartitionLogId(model), _getPartitionLogQuery);
 	}
 
