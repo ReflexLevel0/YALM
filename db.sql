@@ -1,65 +1,91 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
+
 CREATE TABLE cpu
+(
+    serverid     integer PRIMARY KEY,
+    name         varchar(256),
+    architecture varchar(256),
+    cores        integer,
+    threads      integer,
+    frequencyMHz integer
+);
+
+CREATE TABLE cpuLog
 (
     serverid      integer   NOT NULL,
     date          timestamp NOT NULL,
     interval      integer   NOT NULL,
     usage         numeric,
     numberoftasks integer,
-    PRIMARY KEY (serverid, date)
+    PRIMARY KEY (serverid, date),
+    FOREIGN KEY (serverId) REFERENCES cpu(serverId)
 );
 
-CREATE TABLE program
+CREATE TABLE programLog
 (
     serverid                    integer   NOT NULL,
     date                        timestamp NOT NULL,
+    name                        varchar(255) NOT NULL,
     interval                    integer   NOT NULL,
     cpuutilizationpercentage    numeric,
-    memoryutilizationpercentage numeric
+    memoryutilizationpercentage numeric,
+    PRIMARY KEY (serverid, date, name)
 );
 
-CREATE TABLE memory
+CREATE TABLE memoryLog
 (
-    serverid integer   NOT NULL,
-    date     timestamp NOT NULL,
-    interval integer   NOT NULL,
-    mbused   integer,
-    mbtotal  integer,
+    serverid       integer   NOT NULL,
+    date           timestamp NOT NULL,
+    interval       bigint    NOT NULL,
+    totalKb        bigint, --memory size (excluding swap size) 
+    freeKb         bigint, --memory that isn't used or cached
+    usedKb         bigint, --used memory
+    swapTotalKb    bigint, --swap memory size
+    swapFreeKb     bigint, --swap memory that isn't used or cached
+    swapUsedKb     bigint, --used swap memory
+    availableKb    bigint, --memory that isn't used (including unused swap memory)
+    cachedKb       bigint, --cached memory
     PRIMARY KEY (serverid, date)
 );
 
 CREATE TABLE disk
 (
-    id       SERIAL,
-    serverid integer NOT NULL,
-    label    VARCHAR(256),
-    PRIMARY KEY (id),
-    UNIQUE (serverid, label)
+    uuid        VARCHAR(256),       --unique ID of the disk
+    serverid    INTEGER NOT NULL,   --server ID to which the disk belongs
+    type        VARCHAR(32),        --type of the disk (ex: gpt)
+    serial      VARCHAR(256),       --globally unique (generally unique, but not guaranteed) disk ID
+    path        VARCHAR(256),       --disk path (ex: /dev/sda) 
+    vendor      VARCHAR(256),       --manufacturer of the disk (ex: ATA)
+    model       VARCHAR(256),       --disk name (ex: Samsung EVO 970)
+    bytesTotal  BIGINT,             --size of the disk in bytes
+    PRIMARY KEY (uuid, serverid)
 );
 
 CREATE TABLE partition
 (
-    diskId            SERIAL      NOT NULL,
-    uuid              varchar(64) NOT NULL,
+    diskUuid          varchar(256) NOT NULL,
+    uuid              varchar(64),
+    serverId          integer,
     filesystemName    varchar(64),
     filesystemVersion varchar(64),
     label             varchar(256),
     mountpath         varchar(1024),
-    PRIMARY KEY (diskId, uuid),
-    FOREIGN KEY (diskId) REFERENCES disk ON DELETE CASCADE 
+    UNIQUE(serverId, uuid),
+    PRIMARY KEY (serverId, uuid),
+    FOREIGN KEY (diskUuid, serverId) REFERENCES disk(uuid, serverId) ON DELETE CASCADE
 );
 
 CREATE TABLE partitionLog
 (
-    diskId     SERIAL      NOT NULL,
-    uuid       varchar(64) NOT NULL,
-    date       timestamp   NOT NULL,
-    interval   integer     NOT NULL,
-    bytestotal bigint,
-    usage      decimal(3, 2),
-    PRIMARY KEY (diskId, date, uuid),
-    FOREIGN KEY (diskId, uuid) REFERENCES partition ON DELETE CASCADE
+    serverId        integer NOT NULL,
+    partitionUuid   varchar(64) NOT NULL,
+    date            timestamp   NOT NULL,
+    interval        integer     NOT NULL,
+    bytestotal      bigint,
+    usage           decimal(3, 2),
+    PRIMARY KEY (serverId, partitionUuid, date),
+    FOREIGN KEY (serverId, partitionUuid) REFERENCES partition(serverId, uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE servicename

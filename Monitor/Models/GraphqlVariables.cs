@@ -4,7 +4,12 @@ namespace YALM.Monitor.Models;
 
 public class GraphqlVariables
 {
-	public CpuLogInput CpuLog;
-	public MemoryLogInput MemoryLog;
-	public PartitionLogInput PartitionLog;
+	public CpuInput? Cpu { get; set; }
+	public CpuLogInput? CpuLog { get; set; }
+	public MemoryLogInput? MemoryLog { get; set; }
+	public PartitionLogInput? PartitionLog { get; set; }
+	public List<ProgramLogInput>? ProgramLogs { get; set; }
+	public List<DiskInput>? Disks { get; set; }
+	public List<PartitionInput>? Partitions { get; set; }
+	public List<PartitionLogInput>? PartitionLogs { get; set; }
 }
