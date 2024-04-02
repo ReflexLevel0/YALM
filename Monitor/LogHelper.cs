@@ -42,8 +42,9 @@ public class LogHelper
 		{
 			Thread.Sleep(sleepMillis);
 		}
-		
-		var log = new LogBase(DateTime.Now);
+
+		var currentDate = DateTime.Now;
+		var log = new LogBase(new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, currentDate.Hour, currentDate.Minute, 0));
 
 		if (_config.Cpu)
 		{
