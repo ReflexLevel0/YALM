@@ -29,10 +29,11 @@ public class LogHelper
 		nextLogDate = nextLogDate.Value.AddMilliseconds(-nextLogDate.Value.Millisecond);
 		nextLogDate = nextLogDate.Value.AddMicroseconds(-nextLogDate.Value.Microsecond);
 		
-		//If a log should already have been taken more then the interval ago 
+		//Logging the next minute if the log should already have been taken more then the interval ago 
 		if (DateTime.Now > nextLogDate && DateTime.Now.Subtract((DateTime)nextLogDate).TotalMinutes >= _config.IntervalInMinutes)
 		{
-			nextLogDate = DateTime.Now;
+			var now = DateTime.Now;
+			nextLogDate = now.AddSeconds(60 - now.Second);
 		}
 			
 		Console.WriteLine($"Next log time: {nextLogDate}");
