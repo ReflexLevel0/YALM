@@ -30,10 +30,11 @@ public class QueryHelper
 		return result.ToString();
 	}
 	
-	public static decimal CombineValues<T>(string? method, IEnumerable<T> values)
+	public static decimal? CombineValues<T>(string? method, IEnumerable<T> values)
 	{
 		var filteredValues = values.Where(v => v != null);
-		var decimalValues = filteredValues.Select(v => Convert.ToDecimal(v));
+		var decimalValues = filteredValues.Select(v => Convert.ToDecimal(v)).ToList();
+		if (decimalValues.Count == 0) return null;
 		decimal result;
 		switch (method)
 		{

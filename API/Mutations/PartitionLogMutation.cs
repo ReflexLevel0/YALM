@@ -22,6 +22,13 @@ public class PartitionLogMutation(IDb db, IMutationHelper mutationHelper)
 		var model = InputToDbModel(log);
 		return await mutationHelper.AddModelAsync<PartitionLogIdInput, PartitionLogDbRecord, PartitionLog>(model, _getPartitionLogId(model), _getPartitionLogQuery);
 	}
+	
+	public async Task<Payload<List<PartitionLog>>> AddPartitionLogs(List<PartitionLogInput> logs)
+	{
+		var partitionLogDbRecords = new List<PartitionLogDbRecord>();
+		logs.ForEach(p => partitionLogDbRecords.Add(InputToDbModel(p)));
+		return await mutationHelper.AddOrReplaceModelsAsync<PartitionLogIdInput, PartitionLogDbRecord, PartitionLog>(partitionLogDbRecords, _getPartitionLogId, _getPartitionLogQuery);
+	}
 
 	private static PartitionLogDbRecord InputToDbModel(PartitionLogInput l)
 	{

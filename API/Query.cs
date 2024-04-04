@@ -22,9 +22,9 @@ public class Query(IDb db)
 		var getEmptyRecordFunc = () => new CpuLog();
 		Func<IList<CpuLogDbRecord>, CpuLog> combineLogsFunc = logs =>
 		{
-			double usageProcessed = (double)QueryHelper.CombineValues(method, logs.Select(c => c.Usage).ToList());
+			double? usageProcessed = (double?)QueryHelper.CombineValues(method, logs.Select(c => c.Usage).ToList());
 			var numberOfTasksValues = logs.Where(c => c.NumberOfTasks != null).Select(c => c.NumberOfTasks!);
-			int numberOfTasks = (int)QueryHelper.CombineValues(method, numberOfTasksValues.ToList());
+			int? numberOfTasks = (int?)QueryHelper.CombineValues(method, numberOfTasksValues.ToList());
 			return new CpuLog { Date = logs.First().Date.ToLocalTime(), Usage = usageProcessed, NumberOfTasks = numberOfTasks };
 		};
 		
@@ -59,14 +59,14 @@ public class Query(IDb db)
 		var getEmptyRecordFunc = () => new MemoryLog { Date = DateTime.Now };
 		Func<IList<MemoryLogDbRecord>, MemoryLog> combineLogsFunc = logs =>
 		{
-			long totalKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.TotalKb));
-			long freeKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.FreeKb));
-			long usedKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.UsedKb));
-			long swapTotalKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.SwapTotalKb));
-			long swapFreeKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.SwapFreeKb));
-			long swapUsedKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.SwapUsedKb));
-			long cachedKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.CachedKb));
-			long availableKb = (long)QueryHelper.CombineValues(method, logs.Select(l => l.AvailableKb));
+			long? totalKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.TotalKb));
+			long? freeKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.FreeKb));
+			long? usedKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.UsedKb));
+			long? swapTotalKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.SwapTotalKb));
+			long? swapFreeKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.SwapFreeKb));
+			long? swapUsedKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.SwapUsedKb));
+			long? cachedKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.CachedKb));
+			long? availableKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.AvailableKb));
 			return new MemoryLog
 			{
 				Date = logs.First().Date.ToLocalTime(),
@@ -98,8 +98,8 @@ public class Query(IDb db)
 		var getEmptyRecordFunc = () => new ProgramLog { Name = "", Date = DateTime.Now };
 		Func<IList<ProgramLogDbRecord>, ProgramLog> combineLogsFunc = logs =>
 		{
-			decimal cpuUsage = QueryHelper.CombineValues(method, logs.Select(l => l.CpuutilizationPercentage));
-			decimal memoryUsage = QueryHelper.CombineValues(method, logs.Select(l => l.MemoryUtilizationPercentage));
+			decimal? cpuUsage = QueryHelper.CombineValues(method, logs.Select(l => l.CpuutilizationPercentage));
+			decimal? memoryUsage = QueryHelper.CombineValues(method, logs.Select(l => l.MemoryUtilizationPercentage));
 			return new ProgramLog
 			{
 				Date = logs.First().Date.ToLocalTime(),
@@ -126,8 +126,8 @@ public class Query(IDb db)
 		var getEmptyRecordFunc = () => new PartitionLog { Date = DateTime.Now };
 		Func<IList<PartitionLogDbRecord>, PartitionLog> combineLogsFunc = logs =>
 		{
-			long bytes = (long)QueryHelper.CombineValues(method, logs.Select(l => l.BytesTotal).ToList());
-			decimal usage = QueryHelper.CombineValues(method, logs.Select(l => l.Usage).ToList());
+			long? bytes = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.BytesTotal).ToList());
+			decimal? usage = QueryHelper.CombineValues(method, logs.Select(l => l.Usage).ToList());
 			return new PartitionLog { Date = logs.First().Date.ToLocalTime(), Bytes = bytes, UsedPercentage = usage };
 		};
 	
@@ -147,7 +147,7 @@ public class Query(IDb db)
 				disk.Partitions.Add(partitionOutput);
 				
 				//Getting all logs for this partition
-				var partitionLogs =
+				var partitionLogs = 
 					from l in db.PartitionLogs
 					where l.Serverid == partition.Serverid && l.Partitionuuid == partition.Uuid
 					select l;

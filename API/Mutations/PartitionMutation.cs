@@ -25,9 +25,9 @@ public class PartitionMutation(IDb db, IMutationHelper mutationHelper)
 
 	public async Task<Payload<List<PartitionOutputBase>>> AddOrReplacePartitions(List<PartitionInput> partitions)
 	{
-		var partitionInputList = new List<PartitionDbRecord>();
-		partitions.ForEach(p => partitionInputList.Add(InputToDbModel(p)));
-		return await mutationHelper.AddOrReplaceModelsAsync<PartitionIdInput, PartitionDbRecord, PartitionOutputBase>(partitionInputList, _getPartitionId, _getPartitionQuery);
+		var partitionDbRecords = new List<PartitionDbRecord>();
+		partitions.ForEach(p => partitionDbRecords.Add(InputToDbModel(p)));
+		return await mutationHelper.AddOrReplaceModelsAsync<PartitionIdInput, PartitionDbRecord, PartitionOutputBase>(partitionDbRecords, _getPartitionId, _getPartitionQuery);
 	}
 
 	private static PartitionDbRecord InputToDbModel(PartitionInput partition)
