@@ -17,7 +17,7 @@ public class Query(IDb db)
 	/// <param name="interval">Interval that specifies time distance between two logs. If interval is null, then interval is decided dynamically (interval=1 minute for every hour between <param name="startDateTime"></param> and <param name="endDateTime"></param>).</param>
 	/// <param name="method">Method for combining multiple logs into one (min, max, avg, etc.)</param>
 	/// <returns></returns>
-	public async Task<CpuOutput> Cpu(int serverId, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
+	public async Task<CpuOutput?> Cpu(int serverId, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
 	{
 		var getEmptyRecordFunc = () => new CpuLog();
 		Func<IList<CpuLogDbRecord>, CpuLog> combineLogsFunc = logs =>
@@ -30,14 +30,13 @@ public class Query(IDb db)
 		
 		var cpuOutput = new CpuOutput(serverId);
 		var cpu = await (from c in db.Cpus where c.ServerId == serverId select c).FirstOrDefaultAsync();
-		if (cpu != null)
-		{
-			cpuOutput.Name = cpu.Name;
-			cpuOutput.Architecture = cpu.Architecture;
-			cpuOutput.Cores = cpu.Cores;
-			cpuOutput.Threads = cpu.Threads;
-			cpuOutput.Frequency = cpu.FrequencyMhz;
-		} 
+		if (cpu == null) return null;
+		
+		cpuOutput.Name = cpu.Name;
+		cpuOutput.Architecture = cpu.Architecture;
+		cpuOutput.Cores = cpu.Cores;
+		cpuOutput.Threads = cpu.Threads;
+		cpuOutput.Frequency = cpu.FrequencyMhz;
 		await foreach (var log in QueryHelper.GetLogs(db.CpuLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
 		{
 			cpuOutput.Logs.Add(log);
