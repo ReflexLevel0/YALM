@@ -42,6 +42,8 @@ export class Api {
       } 
     }`;
 
-    return this.executeQuery(queryString)
+    let response = await this.executeQuery(queryString)
+    let cpu = response.data.cpu
+    return new Cpu(cpu.serverId, cpu.name, cpu.architecture, cpu.cores, cpu.threads, cpu.frequency, cpu.logs)
   }
 }
