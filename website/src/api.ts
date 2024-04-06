@@ -1,8 +1,9 @@
 import moment from "moment";
+import { Cpu } from "@/models/Cpu";
 
 export class Api {
-  static executeQuery(queryString: string) {
-    return fetch("http://localhost:3000/graphql", {
+  static async executeQuery(queryString: string) {
+    const response = await fetch("http://localhost:3000/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -12,34 +13,35 @@ export class Api {
         query: queryString
       })
     });
+
+    return await response.json()
   }
 
   private static dateToString(date: Date){
     if(date === null) return ""
-    date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
     return moment(date).format("yyyy-MM-DD HH:mm")
   }
 
-  static getCpuUsage(startDate: Date, endDate: Date) {
+  static async getCpuData(startDate: Date, endDate: Date) {
+    let startDateString = startDate == null ? "null" : `"${this.dateToString(startDate)}"`
+    let endDateString = endDate == null ? "null" : `"${this.dateToString(endDate)}"`
     const queryString = `
     { 
-      cpu(serverId: 0, startDateTime: "${this.dateToString(startDate)}", endDateTime: "${this.dateToString(endDate)}") {
-        date, 
-        usage
+      cpu(serverId: 0, startDateTime: ${startDateString}, endDateTime: ${endDateString}) {
+        serverId,
+        name,
+        architecture,
+        cores,
+        threads,
+        frequency,
+        logs{
+          date
+          usage
+          numberOfTasks
+        }
       } 
     }`;
-    console.log(queryString)
-    return this.executeQuery(queryString);
-  }
 
-  static getCpuNumberOfTasks(startDate: Date, endDate: Date){
-    const queryString = `
-    { 
-      cpu(serverId: 0, startDateTime: "${this.dateToString(startDate)}", endDateTime: "${this.dateToString(endDate)}") {
-        date, 
-        numberOfTasks
-      } 
-    }`;
-    return this.executeQuery(queryString);
+    return this.executeQuery(queryString)
   }
 }

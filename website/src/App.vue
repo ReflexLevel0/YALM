@@ -1,9 +1,8 @@
 <script>
 import Chart from "./components/Chart.vue";
-import { ChartHelper } from "@/ChartHelper";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { nextTick } from "vue";
+import CpuInfo from "@/components/CpuInfo.vue";
 
 export default {
   name: "app",
@@ -11,103 +10,23 @@ export default {
     return {
       startDate: null,
       endDate: null,
-      cpuUsageConfig: {
-        startDate: null,
-        endDate: null,
-        reloadingChart: false
-      },
-      cpuNumberOfTasksConfig: {
-        startDate: null,
-        endDate: null,
-        reloadingChart: false
-      }
     };
   },
-  computed: {
-    CpuUsageDatasetLoader(){
-      return ChartHelper.GetCpuUsageDataset(
-        this.$data.cpuUsageConfig.startDate,
-        this.$data.cpuUsageConfig.endDate
-      )
-    },
-    CpuNumberOfTasksDatasetLoader(){
-      return ChartHelper.GetCpuNumberOfTasksDataset(
-        this.$data.cpuNumberOfTasksConfig.startDate,
-        this.$data.cpuNumberOfTasksConfig.endDate
-      )
-    }
-  },
   components: {
+    CpuInfo,
     Chart,
     VueDatePicker,
-  },
-  watch: {
-    'startDate': {
-      handler: function(){
-        this.refreshChartDates()
-      }
-    },
-    'endDate': {
-      handler: function(){
-        this.refreshChartDates()
-      }
-    }
   },
   created() {
     //Setting start date to be a week ago by default
     let weekAgo = new Date(Date.now())
     weekAgo = new Date(weekAgo.setDate(weekAgo.getDate() - 7))
     this.$data.startDate = weekAgo
-  },
-  methods: {
-    refreshChartDates(){
-      this.refreshCpuUsageChartDates()
-      this.refreshCpuNumberOfTasksChartDates()
-    },
-    refreshCpuUsageChartDates(){
-      this.$data.cpuUsageConfig.reloadingChart = true
-      nextTick(() => {
-        this.$data.cpuUsageConfig.startDate = this.$data.startDate
-        this.$data.cpuUsageConfig.endDate = this.$data.endDate
-        this.$data.cpuUsageConfig.reloadingChart = false
-      })
-    },
-    refreshCpuNumberOfTasksChartDates(){
-      this.$data.cpuNumberOfTasksConfig.reloadingChart = true
-      nextTick(() => {
-        this.$data.cpuNumberOfTasksConfig.startDate = this.$data.startDate
-        this.$data.cpuNumberOfTasksConfig.endDate = this.$data.endDate
-        this.$data.cpuNumberOfTasksConfig.reloadingChart = false
-      })
-    }
   }
 };
 </script>
 <template>
   <VueDatePicker v-model="startDate" format="yyyy-MM-dd HH:mm" />
   <VueDatePicker v-model="endDate" format="yyyy-MM-dd HH:mm" />
-  <Chart
-    v-if="cpuUsageConfig.reloadingChart === false"
-    name="CPU"
-    :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
-    :get-data-promise="CpuUsageDatasetLoader"
-    @zoom-changed="(limits) =>
-    {
-      $data.cpuUsageConfig.startDate = limits.startDate;
-      $data.cpuUsageConfig.endDate = limits.endDate
-    }"
-    @reload-chart="refreshCpuUsageChartDates"
-  />
-  <Chart
-    v-if="cpuNumberOfTasksConfig.reloadingChart === false"
-    name="CPU"
-    :scales="{ x: { type: 'time' }, y: { min: 0 } }"
-    :get-data-promise="CpuNumberOfTasksDatasetLoader"
-    @zoom-changed="(limits) =>
-    {
-      $data.cpuNumberOfTasksConfig.startDate = limits.startDate;
-      $data.cpuNumberOfTasksConfig.endDate = limits.endDate
-    }"
-    @reload-chart="refreshCpuNumberOfTasksChartDates"
-  />
+  <CpuInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
 </template>

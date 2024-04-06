@@ -1,66 +1,48 @@
-import { Api } from "@/api";
 import { CpuLog } from "@/models/CpuLog";
 
 export class ChartHelper {
-  static DateToString(date: Date){
-    return date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+  static CpuLogsToCpuUsageDataset(logs: CpuLog[]) {
+    let points: object[] = [];
+    logs.forEach(log => {
+      points.push({
+        x: log.date,
+        y: log.usage * 100
+      });
+    });
+
+    return {
+      datasets: [
+        {
+          showLine: true,
+          label: "usage",
+          borderColor: "#00ff04",
+          backgroundColor: "#00ff04",
+          data: points
+        }
+      ]
+    }
   }
 
-  static async GetCpuUsageDataset(startDate: Date, endDate: Date) {
-    let chartData: object;
-    return Api.getCpuUsage(startDate, endDate)
-      .then((r) => r.json())
-      .then((json) => {
-        const points: object[] = [];
-        const cpuLogs: CpuLog[] = json.data.cpu;
-        cpuLogs.forEach((log) => {
-          points.push({
-            x: this.DateToString(new Date(Date.parse(log.date))),
-            y: log.usage * 100
-          });
-        });
+  static CpuLogsToNumberOfTasksDataset(logs: CpuLog[]) {
+    let points: object[] = [];
 
-        chartData = {
-          datasets: [
-            {
-              showLine: true,
-              label: "usage",
-              borderColor: "#00ff04",
-              backgroundColor: "#00ff04",
-              data: points
-            }
-          ]
-        };
-        return chartData;
+    logs.forEach((log) => {
+      points.push({
+        x: log.date,
+        y: log.numberOfTasks == null ? 0 : log.numberOfTasks
       });
-  }
+    });
 
-  static async GetCpuNumberOfTasksDataset(startDate: Date, endDate: Date) {
-    let chartData: object;
-    return Api.getCpuNumberOfTasks(startDate, endDate)
-      .then((r) => r.json())
-      .then((json) => {
-        const points: object[] = [];
-        const cpuLogs: CpuLog[] = json.data.cpu;
-        cpuLogs.forEach((log) => {
-          points.push({
-            x: this.DateToString(new Date(Date.parse(log.date))),
-            y: log.numberOfTasks
-          });
-        });
-
-        chartData = {
-          datasets: [
-            {
-              showLine: true,
-              label: "number of tasks",
-              borderColor: "#7acbf9",
-              backgroundColor: "#7acbf9",
-              data: points
-            }
-          ]
-        };
-        return chartData;
-      });
+    return {
+      datasets: [
+        {
+          showLine: true,
+          label: "number of tasks",
+          borderColor: "#7acbf9",
+          backgroundColor: "#7acbf9",
+          data: points
+        }
+      ]
+    };
   }
 }
