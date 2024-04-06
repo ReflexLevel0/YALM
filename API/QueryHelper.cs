@@ -109,7 +109,8 @@ public class QueryHelper
 
 		//Going through each record in the database
 		var selectQuery = from l in table select l;
-		if (startDateTime != null) selectQuery = selectQuery.Where(l => l.Date >= startDateTime);
+		if (startDateTime != null) selectQuery = selectQuery.Where(l => l.Date >= startDateTime.Value.ToLocalTime());
+		if (endDateTime != null) selectQuery = selectQuery.Where(l => l.Date <= endDateTime.Value.ToLocalTime());
 		foreach (var log in selectQuery)
 		{
 			string hash = calculateHash((TDbLog)log);
