@@ -25,7 +25,7 @@ public class Query(IDb db)
 			double? usageProcessed = (double?)QueryHelper.CombineValues(method, logs.Select(c => c.Usage).ToList());
 			var numberOfTasksValues = logs.Where(c => c.NumberOfTasks != null).Select(c => c.NumberOfTasks!);
 			int? numberOfTasks = (int?)QueryHelper.CombineValues(method, numberOfTasksValues.ToList());
-			return new CpuLog { Date = logs.First().Date.ToLocalTime(), Usage = usageProcessed, NumberOfTasks = numberOfTasks };
+			return new CpuLog { Date = logs.First().Date, Usage = usageProcessed, NumberOfTasks = numberOfTasks };
 		};
 		
 		var cpuOutput = new CpuOutput(serverId);
@@ -69,7 +69,7 @@ public class Query(IDb db)
 			long? availableKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.AvailableKb));
 			return new MemoryLog
 			{
-				Date = logs.First().Date.ToLocalTime(),
+				Date = logs.First().Date,
 				TotalKb = totalKb,
 				FreeKb = freeKb,
 				UsedKb = usedKb,
@@ -102,7 +102,7 @@ public class Query(IDb db)
 			decimal? memoryUsage = QueryHelper.CombineValues(method, logs.Select(l => l.MemoryUtilizationPercentage));
 			return new ProgramLog
 			{
-				Date = logs.First().Date.ToLocalTime(),
+				Date = logs.First().Date,
 				Name = logs.First().Name,
 				CpuUsage = cpuUsage,
 				MemoryUsage = memoryUsage
@@ -128,7 +128,7 @@ public class Query(IDb db)
 		{
 			long? bytes = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.BytesTotal).ToList());
 			decimal? usage = QueryHelper.CombineValues(method, logs.Select(l => l.Usage).ToList());
-			return new PartitionLog { Date = logs.First().Date.ToLocalTime(), Bytes = bytes, UsedPercentage = usage };
+			return new PartitionLog { Date = logs.First().Date, Bytes = bytes, UsedPercentage = usage };
 		};
 	
 		//Going through every disk and getting data for it
