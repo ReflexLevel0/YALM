@@ -1,16 +1,11 @@
-using DataModel;
-using LinqToDB;
 using YALM.API;
-using YALM.API.Models.Db;
+using YALM.API.Db;
 using YALM.API.Mutations;
 
-string connectionString = File.ReadAllText("dbConnectionString.txt");
-var dataOptions = new DataOptions<MonitoringDb>(new DataOptions().UsePostgreSQL(connectionString));
-var db = new MonitoringDb(dataOptions);
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-	.AddSingleton<IDb>(db)
-	.AddTransient<IMutationHelper>(_ => new MutationHelper(db))
+	.AddScoped<IDbProvider>(_ => new MonitoringDbProvider())
+	.AddScoped<IMutationHelper>(_ => new MutationHelper(new MonitoringDbProvider().GetDb()))
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
 	.AddMutationType(m => m.Name("Mutation"))

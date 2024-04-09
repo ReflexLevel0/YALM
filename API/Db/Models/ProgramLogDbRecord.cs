@@ -7,30 +7,25 @@
 
 using LinqToDB.Mapping;
 using System;
-using YALM.API.Models.Db;
 using YALM.Common.Models;
 using YALM.Common.Models.Graphql.Logs;
+using YALM.Common.Models.Graphql.OutputModels;
 
 #pragma warning disable 1573, 1591
 #nullable enable
 
 namespace DataModel
 {
-	[Table("memorylog")]
-	public class MemoryLogDbRecord : ILog, IConvertible
+	[Table("programlog")]
+	public class ProgramLogDbRecord : ILog, IConvertible
 	{
-		[Column("serverid"      , IsPrimaryKey = true, PrimaryKeyOrder = 0)] public int      ServerId       { get; set; } // integer
-		[Column("date"          , IsPrimaryKey = true, PrimaryKeyOrder = 1)] public DateTime Date           { get; set; } // timestamp (6) without time zone
-		[Column("interval"                                                )] public int      Interval       { get; set; } // integer
-		[Column("totalkb")] public long? TotalKb { get; set; } // bigint
-		[Column("freekb")] public long? FreeKb { get; set; } // bigint
-		[Column("usedkb")] public long? UsedKb { get; set; } // bigint
-		[Column("swaptotalkb")] public long? SwapTotalKb { get; set; } // bigint
-		[Column("swapfreekb")] public long? SwapFreeKb { get; set; } // bigint
-		[Column("swapusedkb")] public long? SwapUsedKb { get; set; } // bigint
-		[Column("cachedkb")] public long? CachedKb { get; set; } // bigint
-		[Column("availablekb")] public long? AvailableKb { get; set; } // bigint
-
+		[Column("serverid"                   )] public int      Serverid                    { get; set; } // integer
+		[Column("date"                       )] public DateTime Date                        { get; set; } // timestamp (6) without time zone
+		[Column("interval"                   )] public int      Interval                    { get; set; } // integer
+		[Column("name"                       )] public string  Name                        { get; set; } // varchar(255)
+		[Column("cpuutilizationpercentage"   )] public decimal? CpuutilizationPercentage    { get; set; } // numeric
+		[Column("memoryutilizationpercentage")] public decimal? MemoryUtilizationPercentage { get; set; } // numeric
+		
 		public TypeCode GetTypeCode()
 		{
 			throw new NotImplementedException();
@@ -98,18 +93,13 @@ namespace DataModel
 
 		public object ToType(Type conversionType, IFormatProvider? provider)
 		{
-			if(conversionType != typeof(MemoryLog)) throw new NotImplementedException();
-			return new MemoryLog
+			if (conversionType != typeof(ProgramLog)) throw new NotImplementedException();
+			return new ProgramLog
 			{
-				Date = Date,
-				TotalKb = TotalKb,
-				FreeKb = FreeKb,
-				UsedKb = UsedKb,
-				SwapTotalKb = SwapTotalKb,
-				SwapFreeKb = SwapFreeKb,
-				SwapUsedKb = SwapUsedKb,
-				CachedKb = CachedKb,
-				AvailableKb = AvailableKb 
+				Date = Date, 
+				Name = Name, 
+				CpuUsage = CpuutilizationPercentage, 
+				MemoryUsage = MemoryUtilizationPercentage
 			};
 		}
 

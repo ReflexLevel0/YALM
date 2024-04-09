@@ -1,7 +1,7 @@
 using DataModel;
 using LinqToDB;
 
-namespace YALM.API.Models.Db;
+namespace YALM.API.Db.Models;
 
 public interface IDb : IDataContext
 {

@@ -7,26 +7,33 @@
 
 using LinqToDB.Mapping;
 using System;
-using YALM.API.Models.Db;
 using YALM.Common.Models;
 using YALM.Common.Models.Graphql.Logs;
-using YALM.Common.Models.Graphql.OutputModels;
 
 #pragma warning disable 1573, 1591
 #nullable enable
 
 namespace DataModel
 {
-	[Table("programlog")]
-	public class ProgramLogDbRecord : ILog, IConvertible
+	[Table("cpulog")]
+	public class CpuLogDbRecord : ILog, IConvertible
 	{
-		[Column("serverid"                   )] public int      Serverid                    { get; set; } // integer
-		[Column("date"                       )] public DateTime Date                        { get; set; } // timestamp (6) without time zone
-		[Column("interval"                   )] public int      Interval                    { get; set; } // integer
-		[Column("name"                       )] public string  Name                        { get; set; } // varchar(255)
-		[Column("cpuutilizationpercentage"   )] public decimal? CpuutilizationPercentage    { get; set; } // numeric
-		[Column("memoryutilizationpercentage")] public decimal? MemoryUtilizationPercentage { get; set; } // numeric
-		
+		[Column("serverid"     , IsPrimaryKey = true, PrimaryKeyOrder = 0)] public int      ServerId      { get; set; } // integer
+		[Column("date"         , IsPrimaryKey = true, PrimaryKeyOrder = 1)] public DateTime Date          { get; set; } // timestamp (6) without time zone
+		[Column("interval"                                               )] public int      Interval      { get; set; } // integer
+		[Column("usage"                                                  )] public double? Usage         { get; set; } // numeric
+		[Column("numberoftasks"                                          )] public int?     NumberOfTasks { get; set; } // integer
+
+		public static implicit operator CpuLog(CpuLogDbRecord log)
+		{
+			return new CpuLog
+			{
+				Date = log.Date,
+				Usage = log.Usage,
+				NumberOfTasks = log.NumberOfTasks
+			};
+		}
+
 		public TypeCode GetTypeCode()
 		{
 			throw new NotImplementedException();
@@ -94,13 +101,12 @@ namespace DataModel
 
 		public object ToType(Type conversionType, IFormatProvider? provider)
 		{
-			if (conversionType != typeof(ProgramLog)) throw new NotImplementedException();
-			return new ProgramLog
+			if (conversionType != typeof(CpuLog)) throw new NotImplementedException();
+			return new CpuLog
 			{
-				Date = Date, 
-				Name = Name, 
-				CpuUsage = CpuutilizationPercentage, 
-				MemoryUsage = MemoryUtilizationPercentage
+				Date = Date,
+				NumberOfTasks = NumberOfTasks,
+				Usage = Usage
 			};
 		}
 

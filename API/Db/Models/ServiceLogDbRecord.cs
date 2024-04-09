@@ -7,7 +7,6 @@
 
 using LinqToDB.Mapping;
 using System;
-using YALM.API.Models.Db;
 using YALM.Common.Models;
 
 #pragma warning disable 1573, 1591

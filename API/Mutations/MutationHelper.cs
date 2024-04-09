@@ -1,10 +1,7 @@
-using DataModel;
 using LinqToDB;
 using LinqToDB.Mapping;
-using YALM.API.Models.Db;
+using YALM.API.Db.Models;
 using YALM.Common.Models.Graphql;
-using YALM.Common.Models.Graphql.InputModels;
-using YALM.Common.Models.Graphql.Logs;
 
 namespace YALM.API.Mutations;
 

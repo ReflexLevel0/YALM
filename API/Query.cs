@@ -1,12 +1,12 @@
 using DataModel;
 using LinqToDB;
-using YALM.API.Models.Db;
+using YALM.API.Db;
 using YALM.Common.Models.Graphql.Logs;
 using YALM.Common.Models.Graphql.OutputModels;
 
 namespace YALM.API;
 
-public class Query(IDb db)
+public class Query(IDbProvider dbProvider)
 {
 	/// <summary>
 	/// Returns cpu logs
@@ -29,17 +29,20 @@ public class Query(IDb db)
 		};
 		
 		var cpuOutput = new CpuOutput(serverId);
-		var cpu = await (from c in db.Cpus where c.ServerId == serverId select c).FirstOrDefaultAsync();
-		if (cpu == null) return null;
-		
-		cpuOutput.Name = cpu.Name;
-		cpuOutput.Architecture = cpu.Architecture;
-		cpuOutput.Cores = cpu.Cores;
-		cpuOutput.Threads = cpu.Threads;
-		cpuOutput.Frequency = cpu.FrequencyMhz;
-		await foreach (var log in QueryHelper.GetLogs(db.CpuLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+		await using (var db = dbProvider.GetDb())
 		{
-			cpuOutput.Logs.Add(log);
+			var cpu = await (from c in db.Cpus where c.ServerId == serverId select c).FirstOrDefaultAsync();
+			if (cpu == null) return null;
+		
+			cpuOutput.Name = cpu.Name;
+			cpuOutput.Architecture = cpu.Architecture;
+			cpuOutput.Cores = cpu.Cores;
+			cpuOutput.Threads = cpu.Threads;
+			cpuOutput.Frequency = cpu.FrequencyMhz;
+			await foreach (var log in QueryHelper.GetLogs(db.CpuLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+			{
+				cpuOutput.Logs.Add(log);
+			}
 		}
 
 		return cpuOutput;
@@ -80,11 +83,14 @@ public class Query(IDb db)
 				AvailableKb = availableKb
 			};
 		};
-
+		
 		var memoryOutput = new MemoryOutput(serverId);
-		await foreach (var log in QueryHelper.GetLogs(db.MemoryLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+		await using (var db = dbProvider.GetDb())
 		{
-			memoryOutput.Logs.Add(log);
+			await foreach (var log in QueryHelper.GetLogs(db.MemoryLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+			{
+				memoryOutput.Logs.Add(log);
+			}
 		}
 
 		return memoryOutput;
@@ -110,9 +116,13 @@ public class Query(IDb db)
 		};
 
 		var programOutput = new ProgramOutput(serverId);
-		await foreach (var log in QueryHelper.GetLogs(db.ProgramLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+
+		await using (var db = dbProvider.GetDb())
 		{
-			programOutput.Logs.Add(log);
+			await foreach (var log in QueryHelper.GetLogs(db.ProgramLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+			{
+				programOutput.Logs.Add(log);
+			}
 		}
 
 		return programOutput;
@@ -132,32 +142,35 @@ public class Query(IDb db)
 		};
 	
 		//Going through every disk and getting data for it
-		var disks = await db.Disks.ToListAsync();
-		foreach (var d in disks)
+		await using (var db = dbProvider.GetDb())
 		{
-			var partitions = await 
-				(from p in db.Partitions 
-				where p.Diskuuid == d.Uuid && p.Serverid == d.ServerId
-				select p).ToListAsync();
-	
-			var disk = new DiskOutput(d.ServerId, d.Uuid, d.Type, d.Serial, d.Path, d.Vendor, d.Model, d.BytesTotal);
-			foreach (var partition in partitions)
+			var disks = await db.Disks.ToListAsync();
+			foreach (var d in disks)
 			{
-				var partitionOutput = (PartitionOutput)Convert.ChangeType(partition, typeof(PartitionOutput));
-				disk.Partitions.Add(partitionOutput);
-				
-				//Getting all logs for this partition
-				var partitionLogs = 
-					from l in db.PartitionLogs
-					where l.Serverid == partition.Serverid && l.Partitionuuid == partition.Uuid
-					select l;
-				await foreach(var log in QueryHelper.GetLogs(partitionLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
-				{
-					partitionOutput.Logs.Add(log);
-				}
-			}
+				var partitions = await 
+					(from p in db.Partitions 
+						where p.Diskuuid == d.Uuid && p.Serverid == d.ServerId
+						select p).ToListAsync();
 	
-			yield return disk;
+				var disk = new DiskOutput(d.ServerId, d.Uuid, d.Type, d.Serial, d.Path, d.Vendor, d.Model, d.BytesTotal);
+				foreach (var partition in partitions)
+				{
+					var partitionOutput = (PartitionOutput)Convert.ChangeType(partition, typeof(PartitionOutput));
+					disk.Partitions.Add(partitionOutput);
+				
+					//Getting all logs for this partition
+					var partitionLogs = 
+						from l in db.PartitionLogs
+						where l.Serverid == partition.Serverid && l.Partitionuuid == partition.Uuid
+						select l;
+					await foreach(var log in QueryHelper.GetLogs(partitionLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+					{
+						partitionOutput.Logs.Add(log);
+					}
+				}
+	
+				yield return disk;
+			}
 		}
 	}
 }

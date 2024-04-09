@@ -11,7 +11,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using YALM.API.Models.Db;
+using YALM.API.Db.Models;
 
 #pragma warning disable 1573, 1591
 #nullable enable

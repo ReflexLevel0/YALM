@@ -7,7 +7,6 @@
 
 using LinqToDB.Mapping;
 using System;
-using YALM.API.Models.Db;
 using YALM.Common.Models;
 using YALM.Common.Models.Graphql.Logs;
 
@@ -16,24 +15,23 @@ using YALM.Common.Models.Graphql.Logs;
 
 namespace DataModel
 {
-	[Table("cpulog")]
-	public class CpuLogDbRecord : ILog, IConvertible
+	[Table("partitionlog")]
+	public class PartitionLogDbRecord : ILog, IConvertible
 	{
-		[Column("serverid"     , IsPrimaryKey = true, PrimaryKeyOrder = 0)] public int      ServerId      { get; set; } // integer
-		[Column("date"         , IsPrimaryKey = true, PrimaryKeyOrder = 1)] public DateTime Date          { get; set; } // timestamp (6) without time zone
-		[Column("interval"                                               )] public int      Interval      { get; set; } // integer
-		[Column("usage"                                                  )] public double? Usage         { get; set; } // numeric
-		[Column("numberoftasks"                                          )] public int?     NumberOfTasks { get; set; } // integer
+		[Column("serverid"     , IsPrimaryKey = true , PrimaryKeyOrder = 0                        )] public int      Serverid      { get; set; } // integer
+		[Column("partitionuuid", CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 1)] public string   Partitionuuid { get; set; } = null!; // character varying(64)
+		[Column("date"         , IsPrimaryKey = true , PrimaryKeyOrder = 2                        )] public DateTime Date          { get; set; } // timestamp (6) without time zone
+		[Column("interval"                                                                        )] public int      Interval      { get; set; } // integer
+		[Column("bytestotal"                                                                      )] public long?    BytesTotal    { get; set; } // bigint
+		[Column("usage"                                                                           )] public decimal? Usage         { get; set; } // numeric(3,2)
 
-		public static implicit operator CpuLog(CpuLogDbRecord log)
-		{
-			return new CpuLog
-			{
-				Date = log.Date,
-				Usage = log.Usage,
-				NumberOfTasks = log.NumberOfTasks
-			};
-		}
+		#region Associations
+		/// <summary>
+		/// partitionlog_serverid_partitionuuid_fkey
+		/// </summary>
+		[Association(CanBeNull = false, ThisKey = nameof(Serverid) + "," + nameof(Partitionuuid), OtherKey = nameof(PartitionLogDbRecord.Serverid) + "," + nameof(PartitionLogDbRecord.Partitionuuid))]
+		public PartitionLogDbRecord Serveridpartitionuuidfkey { get; set; } = null!;
+		#endregion
 
 		public TypeCode GetTypeCode()
 		{
@@ -102,12 +100,12 @@ namespace DataModel
 
 		public object ToType(Type conversionType, IFormatProvider? provider)
 		{
-			if (conversionType != typeof(CpuLog)) throw new NotImplementedException();
-			return new CpuLog
+			if(conversionType != typeof(PartitionLog)) throw new NotImplementedException();
+			return new PartitionLog()
 			{
 				Date = Date,
-				NumberOfTasks = NumberOfTasks,
-				Usage = Usage
+				UsedPercentage = Usage,
+				Bytes = BytesTotal
 			};
 		}
 

@@ -1,5 +1,6 @@
 using System.Text;
 using LinqToDB;
+using YALM.API.Db;
 using YALM.Common.Models;
 
 namespace YALM.API;

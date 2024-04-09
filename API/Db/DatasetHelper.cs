@@ -1,6 +1,6 @@
 using YALM.Common.Models;
 
-namespace YALM.API;
+namespace YALM.API.Db;
 
 public class DatasetHelper<TDbLog, TLog>(Func<IList<TDbLog>, TLog> combineLogsFunc, Func<TLog> getEmptyLogFunc, string hash)
 	where TDbLog : ILog

@@ -7,7 +7,6 @@
 
 using LinqToDB.Mapping;
 using System;
-using YALM.API.Models.Db;
 using YALM.Common.Models;
 using YALM.Common.Models.Graphql.Logs;
 
@@ -16,23 +15,20 @@ using YALM.Common.Models.Graphql.Logs;
 
 namespace DataModel
 {
-	[Table("partitionlog")]
-	public class PartitionLogDbRecord : ILog, IConvertible
+	[Table("memorylog")]
+	public class MemoryLogDbRecord : ILog, IConvertible
 	{
-		[Column("serverid"     , IsPrimaryKey = true , PrimaryKeyOrder = 0                        )] public int      Serverid      { get; set; } // integer
-		[Column("partitionuuid", CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 1)] public string   Partitionuuid { get; set; } = null!; // character varying(64)
-		[Column("date"         , IsPrimaryKey = true , PrimaryKeyOrder = 2                        )] public DateTime Date          { get; set; } // timestamp (6) without time zone
-		[Column("interval"                                                                        )] public int      Interval      { get; set; } // integer
-		[Column("bytestotal"                                                                      )] public long?    BytesTotal    { get; set; } // bigint
-		[Column("usage"                                                                           )] public decimal? Usage         { get; set; } // numeric(3,2)
-
-		#region Associations
-		/// <summary>
-		/// partitionlog_serverid_partitionuuid_fkey
-		/// </summary>
-		[Association(CanBeNull = false, ThisKey = nameof(Serverid) + "," + nameof(Partitionuuid), OtherKey = nameof(PartitionLogDbRecord.Serverid) + "," + nameof(PartitionLogDbRecord.Partitionuuid))]
-		public PartitionLogDbRecord Serveridpartitionuuidfkey { get; set; } = null!;
-		#endregion
+		[Column("serverid"      , IsPrimaryKey = true, PrimaryKeyOrder = 0)] public int      ServerId       { get; set; } // integer
+		[Column("date"          , IsPrimaryKey = true, PrimaryKeyOrder = 1)] public DateTime Date           { get; set; } // timestamp (6) without time zone
+		[Column("interval"                                                )] public int      Interval       { get; set; } // integer
+		[Column("totalkb")] public long? TotalKb { get; set; } // bigint
+		[Column("freekb")] public long? FreeKb { get; set; } // bigint
+		[Column("usedkb")] public long? UsedKb { get; set; } // bigint
+		[Column("swaptotalkb")] public long? SwapTotalKb { get; set; } // bigint
+		[Column("swapfreekb")] public long? SwapFreeKb { get; set; } // bigint
+		[Column("swapusedkb")] public long? SwapUsedKb { get; set; } // bigint
+		[Column("cachedkb")] public long? CachedKb { get; set; } // bigint
+		[Column("availablekb")] public long? AvailableKb { get; set; } // bigint
 
 		public TypeCode GetTypeCode()
 		{
@@ -101,12 +97,18 @@ namespace DataModel
 
 		public object ToType(Type conversionType, IFormatProvider? provider)
 		{
-			if(conversionType != typeof(PartitionLog)) throw new NotImplementedException();
-			return new PartitionLog()
+			if(conversionType != typeof(MemoryLog)) throw new NotImplementedException();
+			return new MemoryLog
 			{
 				Date = Date,
-				UsedPercentage = Usage,
-				Bytes = BytesTotal
+				TotalKb = TotalKb,
+				FreeKb = FreeKb,
+				UsedKb = UsedKb,
+				SwapTotalKb = SwapTotalKb,
+				SwapFreeKb = SwapFreeKb,
+				SwapUsedKb = SwapUsedKb,
+				CachedKb = CachedKb,
+				AvailableKb = AvailableKb 
 			};
 		}
 
