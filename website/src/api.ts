@@ -44,6 +44,9 @@ export class Api {
     }`
 
     let response = await this.executeQuery(queryString)
+    console.log("cpu response: ")
+    console.log(queryString)
+    console.log(response)
     let cpu = response.data.cpu
     return new Cpu(cpu.serverId, cpu.name, cpu.architecture, cpu.cores, cpu.threads, cpu.frequency, cpu.logs)
   }
@@ -70,6 +73,9 @@ export class Api {
     }`
 
     let response = await this.executeQuery(queryString)
+    console.log("memory response:")
+    console.log(queryString)
+    console.log(response)
     let memory = response.data.memory
     return new Memory(memory.serverId, memory.logs)
   }

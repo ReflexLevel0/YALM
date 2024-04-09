@@ -3,6 +3,7 @@ import Chart from "./components/Chart.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import CpuInfo from "@/components/CpuInfo.vue";
+import MemoryInfo from "@/components/MemoryInfo.vue";
 
 export default {
   name: "app",
@@ -13,6 +14,7 @@ export default {
     };
   },
   components: {
+    MemoryInfo,
     CpuInfo,
     Chart,
     VueDatePicker,
@@ -28,5 +30,15 @@ export default {
 <template>
   <VueDatePicker v-model="startDate" format="yyyy-MM-dd HH:mm" />
   <VueDatePicker v-model="endDate" format="yyyy-MM-dd HH:mm" />
-  <CpuInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+  <div class="summary">
+    <CpuInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+    <MemoryInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+  </div>
 </template>
+
+<style scoped>
+.summary{
+  display: flex;
+  flex-direction: column;
+}
+</style>
