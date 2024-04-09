@@ -128,14 +128,18 @@ export default defineComponent({
 </script>
 
 <template>
-  <div v-if="this.loadingData" class="info">
-    Loading {{ this.$props.name }} data...
+  <div class="summary-container">
+    <div v-if="this.loadingData" class="info">
+      Loading {{ this.$props.name }} data...
+    </div>
+    <div v-else-if="this.noData" class="info">
+      No data (try choosing a different date range)
+    </div>
+    <div v-else-if="this.loadingData === false">
+        <Scatter :id="chart" :data="this.$props.chartData" :options="options" style="float: left"/>
+        <button style="display: inline-block" @click="reloadChart">R</button>
+    </div>
   </div>
-  <div v-else-if="this.noData" class="info">
-    No data (try choosing a different date range)
-  </div>
-  <Scatter v-else-if="this.loadingData === false" :id="chart" :data="this.$props.chartData" :options="options" />
-  <button @click="reloadChart">Reset zoom</button>
 </template>
 
 <style scoped>
@@ -143,6 +147,26 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+}
+</style>
+
+<style scoped>
+.summary-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+@media screen and (min-width: 1000px) {
+  .summary-container {
+    min-height: 200px;
+    max-height: 280px;
+    max-width: 450px;
+  }
+}
+@media screen and (max-width: 999px) {
+  .summary-container{
+    height: 150px;
+    width: 100vw;
+  }
 }
 </style>

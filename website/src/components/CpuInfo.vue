@@ -78,40 +78,43 @@ export default {
 </script>
 
 <template>
-  <!-- Displaying generic CPU data if it has been loaded -->
-  <div v-if="cpu !== null">
-    <p><b>{{ $data.cpu.name }}</b></p>
-    <ul>
-      <li>Architecture: {{ $data.cpu.architecture }}</li>
-      <li>Cores: {{ $data.cpu.cores }}</li>
-      <li>Threads: {{ $data.cpu.threads }}</li>
-      <li>Frequency: {{ $data.cpu.frequency }}MHz</li>
-    </ul>
-  </div>
+  <div>
+    <!-- Displaying generic CPU data if it has been loaded -->
+    <div v-if="cpu !== null">
+      <p><b>CPU</b></p>
+      <p>{{ $data.cpu.name }}</p>
+      <ul>
+        <li>Architecture: {{ $data.cpu.architecture }}</li>
+        <li>Cores: {{ $data.cpu.cores }}</li>
+        <li>Threads: {{ $data.cpu.threads }}</li>
+        <li>Frequency: {{ $data.cpu.frequency }}MHz</li>
+      </ul>
+    </div>
 
-  <!-- Chart showing CPU usage over time -->
-  <Chart
-    name="CPU usage"
-    :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
-    :chart-data="this.$data.cpuUsageChartData"
-    @zoom-changed="async (limits) =>
+    <!-- Chart showing CPU usage over time -->
+    <Chart
+      name="CPU usage"
+      :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
+      :chart-data="this.$data.cpuUsageChartData"
+      @zoom-changed="async (limits) =>
       {
         $data.cpuUsageChartConfig.startDate = limits.startDate == null ? $props.startDate : limits.startDate;
         $data.cpuUsageChartConfig.endDate = limits.endDate == null ? $props.endDate : limits.endDate;
         await this.refreshCpuUsageChart()
       }"
-  />
+    />
 
-  <!-- Chart showing number of tasks over time -->
-  <Chart
-    name="Number of tasks"
-    :scales="{ x: { type: 'time' }, y: { min: 0 } }"
-    :chart-data="this.$data.numberOfTasksChartData"
-    @zoom-changed="async (limits) =>
+    <!-- Chart showing number of tasks over time -->
+    <Chart
+      name="Number of tasks"
+      :scales="{ x: { type: 'time' }, y: { min: 0 } }"
+      :chart-data="this.$data.numberOfTasksChartData"
+      @zoom-changed="async (limits) =>
         {
           $data.numberOfTasksChartConfig.startDate = limits.startDate == null ? $props.startDate : limits.startDate;
           $data.numberOfTasksChartConfig.endDate = limits.endDate == null ? $props.endDate : limits.endDate
           await this.refreshNumberOfTasksChart()
         }"
-  />
+    />
+  </div>
 </template>

@@ -43,14 +43,17 @@ export default {
 </script>
 
 <template>
-  <Chart
-    name="Memory"
-    :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 }}"
-    :chart-data="this.$data.memoryChartData"
-    @zoom-changed="async (limits) => {
+  <div>
+    <p><b>Memory</b></p>
+    <Chart
+      name="Memory"
+      :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 }}"
+      :chart-data="this.$data.memoryChartData"
+      @zoom-changed="async (limits) => {
       $data.memoryChartConfig.startDate = limits.startDate ?? $props.startDate
       $data.memoryChartConfig.endDate = limits.endDate ?? $props.endDate
       await this.refreshData($data.memoryChartConfig.startDate, $data.memoryChartConfig.endDate)
     }"
-  />
+    />
+  </div>
 </template>

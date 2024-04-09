@@ -37,8 +37,19 @@ export default {
 </template>
 
 <style scoped>
-.summary{
-  display: flex;
-  flex-direction: column;
+@media screen and (min-width: 1000px) {
+  .summary{
+    max-height: 100vh;
+    display: flex;
+    flex-flow: column wrap;
+    //background-color: red;
+  }
+}
+@media screen and (max-width: 999px) {
+  .summary {
+    display: flex;
+    flex-flow: column nowrap;
+    //background-color: green;
+  }
 }
 </style>
