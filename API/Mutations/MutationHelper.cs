@@ -1,17 +1,20 @@
 using LinqToDB;
 using LinqToDB.Mapping;
-using YALM.API.Db.Models;
+using YALM.API.Db;
 using YALM.Common.Models.Graphql;
 
 namespace YALM.API.Mutations;
 
-public class MutationHelper(IDb db) : IMutationHelper
+public class MutationHelper(IDbProvider dbProvider) : IMutationHelper
 {
 	public async Task<Payload<TOutput>> AddModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull 
 	{
 		try
 		{
-			return await UpdateDbRecordAsync<TDbModel, TOutput>(db.InsertAsync(model), getModelQuery(modelId));
+			await using (var db = dbProvider.GetDb())
+			{
+				return await UpdateDbRecordAsync<TDbModel, TOutput>(db.InsertAsync(model), getModelQuery(modelId));
+			}
 		}
 		catch
 		{
@@ -28,12 +31,14 @@ public class MutationHelper(IDb db) : IMutationHelper
 	{
 		try
 		{
+			await using var db = dbProvider.GetDb();
 			await db.InsertOrReplaceAsync(model);
 			var dbRecord = await getModelQuery(modelId).FirstAsync();
 			return new Payload<TOutput> { Data = (TOutput)Convert.ChangeType(dbRecord, typeof(TOutput)) };
 		}
-		catch
+		catch(Exception ex)
 		{
+			Console.WriteLine(ex.Message);
 			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
 		}
 	}
@@ -47,6 +52,7 @@ public class MutationHelper(IDb db) : IMutationHelper
 		try
 		{
 			var model = await getModelQuery(modelId).FirstAsync();
+			await using var db = dbProvider.GetDb();
 			await db.DeleteAsync(model);
 			return new Payload<TOutput> { Data = (TOutput)Convert.ChangeType(model, typeof(TOutput)) };
 		}

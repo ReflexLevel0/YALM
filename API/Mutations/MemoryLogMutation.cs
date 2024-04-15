@@ -1,6 +1,6 @@
 using DataModel;
 using HotChocolate.Language;
-using YALM.API.Db.Models;
+using YALM.API.Db;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
@@ -8,10 +8,10 @@ using YALM.Common.Models.Graphql.Logs;
 namespace YALM.API.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
-public class MemoryLogMutation(IDb db, IMutationHelper mutationHelper)
+public class MemoryLogMutation(IDbProvider dbProvider, IMutationHelper mutationHelper)
 {
 	private readonly Func<MemoryLogIdInput, IQueryable<MemoryLogDbRecord>> _getMemoryLogQuery = memoryLog =>
-		from m in db.MemoryLogs
+		from m in dbProvider.GetDb().MemoryLogs
 		where m.ServerId == memoryLog.ServerId
 		select m;
 

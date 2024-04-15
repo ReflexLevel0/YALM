@@ -1,6 +1,6 @@
 using DataModel;
 using HotChocolate.Language;
-using YALM.API.Db.Models;
+using YALM.API.Db;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.OutputModels;
@@ -8,10 +8,10 @@ using YALM.Common.Models.Graphql.OutputModels;
 namespace YALM.API.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
-public class PartitionMutation(IDb db, IMutationHelper mutationHelper)
+public class PartitionMutation(IDbProvider dbProvider, IMutationHelper mutationHelper)
 {
 	private readonly Func<PartitionIdInput, IQueryable<PartitionDbRecord>> _getPartitionQuery = pId =>
-		from p in db.Partitions
+		from p in dbProvider.GetDb().Partitions
 		where pId.ServerId == p.Serverid && string.CompareOrdinal(pId.Uuid, p.Uuid) == 0
 		select p;
 

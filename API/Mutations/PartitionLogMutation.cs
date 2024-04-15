@@ -1,6 +1,6 @@
 using DataModel;
 using HotChocolate.Language;
-using YALM.API.Db.Models;
+using YALM.API.Db;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
@@ -8,10 +8,10 @@ using YALM.Common.Models.Graphql.Logs;
 namespace YALM.API.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
-public class PartitionLogMutation(IDb db, IMutationHelper mutationHelper)
+public class PartitionLogMutation(IDbProvider dbProvider, IMutationHelper mutationHelper)
 {
 	private readonly Func<PartitionLogIdInput, IQueryable<PartitionLogDbRecord>> _getPartitionLogQuery = pId =>
-		from p in db.PartitionLogs
+		from p in dbProvider.GetDb().PartitionLogs
 		where p.Serverid == pId.ServerId && string.CompareOrdinal(p.Partitionuuid, pId.Uuid) == 0 && pId.Date == p.Date
 		select p;
 

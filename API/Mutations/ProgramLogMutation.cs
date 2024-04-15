@@ -1,6 +1,6 @@
 using DataModel;
 using HotChocolate.Language;
-using YALM.API.Db.Models;
+using YALM.API.Db;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
@@ -8,10 +8,10 @@ using YALM.Common.Models.Graphql.Logs;
 namespace YALM.API.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
-public class ProgramLogMutation(IDb db, IMutationHelper mutationHelper)
+public class ProgramLogMutation(IDbProvider dbProvider, IMutationHelper mutationHelper)
 {
 	private readonly Func<ProgramLogIdInput, IQueryable<ProgramLogDbRecord>> _getProgramQuery = pid =>
-		from p in db.ProgramLogs
+		from p in dbProvider.GetDb().ProgramLogs
 		where pid.ServerId == p.Serverid && pid.Date == p.Date && string.CompareOrdinal(pid.Name, p.Name) == 0
 		select p;
 

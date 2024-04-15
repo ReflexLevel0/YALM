@@ -1,6 +1,6 @@
 using DataModel;
 using HotChocolate.Language;
-using YALM.API.Db.Models;
+using YALM.API.Db;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.OutputModels;
@@ -8,10 +8,10 @@ using YALM.Common.Models.Graphql.OutputModels;
 namespace YALM.API.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
-public class CpuMutation(IDb db, IMutationHelper mutationHelper)
+public class CpuMutation(IDbProvider dbProvider, IMutationHelper mutationHelper)
 {
     private readonly Func<CpuIdInput, IQueryable<CpuDbRecord>> _getCpuQuery = cpu =>
-        from c in db.Cpus
+        from c in dbProvider.GetDb().Cpus
         where c.ServerId == cpu.ServerId
         select c;
 

@@ -5,7 +5,7 @@ using YALM.API.Mutations;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
 	.AddScoped<IDbProvider>(_ => new MonitoringDbProvider())
-	.AddScoped<IMutationHelper>(_ => new MutationHelper(new MonitoringDbProvider().GetDb()))
+	.AddScoped<IMutationHelper>(_ => new MutationHelper(new MonitoringDbProvider()))
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
 	.AddMutationType(m => m.Name("Mutation"))
