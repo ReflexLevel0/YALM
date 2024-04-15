@@ -4,6 +4,8 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import CpuInfo from "@/components/CpuInfo.vue";
 import MemoryInfo from "@/components/MemoryInfo.vue";
+import { VueCollapsiblePanel, VueCollapsiblePanelGroup } from '@dafcoe/vue-collapsible-panel'
+import '@dafcoe/vue-collapsible-panel/dist/vue-collapsible-panel.css'
 
 export default {
   name: "app",
@@ -18,6 +20,8 @@ export default {
     CpuInfo,
     Chart,
     VueDatePicker,
+    VueCollapsiblePanel,
+    VueCollapsiblePanelGroup
   },
   created() {
     //Setting start date to be a week ago by default
@@ -30,10 +34,22 @@ export default {
 <template>
   <VueDatePicker v-model="startDate" format="yyyy-MM-dd HH:mm" />
   <VueDatePicker v-model="endDate" format="yyyy-MM-dd HH:mm" />
-  <div class="summary">
-    <CpuInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
-    <MemoryInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
-  </div>
+  <VueCollapsiblePanelGroup class="summary">
+    <VueCollapsiblePanel>
+      <template #title>CPU</template>
+      <template #content>
+        ===
+        <CpuInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+      </template>
+    </VueCollapsiblePanel>
+    <VueCollapsiblePanel>
+      <template #title>RAM</template>
+      <template #content>
+        ===
+        <MemoryInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+      </template>
+    </VueCollapsiblePanel>
+  </VueCollapsiblePanelGroup>
 </template>
 
 <style scoped>
@@ -42,14 +58,12 @@ export default {
     max-height: 100vh;
     display: flex;
     flex-flow: column wrap;
-    //background-color: red;
   }
 }
 @media screen and (max-width: 999px) {
   .summary {
     display: flex;
     flex-flow: column nowrap;
-    //background-color: green;
   }
 }
 </style>

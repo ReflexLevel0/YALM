@@ -44,7 +44,6 @@ export default {
 
 <template>
   <div>
-    <p><b>Memory</b></p>
     <Chart
       name="Memory"
       :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 }}"

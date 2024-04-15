@@ -81,7 +81,6 @@ export default {
   <div>
     <!-- Displaying generic CPU data if it has been loaded -->
     <div v-if="cpu !== null">
-      <p><b>CPU</b></p>
       <p>{{ $data.cpu.name }}</p>
       <ul>
         <li>Architecture: {{ $data.cpu.architecture }}</li>
