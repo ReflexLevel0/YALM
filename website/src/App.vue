@@ -55,7 +55,7 @@ export default {
 <style scoped>
 @media screen and (min-width: 1000px) {
   .summary{
-    max-height: 100vh;
+    max-height: 90vh;
     display: flex;
     flex-flow: column wrap;
   }

@@ -156,13 +156,14 @@ export default defineComponent({
   flex-direction: row;
   flex-wrap: wrap;
 }
+
 @media screen and (min-width: 1000px) {
   .summary-container {
-    min-height: 200px;
-    max-height: 280px;
-    max-width: 450px;
+    height: 250px;
+    width: 100%;
   }
 }
+
 @media screen and (max-width: 999px) {
   .summary-container{
     height: 150px;
