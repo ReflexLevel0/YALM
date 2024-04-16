@@ -60,7 +60,7 @@ public class LogHelper
 		if (_config.Storage)
 		{
 			log.Disks = new List<DiskInfo>();
-			await foreach (var l in _dataHelper.GetStorageInfo())
+			foreach (var l in await _dataHelper.GetStorageInfo())
 			{
 				log.Disks.Add(l);
 			}

@@ -142,7 +142,7 @@ public class ApiHelper
                     {
                         Date = log.LogTime,
                         Bytes = p.FilesystemAvailable,
-                        UsedPercentage = p.FilesystemUsed == null || p.FilesystemAvailable == null ? null : (decimal) p.FilesystemUsed / p.FilesystemAvailable
+                        UsedPercentage = p.FilesystemUsed == null || p.Size == null ? null : (decimal) p.FilesystemUsed / p.Size
                     };
                     variables.PartitionLogs.Add(l);
                 }
