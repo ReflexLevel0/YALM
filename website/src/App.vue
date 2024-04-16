@@ -5,7 +5,6 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import CpuInfo from "@/components/CpuInfo.vue";
 import MemoryInfo from "@/components/MemoryInfo.vue";
 import { VueCollapsiblePanel, VueCollapsiblePanelGroup } from '@dafcoe/vue-collapsible-panel'
-import '@dafcoe/vue-collapsible-panel/dist/vue-collapsible-panel.css'
 import DiskInfo from "@/components/DiskInfo.vue";
 
 export default {

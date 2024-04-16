@@ -87,6 +87,8 @@ export default defineComponent({
   },
   async mounted() {
     this.$data.options.scales = this.$props.scales
+    console.log("chart data on mount: ")
+    console.log(this.$data.chart)
   },
   methods: {
     emitZoomChanged(chart){
@@ -120,7 +122,7 @@ export default defineComponent({
   },
   watch: {
     "chartData": function(){
-      console.log("data: ")
+      console.log("chart data: ")
       console.log(this.$props.chartData)
       this.$data.loadingData = false
       this.$data.noData = this.$props.chartData.data === 0

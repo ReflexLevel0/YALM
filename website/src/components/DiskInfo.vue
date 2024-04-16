@@ -3,7 +3,6 @@ import { Api } from "@/api";
 import { Disk } from "@/models/Disk";
 import Chart from "@/components/Chart.vue";
 import { VueCollapsiblePanel, VueCollapsiblePanelGroup } from "@dafcoe/vue-collapsible-panel";
-import "@dafcoe/vue-collapsible-panel/dist/vue-collapsible-panel.css";
 import { ChartHelper } from "@/ChartHelper";
 
 export default {
@@ -14,14 +13,9 @@ export default {
   },
   data() {
     return {
-      disks: Disk,
+      disks: [],
       chartDataDictionary: {},
-      chartConfigDictionary: {},
-      chartDataConfig: {
-        startDate: null,
-        endDate: null
-      },
-      chartData: null
+      chartConfigDictionary: {}
     }
   },
   props: {
@@ -33,7 +27,7 @@ export default {
     VueCollapsiblePanel,
     VueCollapsiblePanelGroup
   },
-  async created(){
+  async mounted(){
     await this.refreshAllData(this.$props.startDate, this.$props.endDate)
   },
   methods: {
@@ -63,25 +57,46 @@ export default {
           ]
         }
       })
+
+      console.log("dic: ")
+      console.log(this.$data.chartDataDictionary)
     },
+  },
+  watch: {
+    "startDate": async function() {
+      await this.refreshAllData(this.$props.startDate, this.$props.endDate);
+    },
+    "endDate": async function() {
+      await this.refreshAllData(this.$props.startDate, this.$props.endDate);
+    }
   }
 }
 </script>
 
 <template>
-<!--          <Chart-->
-<!--            v-if="$data.chartDataDictionary.length !== 0"-->
-<!--            v-for="d in $data.chartDataDictionary.keys()"-->
-<!--            name="disk usage"-->
-<!--            :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"-->
-<!--            :chart-data="$data.chartDataDictionary[d.uuid]"/>-->
-<!--&lt;!&ndash;            @zoom-changed="async (limits) =>&ndash;&gt;-->
-<!--&lt;!&ndash;            {&ndash;&gt;-->
-<!--&lt;!&ndash;              $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate;&ndash;&gt;-->
-<!--&lt;!&ndash;              $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate;&ndash;&gt;-->
-<!--&lt;!&ndash;              await this.refreshDiskData($data.chartConfigDictionary[d.uuid].startDate, $data.chartConfigDictionary[d.uuid].endDate)&ndash;&gt;-->
-<!--&lt;!&ndash;            }&ndash;&gt;-->
-
+  <VueCollapsiblePanelGroup>
+    <VueCollapsiblePanel v-for="d in $data.disks">
+      <template #title>{{d.model}}</template>
+      <template #content>
+        ===
+        <div v-if="d.uuid in this.$data.chartDataDictionary">
+          aaa
+        </div>
+        <Chart
+          v-if="d.uuid in this.$data.chartDataDictionary"
+          name="disk usage"
+          :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
+          :chart-data="this.$data.chartDataDictionary[d.uuid]"
+          @zoom-changed="async (limits) =>
+          {
+            $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate;
+            $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate;
+            await this.refreshAllData($data.chartConfigDictionary[d.uuid].startDate, $data.chartConfigDictionary[d.uuid].endDate)
+          }"
+        />
+      </template>
+    </VueCollapsiblePanel>
+  </VueCollapsiblePanelGroup>
 </template>
 
 <style scoped>
