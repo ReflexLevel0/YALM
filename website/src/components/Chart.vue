@@ -120,6 +120,8 @@ export default defineComponent({
   },
   watch: {
     "chartData": function(){
+      console.log("data: ")
+      console.log(this.$props.chartData)
       this.$data.loadingData = false
       this.$data.noData = this.$props.chartData.data === 0
     }

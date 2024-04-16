@@ -1,5 +1,6 @@
 import { CpuLog } from "@/models/CpuLog";
 import { MemoryLog } from "@/models/MemoryLog";
+import { PartitionLog } from "@/models/PartitionLog";
 
 export class ChartHelper {
   static CpuLogsToCpuUsageDataset(logs: CpuLog[]) {
@@ -92,5 +93,28 @@ export class ChartHelper {
         },
       ]
     };
+  }
+
+  static PartitionLogsToDataset(logs: PartitionLog[]){
+    let usagePoints: object[] = []
+
+    logs.forEach(l => {
+      usagePoints.push({
+        x: l.date,
+        y: l.usedPercentage == null ? 0 : l.usedPercentage
+      })
+    })
+
+    return {
+      datasets: [
+        {
+          showLine: true,
+          label: "disk usage %",
+          borderColor: "#1a881c",
+          backgroundColor: "#1a881c",
+          data: usagePoints
+        }
+      ]
+    }
   }
 }

@@ -6,6 +6,7 @@ import CpuInfo from "@/components/CpuInfo.vue";
 import MemoryInfo from "@/components/MemoryInfo.vue";
 import { VueCollapsiblePanel, VueCollapsiblePanelGroup } from '@dafcoe/vue-collapsible-panel'
 import '@dafcoe/vue-collapsible-panel/dist/vue-collapsible-panel.css'
+import DiskInfo from "@/components/DiskInfo.vue";
 
 export default {
   name: "app",
@@ -16,6 +17,7 @@ export default {
     };
   },
   components: {
+    DiskInfo,
     MemoryInfo,
     CpuInfo,
     Chart,
@@ -47,6 +49,13 @@ export default {
       <template #content>
         ===
         <MemoryInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+      </template>
+    </VueCollapsiblePanel>
+    <VueCollapsiblePanel>
+      <template #title>Disks</template>
+      <template #content>
+        ===
+        <DiskInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
       </template>
     </VueCollapsiblePanel>
   </VueCollapsiblePanelGroup>

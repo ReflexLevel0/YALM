@@ -1,6 +1,7 @@
 import moment from "moment";
 import { Cpu } from "@/models/Cpu";
 import { Memory } from "@/models/Memory";
+import { Disk } from "@/models/Disk";
 
 export class Api {
   static async executeQuery(queryString: string) {
@@ -78,5 +79,40 @@ export class Api {
     console.log(response)
     let memory = response.data.memory
     return new Memory(memory.serverId, memory.logs)
+  }
+
+  static async getDisks(startDate: Date, endDate: Date){
+    let startDateString = this.dateToString(startDate)
+    let endDateString = this.dateToString(endDate)
+    const queryString = `
+    {
+      disk(serverId: 0, startDateTime: ${startDateString}, endDateTime: ${endDateString}) {
+        serverId,
+        uuid,
+        type,
+        serial,
+        path,
+        vendor,
+        model,
+        bytesTotal,
+        partitions{
+          uuid, label, filesystemName, filesystemVersion, mountPath,
+          logs{
+            date,
+            bytes,
+            usedPercentage
+          }
+        }
+      }
+    }`
+
+    let response = await this.executeQuery(queryString)
+    console.log("disk response:")
+    console.log(queryString)
+    console.log(response)
+    let disks = response.data.disk
+    let result: Disk[] = []
+    disks.forEach((d: any) => result.push(new Disk(d.serverId, d.uuid, d.type, d.serial, d.path, d.vendor, d.model, d.bytesTotal, d.partitions)))
+    return result
   }
 }
