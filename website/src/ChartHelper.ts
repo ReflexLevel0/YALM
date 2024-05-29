@@ -106,7 +106,7 @@ export class ChartHelper {
     logs.forEach(l => {
       usagePoints.push({
         x: l.date,
-        y: l.usedPercentage == null ? 0 : l.usedPercentage
+        y: l.usedPercentage == null ? 0 : l.usedPercentage * 100
       })
     })
 

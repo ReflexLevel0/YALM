@@ -116,6 +116,7 @@ export class Api {
     console.log(queryString)
     console.log("disk response:")
     console.log(response)
+    if (response == null || response.data.disk == null) return []
     let disks = response.data.disk
     let result: Disk[] = []
     disks.forEach((d: any) => result.push(new Disk(d.serverId, d.uuid, d.type, d.serial, d.path, d.vendor, d.model, d.bytesTotal, d.partitions)))

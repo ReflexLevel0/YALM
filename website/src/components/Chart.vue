@@ -87,6 +87,7 @@ export default defineComponent({
   },
   async mounted() {
     this.$data.options.scales = this.$props.scales
+    if (this.$props.chartData != null) this.onChartDataChanged()
   },
   methods: {
     emitZoomChanged(chart){
@@ -104,6 +105,12 @@ export default defineComponent({
         startDate: null,
         endDate: null
       })
+    },
+    onChartDataChanged(){
+      console.log("chart data changed: ");
+      console.log(this.$props.chartData);
+      this.$data.loadingData = false;
+      this.$data.noData = this.$props.chartData.data === null || this.$props.chartData.datasets.length === 0;
     }
   },
   props: {
@@ -119,11 +126,11 @@ export default defineComponent({
     },
   },
   watch: {
-    "chartData": function(){
-      console.log("chart data changed: ")
-      console.log(this.$props.chartData)
-      this.$data.loadingData = false
-      this.$data.noData = this.$props.chartData.data === null || this.$props.chartData.datasets.length === 0
+    chartData: {
+      handler: function() {
+        this.onChartDataChanged()
+      },
+      deep: true
     }
   }
 });

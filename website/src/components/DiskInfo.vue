@@ -15,7 +15,8 @@ export default {
     return {
       disks: [],
       chartDataDictionary: {},
-      chartConfigDictionary: {}
+      chartConfigDictionary: {},
+      chartData: null
     }
   },
   props: {
@@ -35,32 +36,25 @@ export default {
       let disks = await Api.getDisks(startDate, endDate)
       this.$data.disks = []
       disks.forEach(d => {
-        let datasets = []
         this.$data.disks.push(d)
-        d.partitions.forEach(p => {
-          ChartHelper.PartitionLogsToDataset(p.logs).datasets.forEach(dataset => datasets.push(dataset))
-        })
-        this.$data.chartDataDictionary[d.uuid] = {
-          datasets: [
-            {
-              showLine: true,
-              label: "memory used %",
-              borderColor: "#fa1818",
-              backgroundColor: "#fa1818",
-              data: [
-                {
-                  "x": "2024-04-16T14:36:00.000+02:00",
-                  "y": 30
-                }
-              ]
-            }
-          ]
+        this.$data.chartDataDictionary[d.uuid] = {datasets: []}
+        this.$data.chartConfigDictionary[d.uuid] = {
+          startDate: this.$props.startDate,
+          endDate: this.$props.endDate
         }
+        d.partitions.forEach(p => {
+          ChartHelper.PartitionLogsToDataset(p.logs).datasets.forEach(dataset => this.$data.chartDataDictionary[d.uuid].datasets.push(dataset))
+        })
       })
 
-      console.log("dic: ")
+      console.log("disks: ")
+      console.log(this.$data.disks)
+      console.log("chart data dictionary: ")
       console.log(this.$data.chartDataDictionary)
     },
+    async refreshDiskData(startDate, endDate){
+
+    }
   },
   watch: {
     "startDate": async function() {
@@ -74,29 +68,23 @@ export default {
 </script>
 
 <template>
-  <VueCollapsiblePanelGroup>
-    <VueCollapsiblePanel v-for="d in $data.disks">
-      <template #title>{{d.model}}</template>
-      <template #content>
-        ===
-        <div v-if="d.uuid in this.$data.chartDataDictionary">
-          aaa
-        </div>
-        <Chart
-          v-if="d.uuid in this.$data.chartDataDictionary"
-          name="disk usage"
-          :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
-          :chart-data="this.$data.chartDataDictionary[d.uuid]"
-          @zoom-changed="async (limits) =>
-          {
-            $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate;
-            $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate;
-            await this.refreshAllData($data.chartConfigDictionary[d.uuid].startDate, $data.chartConfigDictionary[d.uuid].endDate)
-          }"
-        />
-      </template>
-    </VueCollapsiblePanel>
-  </VueCollapsiblePanelGroup>
+  <VueCollapsiblePanel v-for="d in disks">
+    <template #title>{{d.uuid}}</template>
+    <template #content>
+      ===
+      <Chart
+        name="Disk usage"
+        :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
+        :chart-data="this.$data.chartDataDictionary[d.uuid]"
+        @zoom-changed="async (limits) =>
+        {
+          $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate;
+          $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate;
+          await this.refreshDiskData(d)
+        }"
+      />
+    </template>
+  </VueCollapsiblePanel>
 </template>
 
 <style scoped>
