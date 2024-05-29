@@ -25,7 +25,7 @@ export default {
   methods: {
     async refreshData(startDate, endDate) {
       this.$data.memory = await Api.getMemory(startDate, endDate)
-      this.$data.memoryChartData = ChartHelper.MemoryLogsToDataset(this.$data.memory.logs)
+      this.$data.memoryChartData = ChartHelper.MemoryLogsToDataset(this.$data.memory?.logs)
     }
   },
   async mounted() {
@@ -43,7 +43,6 @@ export default {
 </script>
 
 <template>
-  <div>
     <Chart
       name="Memory"
       :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 }}"
@@ -54,5 +53,4 @@ export default {
       await this.refreshData($data.memoryChartConfig.startDate, $data.memoryChartConfig.endDate)
     }"
     />
-  </div>
 </template>

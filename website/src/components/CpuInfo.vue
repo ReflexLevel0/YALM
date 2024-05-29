@@ -35,28 +35,25 @@ export default {
   methods: {
     //Refreshing all CPU data
     async refreshData(startDate, endDate) {
-      let cpu = await Api.getCpu(startDate, endDate)
-      this.$data.cpu = cpu
-      await this.refreshCpuUsageChart(cpu.logs)
-      await this.refreshNumberOfTasksChart(cpu.logs)
+      this.$data.cpu = await Api.getCpu(startDate, endDate)
+      await this.refreshCpuUsageChart(false)
+      await this.refreshNumberOfTasksChart(false)
     },
 
     //Refreshing only CPU usage chart with provided logs (fetching logs if no logs are provided)
-    async refreshCpuUsageChart(logs = null) {
-      if(logs === null){
-        let cpu = await Api.getCpu(this.$data.cpuUsageChartConfig.startDate, this.$data.cpuUsageChartConfig.endDate)
-        logs = cpu.logs
+    async refreshCpuUsageChart(refresh) {
+      if(refresh){
+        this.$data.cpu = await Api.getCpu(this.$data.cpuUsageChartConfig.startDate, this.$data.cpuUsageChartConfig.endDate)
       }
-      this.$data.cpuUsageChartData = ChartHelper.CpuLogsToCpuUsageDataset(logs)
+      this.$data.cpuUsageChartData = ChartHelper.CpuLogsToCpuUsageDataset(this.$data.cpu?.logs)
     },
 
     //Refreshing only number of tasks chart with provided logs (fetching logs if no logs are provided)
-    async refreshNumberOfTasksChart(logs = null) {
-      if(logs === null){
-        let cpu = await Api.getCpu(this.$data.numberOfTasksChartConfig.startDate, this.$data.numberOfTasksChartConfig.endDate)
-        logs = cpu.logs
+    async refreshNumberOfTasksChart(refresh) {
+      if(refresh){
+        this.$data.cpu = await Api.getCpu(this.$data.numberOfTasksChartConfig.startDate, this.$data.numberOfTasksChartConfig.endDate)
       }
-      this.$data.numberOfTasksChartData = ChartHelper.CpuLogsToNumberOfTasksDataset(logs);
+      this.$data.numberOfTasksChartData = ChartHelper.CpuLogsToNumberOfTasksDataset(this.$data.cpu?.logs);
     }
   },
   async mounted() {
@@ -99,7 +96,7 @@ export default {
       {
         $data.cpuUsageChartConfig.startDate = limits.startDate == null ? $props.startDate : limits.startDate;
         $data.cpuUsageChartConfig.endDate = limits.endDate == null ? $props.endDate : limits.endDate;
-        await this.refreshCpuUsageChart()
+        await this.refreshCpuUsageChart(true)
       }"
     />
 
@@ -112,7 +109,7 @@ export default {
         {
           $data.numberOfTasksChartConfig.startDate = limits.startDate == null ? $props.startDate : limits.startDate;
           $data.numberOfTasksChartConfig.endDate = limits.endDate == null ? $props.endDate : limits.endDate
-          await this.refreshNumberOfTasksChart()
+          await this.refreshNumberOfTasksChart(true)
         }"
     />
   </div>

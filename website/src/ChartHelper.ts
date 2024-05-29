@@ -4,6 +4,8 @@ import { PartitionLog } from "@/models/PartitionLog";
 
 export class ChartHelper {
   static CpuLogsToCpuUsageDataset(logs: CpuLog[]) {
+    if (logs == null) return { datasets: [] }
+
     let points: object[] = [];
     logs.forEach(log => {
       points.push({
@@ -26,14 +28,15 @@ export class ChartHelper {
   }
 
   static CpuLogsToNumberOfTasksDataset(logs: CpuLog[]) {
-    let points: object[] = [];
+    if (logs == null) return { datasets: [] }
 
+    let points: object[] = []
     logs.forEach((log) => {
       points.push({
         x: log.date,
         y: log.numberOfTasks == null ? 0 : log.numberOfTasks
-      });
-    });
+      })
+    })
 
     return {
       datasets: [
@@ -45,14 +48,15 @@ export class ChartHelper {
           data: points
         }
       ]
-    };
+    }
   }
 
   static MemoryLogsToDataset(logs: MemoryLog[]){
+    if (logs == null) return {datasets: []}
+
     let memoryPoints: object[] = [];
     let swapMemoryPoints: object[] = [];
     let cachedPoints: object[] = [];
-
     logs.forEach(log => {
       memoryPoints.push({
         x: log.date,
@@ -96,8 +100,9 @@ export class ChartHelper {
   }
 
   static PartitionLogsToDataset(logs: PartitionLog[]){
-    let usagePoints: object[] = []
+    if (logs == null) return {datasets: []}
 
+    let usagePoints: object[] = []
     logs.forEach(l => {
       usagePoints.push({
         x: l.date,

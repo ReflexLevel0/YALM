@@ -5,18 +5,22 @@ import { Disk } from "@/models/Disk";
 
 export class Api {
   static async executeQuery(queryString: string) {
-    const response = await fetch("http://localhost:3000/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
-      },
-      body: JSON.stringify({
-        query: queryString
-      })
-    });
+    try{
+      const response = await fetch("http://localhost:3000/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          query: queryString
+        })
+      });
 
-    return await response.json()
+      return await response.json()
+    }catch{
+      return null
+    }
   }
 
   private static dateToString(date: Date){
@@ -45,9 +49,10 @@ export class Api {
     }`
 
     let response = await this.executeQuery(queryString)
-    console.log("cpu response: ")
     console.log(queryString)
+    console.log("cpu response: ")
     console.log(response)
+    if(response == null || response.data.cpu == null) return null
     let cpu = response.data.cpu
     return new Cpu(cpu.serverId, cpu.name, cpu.architecture, cpu.cores, cpu.threads, cpu.frequency, cpu.logs)
   }
@@ -74,9 +79,10 @@ export class Api {
     }`
 
     let response = await this.executeQuery(queryString)
-    console.log("memory response:")
     console.log(queryString)
+    console.log("memory response:")
     console.log(response)
+    if(response == null || response.data.memory == null) return null
     let memory = response.data.memory
     return new Memory(memory.serverId, memory.logs)
   }
@@ -107,8 +113,8 @@ export class Api {
     }`
 
     let response = await this.executeQuery(queryString)
-    console.log("disk response:")
     console.log(queryString)
+    console.log("disk response:")
     console.log(response)
     let disks = response.data.disk
     let result: Disk[] = []
