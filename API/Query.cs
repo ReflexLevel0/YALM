@@ -1,7 +1,9 @@
 using DataModel;
 using LinqToDB;
+using YALM.API.Alerts;
 using YALM.API.Db;
 using YALM.API.Db.Models;
+using YALM.Common;
 using YALM.Common.Models.Graphql.Logs;
 using YALM.Common.Models.Graphql.OutputModels;
 
@@ -190,7 +192,7 @@ public class Query(IDbProvider dbProvider)
 			select alert).ToListAsync();
 		foreach (var alert in alerts)
 		{
-			yield return new AlertOutput(alert.Serverid, alert.Date, alert.Text);
+			yield return new AlertOutput(alert.Serverid, alert.Date, (AlertSeverity)alert.Severity, alert.Text);
 		}
 	}
 }

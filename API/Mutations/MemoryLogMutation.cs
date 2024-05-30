@@ -2,9 +2,11 @@ using DataModel;
 using HotChocolate.Language;
 using YALM.API.Alerts;
 using YALM.API.Db;
+using YALM.Common;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
+using YALM.Common.Models.Graphql.OutputModels;
 
 namespace YALM.API.Mutations;
 

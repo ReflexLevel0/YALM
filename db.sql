@@ -122,3 +122,57 @@ CREATE TABLE servicelog
     messagetext varchar(1024) NOT NULL,
     PRIMARY KEY (serverid, serviceid, date, messagetext)
 );
+
+CREATE TABLE alert
+(
+    serverId integer NOT NULL,
+    date timestamp NOT NULL,
+	severity int NOT NULL,
+    text varchar(256) NOT NULL,
+    primary key (serverId, date, text)
+);
+
+CREATE OR REPLACE FUNCTION before_alert_insert_func()
+    RETURNS TRIGGER
+    LANGUAGE PLPGSQL
+AS
+$$
+DECLARE
+    mins INT;
+BEGIN
+    SELECT EXTRACT(EPOCH FROM NEW.date::timestamp-date::timestamp)/60 FROM alert WHERE NEW.serverId = serverId AND NEW.text LIKE text ORDER BY date desc INTO mins;
+    IF mins < 60 THEN
+        RAISE EXCEPTION 'Same alert already raised less then an hour ago (% minutes ago)', mins;
+    END IF;
+    RETURN NEW;
+END
+$$;
+    
+CREATE TRIGGER before_alert_insert
+    BEFORE INSERT
+    ON alert
+    FOR EACH ROW
+    EXECUTE FUNCTION before_alert_insert_func();
+
+--CREATE PROCEDURE update_server_status()
+--LANGUAGE plpgsql
+--AS $$
+--BEGIN
+--    DELETE FROM alert WHERE 1=1;
+--END;
+--$$;
+
+--DROP EXTENSION pg_cron;
+--CREATE EXTENSION pg_cron;
+--SELECT cron.schedule('process-updates', '5 seconds', 'CALL update_server_status()');
+--SELECT * FROM cron.job;
+
+-- testing alerts
+DELETE FROM alert WHERE 1=1;
+INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-05-30 00:00:00', 3, 'Cpu usage above 90%');
+INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-05-30 01:30:00', 3, 'Cpu usage above 90%');
+INSERT INTO alert(serverId, date, severity, text) VALUES(1, '2024-05-30 02:00:00', 3, 'Cpu usage above 90%');
+INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-05-30 02:15:00', 2, 'Memory usage above 50%');
+-- INSERT INTO alert(serverId, date, text) VALUES(0, '2024-05-30 02:15:00', '[WARNING] Cpu usage above 90%');
+INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-06-02 12:33:33', 1, 'This is an info message');
+SELECT * FROM alert;

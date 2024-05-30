@@ -1,6 +1,8 @@
 using LinqToDB;
 using YALM.API.Db;
 using YALM.API.Db.Models;
+using YALM.Common;
+using YALM.Common.Models.Graphql.OutputModels;
 
 namespace YALM.API.Alerts;
 

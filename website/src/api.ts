@@ -2,6 +2,7 @@ import moment from "moment";
 import { Cpu } from "@/models/Cpu";
 import { Memory } from "@/models/Memory";
 import { Disk } from "@/models/Disk";
+import { Alert } from "@/models/Alert";
 
 export class Api {
   static async executeQuery(queryString: string) {
@@ -130,5 +131,26 @@ export class Api {
     let result: Disk[] = []
     disks.forEach((d: any) => result.push(new Disk(d.serverId, d.uuid, d.type, d.serial, d.path, d.vendor, d.model, d.bytesTotal, d.partitions)))
     return result
+  }
+
+  static async getAlerts(){
+    let queryString = `
+    query {
+      alert {
+        date
+        serverId
+        text
+        severity
+      }
+    }`
+
+    let response = await this.executeQuery(queryString)
+    console.log(queryString)
+    console.log("alert response:")
+    console.log(response)
+    if (response?.data?.alert == null) return []
+    let alerts: Alert[] = []
+    response.data.alert.forEach((a: any) => alerts.push(a))
+    return alerts
   }
 }
