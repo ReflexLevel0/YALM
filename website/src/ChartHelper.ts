@@ -99,7 +99,7 @@ export class ChartHelper {
     };
   }
 
-  static PartitionLogsToDataset(logs: PartitionLog[]){
+  static PartitionLogsToDataset(partitionLabel: string, color: string, logs: PartitionLog[]){
     if (logs == null) return {datasets: []}
 
     let usagePoints: object[] = []
@@ -111,15 +111,11 @@ export class ChartHelper {
     })
 
     return {
-      datasets: [
-        {
-          showLine: true,
-          label: "disk usage %",
-          borderColor: "#1a881c",
-          backgroundColor: "#1a881c",
-          data: usagePoints
-        }
-      ]
+      showLine: true,
+      label: partitionLabel + "%",
+      borderColor: color,
+      backgroundColor: color,
+      data: usagePoints
     }
   }
 }

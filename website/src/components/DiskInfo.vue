@@ -59,12 +59,23 @@ export default {
     },
 
     partitionsToDatasets(disk){
+      let initialColors = ["#1a881c", "#8e3cc2", "#00e6ff", "#ffcb5a", "#ff00e9", "#5d311a", "#62811a"]
+      let colors = []
       let datasets = []
+
       disk.partitions.forEach(p => {
-        ChartHelper.PartitionLogsToDataset(p.logs).datasets.forEach(dataset => datasets.push(dataset))
+        if(colors.length === 0){
+          initialColors.forEach(c => colors.push(c))
+        }
+
+        //each dataset has a random color (unless that color has already been used for this disk's partitions)
+        let randomColorIndex = Math.floor(colors.length * Math.random())
+        let randomColor = colors.splice(randomColorIndex, 1)[0]
+        datasets.push(ChartHelper.PartitionLogsToDataset(p.label, randomColor, p.logs))
       })
       return datasets
     },
+
     getChartConfig(startDate, endDate){
       return {
         startDate: startDate,
