@@ -52,7 +52,7 @@ export class Api {
     console.log(queryString)
     console.log("cpu response: ")
     console.log(response)
-    if(response == null || response.data.cpu == null) return null
+    if(response?.data?.cpu == null) return null
     let cpu = response.data.cpu
     return new Cpu(cpu.serverId, cpu.name, cpu.architecture, cpu.cores, cpu.threads, cpu.frequency, cpu.logs)
   }
@@ -82,17 +82,26 @@ export class Api {
     console.log(queryString)
     console.log("memory response:")
     console.log(response)
-    if(response == null || response.data.memory == null) return null
+    if(response?.data?.memory == null) return null
     let memory = response.data.memory
     return new Memory(memory.serverId, memory.logs)
   }
 
   static async getDisks(startDate: Date, endDate: Date){
+    return await this.getDiskQuery(startDate, endDate)
+  }
+
+  static async getDisk(startDate: Date, endDate: Date, uuid: number){
+    let disks = await this.getDiskQuery(startDate, endDate, uuid)
+    return disks.length > 0 ? disks[0] : null
+  }
+
+  private static async getDiskQuery(startDate: Date, endDate: Date, uuid?: number){
     let startDateString = this.dateToString(startDate)
     let endDateString = this.dateToString(endDate)
-    const queryString = `
+    let queryString = `
     {
-      disk(serverId: 0, startDateTime: ${startDateString}, endDateTime: ${endDateString}) {
+      disk(serverId: 0, startDateTime: ${startDateString}, endDateTime: ${endDateString}, uuid: ${uuid == undefined ? null : `"${uuid}"`}) {
         serverId,
         uuid,
         type,
@@ -116,7 +125,7 @@ export class Api {
     console.log(queryString)
     console.log("disk response:")
     console.log(response)
-    if (response == null || response.data.disk == null) return []
+    if (response?.data?.disk == null) return []
     let disks = response.data.disk
     let result: Disk[] = []
     disks.forEach((d: any) => result.push(new Disk(d.serverId, d.uuid, d.type, d.serial, d.path, d.vendor, d.model, d.bytesTotal, d.partitions)))

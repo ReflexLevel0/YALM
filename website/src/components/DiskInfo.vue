@@ -37,23 +37,39 @@ export default {
       this.$data.disks = []
       disks.forEach(d => {
         this.$data.disks.push(d)
-        this.$data.chartDataDictionary[d.uuid] = {datasets: []}
-        this.$data.chartConfigDictionary[d.uuid] = {
-          startDate: this.$props.startDate,
-          endDate: this.$props.endDate
-        }
-        d.partitions.forEach(p => {
-          ChartHelper.PartitionLogsToDataset(p.logs).datasets.forEach(dataset => this.$data.chartDataDictionary[d.uuid].datasets.push(dataset))
-        })
+        this.$data.chartDataDictionary[d.uuid] = {datasets: this.partitionsToDatasets(d)}
+        this.$data.chartConfigDictionary[d.uuid] = this.getChartConfig(startDate, endDate)
       })
-
       console.log("disks: ")
       console.log(this.$data.disks)
       console.log("chart data dictionary: ")
       console.log(this.$data.chartDataDictionary)
     },
-    async refreshDiskData(startDate, endDate){
 
+    async refreshDiskData(disk){
+      let config = this.$data.chartConfigDictionary[disk.uuid]
+      let newDisk = await Api.getDisk(config.startDate, config.endDate, disk.uuid)
+      if (newDisk == null) {
+        console.log("ERROR IN FETCHING DISK DATA FOR DISK WITH UUID " + disk.uuid)
+        return
+      }
+
+      this.$data.chartDataDictionary[newDisk.uuid] = {datasets: this.partitionsToDatasets(newDisk)}
+      this.$data.chartConfigDictionary[newDisk.uuid] = this.getChartConfig(config.startDate, config.endDate)
+    },
+
+    partitionsToDatasets(disk){
+      let datasets = []
+      disk.partitions.forEach(p => {
+        ChartHelper.PartitionLogsToDataset(p.logs).datasets.forEach(dataset => datasets.push(dataset))
+      })
+      return datasets
+    },
+    getChartConfig(startDate, endDate){
+      return {
+        startDate: startDate,
+          endDate: endDate
+      }
     }
   },
   watch: {
@@ -78,8 +94,8 @@ export default {
         :chart-data="this.$data.chartDataDictionary[d.uuid]"
         @zoom-changed="async (limits) =>
         {
-          $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate;
-          $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate;
+          $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate
+          $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate
           await this.refreshDiskData(d)
         }"
       />
