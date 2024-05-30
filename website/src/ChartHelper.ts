@@ -4,7 +4,7 @@ import { PartitionLog } from "@/models/PartitionLog";
 
 export class ChartHelper {
   static CpuLogsToCpuUsageDataset(logs: CpuLog[]) {
-    if (logs == null) return { datasets: [] }
+    if (logs == null || logs.length === 0) return { datasets: [] }
 
     let points: object[] = [];
     logs.forEach(log => {
@@ -28,7 +28,7 @@ export class ChartHelper {
   }
 
   static CpuLogsToNumberOfTasksDataset(logs: CpuLog[]) {
-    if (logs == null) return { datasets: [] }
+    if (logs == null || logs.length === 0) return { datasets: [] }
 
     let points: object[] = []
     logs.forEach((log) => {
@@ -52,7 +52,7 @@ export class ChartHelper {
   }
 
   static MemoryLogsToDataset(logs: MemoryLog[]){
-    if (logs == null) return {datasets: []}
+    if (logs == null || logs.length === 0) return {datasets: []}
 
     let memoryPoints: object[] = [];
     let swapMemoryPoints: object[] = [];
@@ -100,7 +100,7 @@ export class ChartHelper {
   }
 
   static PartitionLogsToDataset(partitionLabel: string, color: string, logs: PartitionLog[]){
-    if (logs == null) return {datasets: []}
+    if (logs == null || logs.length === 0) return {datasets: []}
 
     let usagePoints: object[] = []
     logs.forEach(l => {
