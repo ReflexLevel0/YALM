@@ -13,6 +13,10 @@
       <EmbeddedResource Include="config.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="server_id.txt" />
+      <EmbeddedResource Include="server_id.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

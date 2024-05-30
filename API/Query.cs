@@ -131,7 +131,7 @@ public class Query(IDbProvider dbProvider)
 	// /// <summary>
 	// /// Returns disk data
 	// /// </summary>
-	public async IAsyncEnumerable<DiskOutput> Disk(int serverId, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
+	public async IAsyncEnumerable<DiskOutput> Disk(int serverId, string? uuid, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
 	{
 		var getEmptyRecordFunc = () => new PartitionLog { Date = DateTime.Now };
 		Func<IList<PartitionLogDbRecord>, PartitionLog> combineLogsFunc = logs =>
@@ -144,9 +144,9 @@ public class Query(IDbProvider dbProvider)
 		//Going through every disk and getting data for it
 		await using (var db = dbProvider.GetDb())
 		{
-			var disks = await 
+			List<DiskDbRecord> disks = await 
 				(from disk in db.Disks 
-					where disk.ServerId == serverId 
+					where disk.ServerId == serverId && (uuid == null || string.CompareOrdinal(disk.Uuid, uuid) == 0)
 					select disk).ToListAsync();
 			foreach (var d in disks)
 			{
