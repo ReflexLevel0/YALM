@@ -1,11 +1,14 @@
 using YALM.API;
+using YALM.API.Alerts;
 using YALM.API.Db;
 using YALM.API.Mutations;
 
+var dbProvider = new MonitoringDbProvider();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-	.AddScoped<IDbProvider>(_ => new MonitoringDbProvider())
-	.AddScoped<IMutationHelper>(_ => new MutationHelper(new MonitoringDbProvider()))
+	.AddScoped<IDbProvider>(_ => dbProvider)
+	.AddScoped<IMutationHelper>(_ => new MutationHelper(dbProvider))
+	.AddSingleton<IAlertHelper>(_ => new AlertHelper(dbProvider))
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
 	.AddMutationType(m => m.Name("Mutation"))

@@ -50,6 +50,7 @@ namespace DataModel
 		public ITable<ServiceLogDbRecord>    ServiceLogs     => this.GetTable<ServiceLogDbRecord>();
 		public ITable<ServicenameDbRecord>   ServiceNames    => this.GetTable<ServicenameDbRecord>();
 		public ITable<ServicestatusDbRecord> ServiceStatuses => this.GetTable<ServicestatusDbRecord>();
+		public ITable<AlertDbRecord>         Alerts          => this.GetTable<AlertDbRecord>();
 	}
 
 	public static partial class ExtensionMethods

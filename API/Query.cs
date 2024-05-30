@@ -1,6 +1,7 @@
 using DataModel;
 using LinqToDB;
 using YALM.API.Db;
+using YALM.API.Db.Models;
 using YALM.Common.Models.Graphql.Logs;
 using YALM.Common.Models.Graphql.OutputModels;
 
@@ -174,6 +175,22 @@ public class Query(IDbProvider dbProvider)
 	
 				yield return disk;
 			}
+		}
+	}
+	
+	// /// <summary>
+	// /// Returns alerts
+	// /// </summary>
+	public async IAsyncEnumerable<AlertOutput> Alert(int? serverId, DateTime? startDateTime, DateTime? endDateTime)
+	{
+		await using var db = dbProvider.GetDb();
+		var alerts = await (from alert in db.Alerts
+			where alert.Serverid == (serverId ?? alert.Serverid) && alert.Date >= (startDateTime ?? DateTime.MinValue) && alert.Date <= (endDateTime ?? DateTime.MaxValue)
+			orderby alert.Date, alert.Serverid
+			select alert).ToListAsync();
+		foreach (var alert in alerts)
+		{
+			yield return new AlertOutput(alert.Serverid, alert.Date, alert.Text);
 		}
 	}
 }

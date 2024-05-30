@@ -16,4 +16,5 @@ public interface IDb : IDataContext
 	public ITable<ServiceLogDbRecord> ServiceLogs { get; }
 	public ITable<ServicenameDbRecord> ServiceNames { get; }
 	public ITable<ServicestatusDbRecord> ServiceStatuses { get; }
+	ITable<AlertDbRecord> Alerts { get; }
 }
