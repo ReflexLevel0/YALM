@@ -9,7 +9,7 @@ public class DatasetHelper<TDbLog, TLog>(Func<IList<TDbLog>, TLog> combineLogsFu
 	public string Hash { get; } = hash;
 	private DateTime? _nextDate;
 	private readonly List<TDbLog> _logs = new();
-	private int _intervalSum;
+	private double _intervalSum;
 	private bool _break;
 
 	/// <summary>
@@ -18,7 +18,7 @@ public class DatasetHelper<TDbLog, TLog>(Func<IList<TDbLog>, TLog> combineLogsFu
 	/// <param name="log"></param>
 	/// <param name="interval"></param>
 	/// <returns></returns>
-	public IEnumerable<TLog?> AddLog(TDbLog log, int? interval)
+	public IEnumerable<TLog?> AddLog(TDbLog log, double? interval)
 	{
 		//Combining logs and adding additional logs if there has been some kind of a break
 		//between the last log and the current one so that the charts goes to 0 in case of break

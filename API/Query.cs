@@ -17,7 +17,7 @@ public class Query(IDbProvider dbProvider)
 	/// <param name="interval">Interval that specifies time distance between two logs. If interval is null, then interval is decided dynamically (interval=1 minute for every hour between <param name="startDateTime"></param> and <param name="endDateTime"></param>).</param>
 	/// <param name="method">Method for combining multiple logs into one (min, max, avg, etc.)</param>
 	/// <returns></returns>
-	public async Task<CpuOutput?> Cpu(int serverId, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
+	public async Task<CpuOutput?> Cpu(int serverId, DateTime? startDateTime, DateTime? endDateTime, double? interval, string? method)
 	{
 		var getEmptyRecordFunc = () => new CpuLog();
 		Func<IList<CpuLogDbRecord>, CpuLog> combineLogsFunc = logs =>
@@ -57,7 +57,7 @@ public class Query(IDbProvider dbProvider)
 	/// <param name="interval">Interval that specifies time distance between two logs. If interval is null, then interval is decided dynamically (interval=1 minute for every hour between <param name="startDateTime"></param> and <param name="endDateTime"></param>).</param>
 	/// <param name="method">Method for combining multiple logs into one (min, max, avg, etc.)</param>
 	/// <returns></returns>
-	public async Task<MemoryOutput> Memory(int serverId, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
+	public async Task<MemoryOutput> Memory(int serverId, DateTime? startDateTime, DateTime? endDateTime, double? interval, string? method)
 	{
 		var getEmptyRecordFunc = () => new MemoryLog { Date = DateTime.Now };
 		Func<IList<MemoryLogDbRecord>, MemoryLog> combineLogsFunc = logs =>
@@ -99,7 +99,7 @@ public class Query(IDbProvider dbProvider)
 	/// <summary>
 	/// Returns program logs
 	/// </summary>
-	public async Task<ProgramOutput> Program(int serverId, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
+	public async Task<ProgramOutput> Program(int serverId, DateTime? startDateTime, DateTime? endDateTime, double? interval, string? method)
 	{
 		var getEmptyRecordFunc = () => new ProgramLog { Name = "", Date = DateTime.Now };
 		Func<IList<ProgramLogDbRecord>, ProgramLog> combineLogsFunc = logs =>
@@ -131,7 +131,7 @@ public class Query(IDbProvider dbProvider)
 	// /// <summary>
 	// /// Returns disk data
 	// /// </summary>
-	public async IAsyncEnumerable<DiskOutput> Disk(int serverId, string? uuid, DateTime? startDateTime, DateTime? endDateTime, int? interval, string? method)
+	public async IAsyncEnumerable<DiskOutput> Disk(int serverId, string? uuid, DateTime? startDateTime, DateTime? endDateTime, double? interval, string? method)
 	{
 		var getEmptyRecordFunc = () => new PartitionLog { Date = DateTime.Now };
 		Func<IList<PartitionLogDbRecord>, PartitionLog> combineLogsFunc = logs =>

@@ -64,21 +64,22 @@ public class QueryHelper
 	/// <param name="startDate">Starting date for interval calculation</param>
 	/// <param name="endDate">Ending date for interval calculation</param>
 	/// <returns></returns>
-	public static async Task<int> CalculateInterval(IQueryable<ILog> table, DateTime? startDate, DateTime? endDate)
+	public static async Task<double> CalculateInterval(IQueryable<ILog> table, DateTime? startDate, DateTime? endDate)
 	{
-		if (startDate == null)
-		{
-			var query = from l in table orderby l.Date select l.Date;
-			startDate = await query.FirstOrDefaultAsync();
-		}
+		var startDateQuery = 
+			from l in table 
+			where l.Date >= (startDate == null ? startDate : DateTime.MinValue) 
+			orderby l.Date select l.Date;
+		startDate = await startDateQuery.FirstOrDefaultAsync();
+		
+		var endDateQuery = 
+			from l in table
+			where l.Date <= (endDate == null ? endDate : DateTime.MaxValue)
+			orderby l.Date descending select l.Date;
+		endDate = await endDateQuery.FirstOrDefaultAsync();
 
-		if (endDate == null)
-		{
-			var query = from l in table orderby l.Date descending select l.Date;
-			endDate = await query.FirstOrDefaultAsync();
-		}
-
-		return (int)((DateTime)endDate).Subtract((DateTime)startDate).TotalHours;
+		double interval = (int)((DateTime)endDate).Subtract((DateTime)startDate).TotalHours;
+		return interval;
 	}
 
 	/// <summary>
@@ -101,7 +102,7 @@ public class QueryHelper
 		Func<TDbLog, string> calculateHash,
 		DateTime? startDateTime,
 		DateTime? endDateTime,
-		int? interval) where TDbLog : ILog where TLog : LogBase
+		double? interval) where TDbLog : ILog where TLog : LogBase
 	{
 		var limits = new List<DatasetHelper<TDbLog, TLog>>();
 
