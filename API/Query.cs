@@ -195,4 +195,18 @@ public class Query(IDbProvider dbProvider)
 			yield return new AlertOutput(alert.Serverid, alert.Date, (AlertSeverity)alert.Severity, alert.Text);
 		}
 	}
+
+	/// <summary>
+	/// Returns server status
+	/// </summary>
+	public async IAsyncEnumerable<ServerOutput> Server(int? serverId)
+	{
+		await using var db = dbProvider.GetDb();
+		var statusList = await (from s in db.ServerStatus where s.Serverid == (serverId ?? s.Serverid) select s).ToListAsync();
+		foreach (var status in statusList)
+		{
+			Console.WriteLine($"{status.Serverid} {status.Status}");
+			yield return new ServerOutput{ServerId = status.Serverid, Online = string.CompareOrdinal(status.Status, "online") == 0};
+		}
+	}
 }

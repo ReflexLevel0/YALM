@@ -123,6 +123,26 @@ CREATE TABLE servicelog
     PRIMARY KEY (serverid, serviceid, date, messagetext)
 );
 
+CREATE TABLE server(
+	serverid integer NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE serverlog(
+	serverid integer NOT NULL,
+	date timestamp NOT NULL,
+	interval integer NOT NULL,
+	PRIMARY KEY (serverid, date),
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
+);
+
+CREATE VIEW serverStatus AS
+SELECT serverid, (SELECT CASE WHEN COUNT(*) > 0 THEN 'online' ELSE 'offline' END
+                  FROM serverlog
+                  WHERE
+                      serverlog.serverid = server.serverid AND
+                      EXTRACT(EPOCH FROM timezone('utc', now())-serverlog.date) < (serverlog.interval * 60)) as status
+FROM server;
+
 CREATE TABLE alert
 (
     serverId integer NOT NULL,
@@ -154,19 +174,6 @@ CREATE TRIGGER before_alert_insert
     FOR EACH ROW
     EXECUTE FUNCTION before_alert_insert_func();
 
---CREATE PROCEDURE update_server_status()
---LANGUAGE plpgsql
---AS $$
---BEGIN
---    DELETE FROM alert WHERE 1=1;
---END;
---$$;
-
---DROP EXTENSION pg_cron;
---CREATE EXTENSION pg_cron;
---SELECT cron.schedule('process-updates', '5 seconds', 'CALL update_server_status()');
---SELECT * FROM cron.job;
-
 -- testing alerts
 DELETE FROM alert WHERE 1=1;
 INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-05-30 00:00:00', 3, 'Cpu usage above 90%');
@@ -175,4 +182,12 @@ INSERT INTO alert(serverId, date, severity, text) VALUES(1, '2024-05-30 02:00:00
 INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-05-30 02:15:00', 2, 'Memory usage above 50%');
 -- INSERT INTO alert(serverId, date, text) VALUES(0, '2024-05-30 02:15:00', '[WARNING] Cpu usage above 90%');
 INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-06-02 12:33:33', 1, 'This is an info message');
-SELECT * FROM alert;
+
+-- testing server status
+INSERT INTO server VALUES(0),(1);
+INSERT INTO serverlog(serverid, date, interval) VALUES(0, now()::timestamp-interval '660 seconds', 5),
+                                                      (0, now()::timestamp-interval '360 seconds', 5),
+                                                      (0, now()::timestamp-interval '60 seconds', 5);
+INSERT INTO serverlog(serverid, date, interval) VALUES(1, now()::timestamp-interval '630 seconds', 5),
+                                                      (1, now()::timestamp-interval '330 seconds', 5);
+SELECT * FROM serverstatus;
