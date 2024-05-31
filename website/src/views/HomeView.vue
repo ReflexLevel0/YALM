@@ -62,6 +62,9 @@ export default {
 </template>
 
 <style scoped>
+.summary{
+  margin-top: 20px;
+}
 @media screen and (min-width: 1000px) {
   .summary{
     max-height: 90vh;

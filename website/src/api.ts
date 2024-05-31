@@ -3,6 +3,7 @@ import { Cpu } from "@/models/Cpu";
 import { Memory } from "@/models/Memory";
 import { Disk } from "@/models/Disk";
 import { Alert } from "@/models/Alert";
+import { Server } from "@/models/Server";
 
 export class Api {
   static async executeQuery(queryString: string) {
@@ -152,5 +153,24 @@ export class Api {
     let alerts: Alert[] = []
     response.data.alert.forEach((a: any) => alerts.push(a))
     return alerts
+  }
+
+  static async getServers(){
+    let queryString = `
+    query {
+      server {
+        serverId
+        online
+      }
+    }`
+
+    let response = await this.executeQuery(queryString)
+    console.log(queryString)
+    console.log("server response:")
+    console.log(response)
+    if (response?.data?.server == null) return []
+    let servers: Server[] = []
+    response.data.server.forEach((s: any) => servers.push(s))
+    return servers
   }
 }
