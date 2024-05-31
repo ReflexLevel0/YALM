@@ -2,8 +2,8 @@
 import { Api } from "@/api";
 import { Disk } from "@/models/Disk";
 import Chart from "@/components/Chart.vue";
-import { VueCollapsiblePanel, VueCollapsiblePanelGroup } from "@dafcoe/vue-collapsible-panel";
 import { ChartHelper } from "@/ChartHelper";
+import Fieldset from "primevue/fieldset";
 
 export default {
   computed: {
@@ -25,8 +25,7 @@ export default {
   },
   components: {
     Chart,
-    VueCollapsiblePanel,
-    VueCollapsiblePanelGroup
+    Fieldset
   },
   async mounted(){
     await this.refreshAllData(this.$props.startDate, this.$props.endDate)
@@ -95,23 +94,21 @@ export default {
 </script>
 
 <template>
-  <VueCollapsiblePanel v-for="d in disks">
-    <template #title>{{d.uuid}}</template>
-    <template #content>
-      ===
+  <Fieldset legend="Disks" :toggleable="true">
+    <Fieldset v-for="d in disks" :legend="d.uuid" :toggleable="true">
       <Chart
         name="Disk usage"
         :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
         :chart-data="this.$data.chartDataDictionary[d.uuid]"
         @zoom-changed="async (limits) =>
-        {
-          $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate
-          $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate
-          await this.refreshDiskData(d)
-        }"
+          {
+            $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate
+            $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate
+            await this.refreshDiskData(d)
+          }"
       />
-    </template>
-  </VueCollapsiblePanel>
+    </Fieldset>
+  </Fieldset>
 </template>
 
 <style scoped>

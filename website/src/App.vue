@@ -38,21 +38,29 @@ export default {
 <template>
   <nav style="margin-bottom: 20px">
     <div class="card">
+
+      <!--main manu-->
       <Menubar :model="menu_items">
         <template #item="{item, props, hasSubmenu}">
+
+          <!--creating a router link in case the item has a route-->
           <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
             <a :href="href" v-bind="props.action" @click="navigate">
               <span :class="item.icon" style="margin-right: 10px;" />
               <span class="ml-2">{{ item.label }}</span>
             </a>
           </router-link>
+
+          <!--creating a normal item in case the item has no route-->
           <a v-else :href="item.url" :target="item.target" v-bind="props.action">
             <span :class="item.icon" style="margin-right: 10px;" />
             <span class="ml-2">{{ item.label }}</span>
             <span v-if="hasSubmenu" class="pi pi-fw pi-angle-down ml-2" />
           </a>
+
         </template>
       </Menubar>
+
     </div>
   </nav>
   <main>

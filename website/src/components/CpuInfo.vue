@@ -3,6 +3,7 @@ import { Cpu } from "@/models/Cpu";
 import { Api } from "@/api";
 import Chart from "@/components/Chart.vue";
 import { ChartHelper } from "@/ChartHelper";
+import Fieldset from "primevue/fieldset";
 
 export default {
   computed: {
@@ -30,7 +31,8 @@ export default {
     endDate: null
   },
   components: {
-    Chart
+    Chart,
+    Fieldset
   },
   methods: {
     //Refreshing all CPU data
@@ -75,7 +77,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <Fieldset legend="CPU" :toggleable="true">
     <!-- Displaying generic CPU data if it has been loaded -->
     <div v-if="cpu !== null">
       <p>{{ $data.cpu.name }}</p>
@@ -112,5 +114,5 @@ export default {
           await this.refreshNumberOfTasksChart(true)
         }"
     />
-  </div>
+  </Fieldset>
 </template>
