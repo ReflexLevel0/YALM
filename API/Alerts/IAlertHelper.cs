@@ -1,5 +1,4 @@
 using YALM.Common;
-using YALM.Common.Models.Graphql.OutputModels;
 
 namespace YALM.API.Alerts;
 

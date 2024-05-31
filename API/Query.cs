@@ -1,8 +1,6 @@
 using DataModel;
 using LinqToDB;
-using YALM.API.Alerts;
 using YALM.API.Db;
-using YALM.API.Db.Models;
 using YALM.Common;
 using YALM.Common.Models.Graphql.Logs;
 using YALM.Common.Models.Graphql.OutputModels;
@@ -205,7 +203,6 @@ public class Query(IDbProvider dbProvider)
 		var statusList = await (from s in db.ServerStatus where s.Serverid == (serverId ?? s.Serverid) select s).ToListAsync();
 		foreach (var status in statusList)
 		{
-			Console.WriteLine($"{status.Serverid} {status.Status}");
 			yield return new ServerOutput{ServerId = status.Serverid, Online = string.CompareOrdinal(status.Status, "online") == 0};
 		}
 	}
