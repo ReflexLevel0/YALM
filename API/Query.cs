@@ -203,7 +203,7 @@ public class Query(IDbProvider dbProvider)
 		var statusList = await (from s in db.ServerStatus where s.Serverid == (serverId ?? s.Serverid) select s).ToListAsync();
 		foreach (var status in statusList)
 		{
-			yield return new ServerOutput{ServerId = status.Serverid, Online = string.CompareOrdinal(status.Status, "online") == 0};
+			yield return new ServerOutput(status.Serverid, string.CompareOrdinal(status.Status, "online") == 0);
 		}
 	}
 }

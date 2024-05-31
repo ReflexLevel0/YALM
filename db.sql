@@ -1,6 +1,26 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
+CREATE TABLE server(
+	serverid integer NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE serverlog(
+	serverid integer NOT NULL,
+	date timestamp NOT NULL,
+	interval integer NOT NULL,
+	PRIMARY KEY (serverid, date),
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
+);
+
+CREATE VIEW serverStatus AS
+SELECT serverid, (SELECT CASE WHEN COUNT(*) > 0 THEN 'online' ELSE 'offline' END
+                  FROM serverlog
+                  WHERE
+                      serverlog.serverid = server.serverid AND
+                      EXTRACT(EPOCH FROM timezone('utc', now())-serverlog.date) < (serverlog.interval * 60)) as status
+FROM server;
+
 CREATE TABLE cpu
 (
     serverid     integer PRIMARY KEY,
@@ -8,7 +28,8 @@ CREATE TABLE cpu
     architecture varchar(256),
     cores        integer,
     threads      integer,
-    frequencyMHz integer
+    frequencyMHz integer,
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
 
 CREATE TABLE cpuLog
@@ -19,7 +40,7 @@ CREATE TABLE cpuLog
     usage         numeric,
     numberoftasks integer,
     PRIMARY KEY (serverid, date),
-    FOREIGN KEY (serverId) REFERENCES cpu (serverId)
+    FOREIGN KEY (serverId) REFERENCES server(serverid)
 );
 
 CREATE TABLE programLog
@@ -30,7 +51,8 @@ CREATE TABLE programLog
     interval                    integer      NOT NULL,
     cpuutilizationpercentage    numeric,
     memoryutilizationpercentage numeric,
-    PRIMARY KEY (serverid, date, name)
+    PRIMARY KEY (serverid, date, name),
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
 
 CREATE TABLE memoryLog
@@ -46,7 +68,8 @@ CREATE TABLE memoryLog
     swapUsedKb  bigint, --used swap memory
     availableKb bigint, --memory that isn't used (including unused swap memory)
     cachedKb    bigint, --cached memory
-    PRIMARY KEY (serverid, date)
+    PRIMARY KEY (serverid, date),
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
 
 CREATE TABLE disk
@@ -59,7 +82,8 @@ CREATE TABLE disk
     vendor     VARCHAR(256),     --manufacturer of the disk (ex: ATA)
     model      VARCHAR(256),     --disk name (ex: Samsung EVO 970)
     bytesTotal BIGINT,           --size of the disk in bytes
-    PRIMARY KEY (uuid, serverid)
+    PRIMARY KEY (uuid, serverid),
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
 
 CREATE TABLE partition
@@ -73,7 +97,8 @@ CREATE TABLE partition
     mountpath         varchar(1024),
     UNIQUE (serverId, uuid),
     PRIMARY KEY (serverId, uuid),
-    FOREIGN KEY (diskUuid, serverId) REFERENCES disk (uuid, serverId) ON DELETE CASCADE
+    FOREIGN KEY (diskUuid, serverId) REFERENCES disk (uuid, serverId) ON DELETE CASCADE,
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
 
 CREATE TABLE partitionLog
@@ -85,7 +110,8 @@ CREATE TABLE partitionLog
     bytestotal    bigint,
     usage         decimal(3, 2),
     PRIMARY KEY (serverId, partitionUuid, date),
-    FOREIGN KEY (serverId, partitionUuid) REFERENCES partition (serverId, uuid) ON DELETE CASCADE
+    FOREIGN KEY (serverId, partitionUuid) REFERENCES partition (serverId, uuid) ON DELETE CASCADE,
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
 
 CREATE TABLE servicename
@@ -110,7 +136,8 @@ CREATE TABLE service
     statusid          integer REFERENCES servicestatus,
     tasks             integer,
     cpuseconds        numeric,
-    PRIMARY KEY (serverid, serviceid, date)
+    PRIMARY KEY (serverid, serviceid, date),
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
 
 CREATE TABLE servicelog
@@ -120,28 +147,9 @@ CREATE TABLE servicelog
     interval    integer       NOT NULL,
     date        timestamp     NOT NULL,
     messagetext varchar(1024) NOT NULL,
-    PRIMARY KEY (serverid, serviceid, date, messagetext)
-);
-
-CREATE TABLE server(
-	serverid integer NOT NULL PRIMARY KEY
-);
-
-CREATE TABLE serverlog(
-	serverid integer NOT NULL,
-	date timestamp NOT NULL,
-	interval integer NOT NULL,
-	PRIMARY KEY (serverid, date),
+    PRIMARY KEY (serverid, serviceid, date, messagetext),
 	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
-
-CREATE VIEW serverStatus AS
-SELECT serverid, (SELECT CASE WHEN COUNT(*) > 0 THEN 'online' ELSE 'offline' END
-                  FROM serverlog
-                  WHERE
-                      serverlog.serverid = server.serverid AND
-                      EXTRACT(EPOCH FROM timezone('utc', now())-serverlog.date) < (serverlog.interval * 60)) as status
-FROM server;
 
 CREATE TABLE alert
 (
@@ -149,7 +157,8 @@ CREATE TABLE alert
     date timestamp NOT NULL,
 	severity int NOT NULL,
     text varchar(256) NOT NULL,
-    primary key (serverId, date, text)
+    primary key (serverId, date, text),
+	FOREIGN KEY (serverid) REFERENCES server(serverid)
 );
 
 CREATE OR REPLACE FUNCTION before_alert_insert_func()
@@ -174,7 +183,7 @@ CREATE TRIGGER before_alert_insert
     FOR EACH ROW
     EXECUTE FUNCTION before_alert_insert_func();
 
--- testing alerts
+/*-- testing alerts
 DELETE FROM alert WHERE 1=1;
 INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-05-30 00:00:00', 3, 'Cpu usage above 90%');
 INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-05-30 01:30:00', 3, 'Cpu usage above 90%');
@@ -182,6 +191,7 @@ INSERT INTO alert(serverId, date, severity, text) VALUES(1, '2024-05-30 02:00:00
 INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-05-30 02:15:00', 2, 'Memory usage above 50%');
 -- INSERT INTO alert(serverId, date, text) VALUES(0, '2024-05-30 02:15:00', '[WARNING] Cpu usage above 90%');
 INSERT INTO alert(serverId, date, severity, text) VALUES(0, '2024-06-02 12:33:33', 1, 'This is an info message');
+SELECT * FROM alert;
 
 -- testing server status
 INSERT INTO server VALUES(0),(1);
@@ -191,3 +201,7 @@ INSERT INTO serverlog(serverid, date, interval) VALUES(0, now()::timestamp-inter
 INSERT INTO serverlog(serverid, date, interval) VALUES(1, now()::timestamp-interval '630 seconds', 5),
                                                       (1, now()::timestamp-interval '330 seconds', 5);
 SELECT * FROM serverstatus;
+
+select * from partitionlog;*/
+
+select * from server;

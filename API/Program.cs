@@ -18,7 +18,8 @@ builder.Services
 	.AddType<PartitionMutation>()
 	.AddType<PartitionLogMutation>()
 	.AddType<ProgramLogMutation>()
-	.AddType<DiskMutation>();
+	.AddType<DiskMutation>()
+	.AddType<ServerMutation>();
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAll", b =>

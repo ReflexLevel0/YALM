@@ -1,7 +1,6 @@
 namespace YALM.Common.Models.Graphql.OutputModels;
 
-public class ServerOutput
+public class ServerOutput(int serverId, bool online) : ServerOutputBase(serverId)
 {
-	public int ServerId { get; set; }
-	public bool Online { get; set; }
+	public bool Online { get; set; } = online;
 }

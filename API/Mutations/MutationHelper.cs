@@ -98,7 +98,7 @@ public class MutationHelper(IDbProvider dbProvider) : IMutationHelper
 			break;
 		}
 	
-		return new Payload<List<TOutput>>{Data = payloadList, Error = error};
+		return new Payload<List<TOutput>>{Data = payloadList, Error = error.Length == 0 ? null : error};
 	}
 	
 	private static string GenerateInsertError(string? type) => $"Failed to insert {type ?? "object"}";

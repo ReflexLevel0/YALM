@@ -27,6 +27,14 @@ public class ApiHelper
         var variableStringBuilder = new StringBuilder(256);
         var queryStringBuilder = new StringBuilder(1024);
 
+        variableStringBuilder.Append("$server: ServerInput!,");
+        queryStringBuilder.AppendLine("""
+                                        addOrReplaceServer(server: $server){
+                                          error
+                                        }
+                                      """);
+        variables.Server = new ServerInput(_serverId);
+        
         if (log.CpuInfo != null)
         {
             variableStringBuilder.Append("$cpu: CpuInput!,");
