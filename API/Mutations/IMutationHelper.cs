@@ -29,8 +29,4 @@ public interface IMutationHelper
 
     Task<Payload<TOutput>> DeleteModelAsync<TIdInput, TDbModel, TOutput>(
         TIdInput modelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
-    
-    string GetGenericDatabaseErrorString() => "Database error";
-    
-    string DateToString(DateTime date);
 }

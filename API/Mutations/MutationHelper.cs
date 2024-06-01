@@ -8,6 +8,8 @@ namespace YALM.API.Mutations;
 
 public class MutationHelper(IDbProvider dbProvider) : IMutationHelper
 {
+	private const string GenericDatabaseErrorString = "Database error";
+	
 	public async Task<Payload<TOutput>> AddModelAsync<TIdInput, TDbModel, TOutput>(TDbModel model, TIdInput modelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull 
 	{
 		try
@@ -17,7 +19,7 @@ public class MutationHelper(IDbProvider dbProvider) : IMutationHelper
 		}
 		catch
 		{
-			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
+			return new Payload<TOutput> { Error = GenericDatabaseErrorString };
 		}
 	}
 
@@ -38,7 +40,7 @@ public class MutationHelper(IDbProvider dbProvider) : IMutationHelper
 		catch(Exception ex)
 		{
 			Console.WriteLine(ex.Message);
-			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
+			return new Payload<TOutput> { Error = GenericDatabaseErrorString };
 		}
 	}
 
@@ -59,7 +61,7 @@ public class MutationHelper(IDbProvider dbProvider) : IMutationHelper
 		}
 		catch
 		{
-			return new Payload<TOutput> { Error = GetGenericDatabaseErrorString() };
+			return new Payload<TOutput> { Error = GenericDatabaseErrorString };
 		}
 	}
 
@@ -103,8 +105,4 @@ public class MutationHelper(IDbProvider dbProvider) : IMutationHelper
 	}
 	
 	private static string GenerateInsertError(string? type) => $"Failed to insert {type ?? "object"}";
-
-	public string GetGenericDatabaseErrorString() => "Database error";
-	
-	public string DateToString(DateTime date) => date.ToString("yyyy-MM-dd HH:mm:ss");
 }

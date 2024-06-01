@@ -66,19 +66,21 @@ public class QueryHelper
 	/// <returns></returns>
 	public static async Task<double> CalculateInterval(IQueryable<ILog> table, DateTime? startDate, DateTime? endDate)
 	{
+		var sd = startDate ?? DateTime.MinValue;
 		var startDateQuery = 
 			from l in table 
-			where l.Date >= (startDate == null ? startDate : DateTime.MinValue) 
+			where l.Date >= sd 
 			orderby l.Date select l.Date;
 		startDate = await startDateQuery.FirstOrDefaultAsync();
-		
-		var endDateQuery = 
+
+		var ed = endDate ?? DateTime.MaxValue;
+		var endDateQuery =
 			from l in table
-			where l.Date <= (endDate == null ? endDate : DateTime.MaxValue)
+			where l.Date <= ed
 			orderby l.Date descending select l.Date;
 		endDate = await endDateQuery.FirstOrDefaultAsync();
 
-		double interval = (int)((DateTime)endDate).Subtract((DateTime)startDate).TotalHours;
+		double interval = (int)((DateTime)endDate).Subtract((DateTime)startDate).TotalHours + 1;
 		return interval;
 	}
 
