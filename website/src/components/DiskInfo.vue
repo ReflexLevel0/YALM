@@ -1,6 +1,5 @@
 <script>
 import { Api } from "@/api";
-import { Disk } from "@/models/Disk";
 import Chart from "@/components/Chart.vue";
 import { ChartHelper } from "@/ChartHelper";
 import Fieldset from "primevue/fieldset";

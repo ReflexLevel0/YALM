@@ -30,7 +30,7 @@ public class Query(IDbProvider dbProvider)
 		};
 		
 		var cpuOutput = new CpuOutput(serverId);
-		await using (var db = dbProvider.GetDb())
+		await using var db = dbProvider.GetDb();
 		{
 			var cpu = await (from c in db.Cpus where c.ServerId == serverId select c).FirstOrDefaultAsync();
 			if (cpu == null) return null;
@@ -86,12 +86,10 @@ public class Query(IDbProvider dbProvider)
 		};
 		
 		var memoryOutput = new MemoryOutput(serverId);
-		await using (var db = dbProvider.GetDb())
+		await using var db = dbProvider.GetDb();
+		await foreach (var log in QueryHelper.GetLogs(db.MemoryLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
 		{
-			await foreach (var log in QueryHelper.GetLogs(db.MemoryLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
-			{
-				memoryOutput.Logs.Add(log);
-			}
+			memoryOutput.Logs.Add(log);
 		}
 
 		return memoryOutput;
@@ -118,12 +116,10 @@ public class Query(IDbProvider dbProvider)
 
 		var programOutput = new ProgramOutput(serverId);
 
-		await using (var db = dbProvider.GetDb())
+		await using var db = dbProvider.GetDb();
+		await foreach (var log in QueryHelper.GetLogs(db.ProgramLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
 		{
-			await foreach (var log in QueryHelper.GetLogs(db.ProgramLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
-			{
-				programOutput.Logs.Add(log);
-			}
+			programOutput.Logs.Add(log);
 		}
 
 		return programOutput;
@@ -143,38 +139,36 @@ public class Query(IDbProvider dbProvider)
 		};
 	
 		//Going through every disk and getting data for it
-		await using (var db = dbProvider.GetDb())
+		await using var db = dbProvider.GetDb();
+		List<DiskDbRecord> disks = await 
+			(from disk in db.Disks 
+				where disk.ServerId == serverId && (uuid == null || string.CompareOrdinal(disk.Uuid, uuid) == 0)
+				select disk).ToListAsync();
+		foreach (var d in disks)
 		{
-			List<DiskDbRecord> disks = await 
-				(from disk in db.Disks 
-					where disk.ServerId == serverId && (uuid == null || string.CompareOrdinal(disk.Uuid, uuid) == 0)
-					select disk).ToListAsync();
-			foreach (var d in disks)
+			var partitions = await 
+				(from p in db.Partitions 
+					where p.Diskuuid == d.Uuid && p.Serverid == d.ServerId
+					select p).ToListAsync();
+	
+			var disk = new DiskOutput(d.ServerId, d.Uuid, d.Type, d.Serial, d.Path, d.Vendor, d.Model, d.BytesTotal);
+			foreach (var partition in partitions)
 			{
-				var partitions = await 
-					(from p in db.Partitions 
-						where p.Diskuuid == d.Uuid && p.Serverid == d.ServerId
-						select p).ToListAsync();
-	
-				var disk = new DiskOutput(d.ServerId, d.Uuid, d.Type, d.Serial, d.Path, d.Vendor, d.Model, d.BytesTotal);
-				foreach (var partition in partitions)
-				{
-					var partitionOutput = (PartitionOutput)Convert.ChangeType(partition, typeof(PartitionOutput));
-					disk.Partitions.Add(partitionOutput);
+				var partitionOutput = (PartitionOutput)Convert.ChangeType(partition, typeof(PartitionOutput));
+				disk.Partitions.Add(partitionOutput);
 				
-					//Getting all logs for this partition
-					var partitionLogs = 
-						from l in db.PartitionLogs
-						where l.Serverid == partition.Serverid && l.Partitionuuid == partition.Uuid
-						select l;
-					await foreach(var log in QueryHelper.GetLogs(partitionLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
-					{
-						partitionOutput.Logs.Add(log);
-					}
+				//Getting all logs for this partition
+				var partitionLogs = 
+					from l in db.PartitionLogs
+					where l.Serverid == partition.Serverid && l.Partitionuuid == partition.Uuid
+					select l;
+				await foreach(var log in QueryHelper.GetLogs(partitionLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+				{
+					partitionOutput.Logs.Add(log);
 				}
-	
-				yield return disk;
 			}
+	
+			yield return disk;
 		}
 	}
 	

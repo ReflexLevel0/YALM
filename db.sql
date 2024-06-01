@@ -7,7 +7,7 @@ CREATE TABLE server(
 
 CREATE TABLE serverlog(
 	serverid integer NOT NULL,
-	date timestamp NOT NULL,
+	date timestamp with time zone NOT NULL,
 	interval integer NOT NULL,
 	PRIMARY KEY (serverid, date),
 	FOREIGN KEY (serverid) REFERENCES server(serverid)
@@ -35,7 +35,7 @@ CREATE TABLE cpu
 CREATE TABLE cpuLog
 (
     serverid      integer   NOT NULL,
-    date          timestamp NOT NULL,
+    date          timestamp with time zone NOT NULL,
     interval      integer   NOT NULL,
     usage         numeric,
     numberoftasks integer,
@@ -46,7 +46,7 @@ CREATE TABLE cpuLog
 CREATE TABLE programLog
 (
     serverid                    integer      NOT NULL,
-    date                        timestamp    NOT NULL,
+    date                        timestamp with time zone    NOT NULL,
     name                        varchar(255) NOT NULL,
     interval                    integer      NOT NULL,
     cpuutilizationpercentage    numeric,
@@ -58,7 +58,7 @@ CREATE TABLE programLog
 CREATE TABLE memoryLog
 (
     serverid    integer   NOT NULL,
-    date        timestamp NOT NULL,
+    date        timestamp with time zone NOT NULL,
     interval    bigint    NOT NULL,
     totalKb     bigint, --memory size (excluding swap size) 
     freeKb      bigint, --memory that isn't used or cached
@@ -105,7 +105,7 @@ CREATE TABLE partitionLog
 (
     serverId      integer     NOT NULL,
     partitionUuid varchar(64) NOT NULL,
-    date          timestamp   NOT NULL,
+    date          timestamp with time zone  NOT NULL,
     interval      integer     NOT NULL,
     bytestotal    bigint,
     usage         decimal(3, 2),
@@ -130,7 +130,7 @@ CREATE TABLE service
 (
     serverid          integer   NOT NULL,
     serviceid         integer   NOT NULL REFERENCES servicename,
-    date              timestamp NOT NULL,
+    date              timestamp with time zone NOT NULL,
     interval          integer   NOT NULL,
     ramusagemegabytes integer,
     statusid          integer REFERENCES servicestatus,
@@ -145,7 +145,7 @@ CREATE TABLE servicelog
     serverid    integer       NOT NULL,
     serviceid   integer       NOT NULL REFERENCES servicename,
     interval    integer       NOT NULL,
-    date        timestamp     NOT NULL,
+    date        timestamp with time zone    NOT NULL,
     messagetext varchar(1024) NOT NULL,
     PRIMARY KEY (serverid, serviceid, date, messagetext),
 	FOREIGN KEY (serverid) REFERENCES server(serverid)
@@ -154,7 +154,7 @@ CREATE TABLE servicelog
 CREATE TABLE alert
 (
     serverId integer NOT NULL,
-    date timestamp NOT NULL,
+    date timestamp with time zone NOT NULL,
 	severity int NOT NULL,
     text varchar(256) NOT NULL,
     primary key (serverId, date, text),
