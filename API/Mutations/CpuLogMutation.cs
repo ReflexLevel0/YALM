@@ -1,7 +1,7 @@
 using DataModel;
 using HotChocolate.Language;
 using YALM.API.Alerts;
-using YALM.API.Db;
+using YALM.API.Db.Models;
 using YALM.Common;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
@@ -10,10 +10,10 @@ using YALM.Common.Models.Graphql.Logs;
 namespace YALM.API.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
-public class CpuLogMutation(IDbProvider dbProvider, IMutationHelper mutationHelper, IAlertHelper alertHelper)
+public class CpuLogMutation(IMutationHelper mutationHelper, IAlertHelper alertHelper)
 {
-	private readonly Func<CpuLogIdInput, IQueryable<CpuLogDbRecord>> _getCpuLogQuery = cpuLog =>
-        from c in dbProvider.GetDb().CpuLogs
+    private readonly Func<IDb, CpuLogIdInput, IQueryable<CpuLogDbRecord>> _getCpuLogQuery = (db, cpuLog) => 
+        from c in db.CpuLogs
         where c.ServerId == cpuLog.ServerId && c.Date == cpuLog.Date
         select c;
 

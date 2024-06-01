@@ -1,6 +1,6 @@
 using DataModel;
 using HotChocolate.Language;
-using YALM.API.Db;
+using YALM.API.Db.Models;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.OutputModels;
@@ -8,10 +8,10 @@ using YALM.Common.Models.Graphql.OutputModels;
 namespace YALM.API.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
-public class DiskMutation(IDbProvider dbProvider, IMutationHelper mutationHelper)
+public class DiskMutation(IMutationHelper mutationHelper)
 {
-	private readonly Func<DiskIdInput, IQueryable<DiskDbRecord>> _getDiskQuery = disk =>
-		from d in dbProvider.GetDb().Disks
+	private readonly Func<IDb, DiskIdInput, IQueryable<DiskDbRecord>> _getDiskQuery = (db, disk) =>
+		from d in db.Disks
 		where d.ServerId == disk.ServerId && string.CompareOrdinal(d.Uuid, disk.Uuid) == 0
 		select d;
 

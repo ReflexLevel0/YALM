@@ -11,8 +11,8 @@ namespace YALM.API.Mutations;
 [ExtendObjectType(OperationType.Mutation)]
 public class ServerMutation(IMutationHelper mutationHelper, IDbProvider dbProvider)
 {
-	private readonly Func<ServerInput, IQueryable<ServerDbRecord>> _getServerQuery = server =>
-		from s in dbProvider.GetDb().Servers
+	private readonly Func<IDb, ServerInput, IQueryable<ServerDbRecord>> _getServerQuery = (db, server) =>
+		from s in db.Servers
 		where s.ServerId == server.ServerId
 		select s;
 

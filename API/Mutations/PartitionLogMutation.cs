@@ -3,6 +3,7 @@ using HotChocolate.Language;
 using LinqToDB;
 using YALM.API.Alerts;
 using YALM.API.Db;
+using YALM.API.Db.Models;
 using YALM.Common;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
@@ -11,10 +12,10 @@ using YALM.Common.Models.Graphql.Logs;
 namespace YALM.API.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
-public class PartitionLogMutation(IDbProvider dbProvider, IMutationHelper mutationHelper, IAlertHelper alertHelper)
+public class PartitionLogMutation(IMutationHelper mutationHelper, IAlertHelper alertHelper, IDbProvider dbProvider)
 {
-	private readonly Func<PartitionLogIdInput, IQueryable<PartitionLogDbRecord>> _getPartitionLogQuery = pId =>
-		from p in dbProvider.GetDb().PartitionLogs
+	private readonly Func<IDb, PartitionLogIdInput, IQueryable<PartitionLogDbRecord>> _getPartitionLogQuery = (db, pId) =>
+		from p in db.PartitionLogs
 		where p.Serverid == pId.ServerId && string.CompareOrdinal(p.Partitionuuid, pId.Uuid) == 0 && pId.Date == p.Date
 		select p;
 
@@ -40,7 +41,8 @@ public class PartitionLogMutation(IDbProvider dbProvider, IMutationHelper mutati
 
 	private async Task AlertIfNeeded(PartitionLogInput log)
 	{
-		var partition = await (from p in dbProvider.GetDb().Partitions
+		await using var db = dbProvider.GetDb();
+		var partition = await (from p in db.Partitions
 			where p.Uuid == log.PartitionUuid
 			select p).FirstOrDefaultAsync();
 		string partitionLabel = partition != null && partition.Label != null ? partition.Label : log.PartitionUuid;
