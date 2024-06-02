@@ -56,7 +56,7 @@ public class DataHelper
 	/// <param name="lastLogDate">Last time data about service was logged</param>
 	/// <returns></returns>
 	/// <exception cref="ServiceNotFoundException"></exception>
-	public async Task<ServiceLog> GetServiceInfo(string serviceName, DateTime? lastLogDate)
+	public async Task<ServiceLog> GetServiceInfo(string serviceName, DateTimeOffset? lastLogDate)
 	{
 		var service = new ServiceLog { Name = serviceName };
 		var process = await ProcessHelper.StartProcess("systemctl", $"status {serviceName}");
@@ -101,7 +101,7 @@ public class DataHelper
 		{
 			int index = logString.IndexOf(" ", StringComparison.Ordinal);
 			if (index == -1 || logString.StartsWith("--")) continue;
-			var date = DateTime.Parse(logString[..index]);
+			var date = DateTimeOffset.Parse(logString[..index]);
 			var log = new ServiceJournalLog(date, logString[(index + 1)..]);
 			service.Logs.Add(log);
 		}

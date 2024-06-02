@@ -2,14 +2,14 @@ namespace YALM.Common.Models;
 
 public class LogBase
 {
-	public DateTime Date { get; set; }
+	public DateTimeOffset Date { get; set; }
 
 	public LogBase()
 	{
 		
 	}
 	
-	public LogBase(DateTime date)
+	public LogBase(DateTimeOffset date)
 	{
 		Date = date;
 	}

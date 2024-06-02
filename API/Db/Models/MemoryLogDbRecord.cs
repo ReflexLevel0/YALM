@@ -19,7 +19,7 @@ namespace DataModel
 	public class MemoryLogDbRecord : ILog, IConvertible
 	{
 		[Column("serverid"      , IsPrimaryKey = true, PrimaryKeyOrder = 0)] public int      ServerId       { get; set; } // integer
-		[Column("date"          , IsPrimaryKey = true, PrimaryKeyOrder = 1)] public DateTime Date           { get; set; } // timestamp (6) without time zone
+		[Column("date"          , IsPrimaryKey = true, PrimaryKeyOrder = 1)] public DateTimeOffset Date           { get; set; } // timestamp (6) without time zone
 		[Column("interval"                                                )] public int      Interval       { get; set; } // integer
 		[Column("totalkb")] public long? TotalKb { get; set; } // bigint
 		[Column("freekb")] public long? FreeKb { get; set; } // bigint

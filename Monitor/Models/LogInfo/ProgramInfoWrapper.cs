@@ -2,11 +2,11 @@ namespace YALM.Monitor.Models.LogInfo;
 
 public class ProgramInfoWrapper : ProgramInfo
 {
-	public DateTime? LastRefreshedDateTime { get; set; }
+	public DateTimeOffset? LastRefreshedDateTime { get; set; }
 
 	public async Task RefreshProgramInfo()
 	{
-		if (LastRefreshedDateTime != null && DateTime.Now.Subtract((DateTime)LastRefreshedDateTime).TotalMinutes < 1) return;
+		if (LastRefreshedDateTime != null && DateTimeOffset.Now.Subtract((DateTimeOffset)LastRefreshedDateTime).TotalMinutes < 1) return;
 		
 		//Spawning "top" process and skipping first batch of data (top is printing data for 2 seconds, and first one is being ignored, for some reason the measurements are more correct this way)
 		var process = await ProcessHelper.StartProcess("top", "-bn2 -w 400");
@@ -115,7 +115,7 @@ public class ProgramInfoWrapper : ProgramInfo
 		}
 		
 		await process.WaitForExitAsync();
-		LastRefreshedDateTime = DateTime.Now;
+		LastRefreshedDateTime = DateTimeOffset.Now;
 		
 		//A program will be stored only if it is top 10 cpu/memory using program
 		var topCpuProgramLogs = ProgramLogs.OrderByDescending(p => p.CpuUsage).Take(10).ToList();

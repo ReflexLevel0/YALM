@@ -20,7 +20,7 @@ namespace DataModel
 	public class ProgramLogDbRecord : ILog, IConvertible
 	{
 		[Column("serverid"                   )] public int      Serverid                    { get; set; } // integer
-		[Column("date"                       )] public DateTime Date                        { get; set; } // timestamp (6) without time zone
+		[Column("date"                       )] public DateTimeOffset Date                        { get; set; } // timestamp (6) without time zone
 		[Column("interval"                   )] public int      Interval                    { get; set; } // integer
 		[Column("name"                       )] public string  Name                        { get; set; } // varchar(255)
 		[Column("cpuutilizationpercentage"   )] public decimal? CpuutilizationPercentage    { get; set; } // numeric

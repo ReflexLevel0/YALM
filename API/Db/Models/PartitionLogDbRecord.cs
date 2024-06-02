@@ -20,7 +20,7 @@ namespace DataModel
 	{
 		[Column("serverid"     , IsPrimaryKey = true , PrimaryKeyOrder = 0                        )] public int      Serverid      { get; set; } // integer
 		[Column("partitionuuid", CanBeNull    = false, IsPrimaryKey    = true, PrimaryKeyOrder = 1)] public string   Partitionuuid { get; set; } = null!; // character varying(64)
-		[Column("date"         , IsPrimaryKey = true , PrimaryKeyOrder = 2                        )] public DateTime Date          { get; set; } // timestamp (6) without time zone
+		[Column("date"         , IsPrimaryKey = true , PrimaryKeyOrder = 2                        )] public DateTimeOffset Date          { get; set; } // timestamp (6) without time zone
 		[Column("interval"                                                                        )] public int      Interval      { get; set; } // integer
 		[Column("bytestotal"                                                                      )] public long?    BytesTotal    { get; set; } // bigint
 		[Column("usage"                                                                           )] public decimal? Usage         { get; set; } // numeric(3,2)

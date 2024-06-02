@@ -7,7 +7,7 @@ namespace YALM.API.Alerts;
 
 public class AlertHelper(IDbProvider dbProvider) : IAlertHelper
 {
-	public async Task RaiseAlert(int serverId, DateTime date, AlertSeverity severity, string text)
+	public async Task RaiseAlert(int serverId, DateTimeOffset date, AlertSeverity severity, string text)
 	{
 		Console.WriteLine($"ALERT: {serverId} {date} {severity} {text}");
 		await using var db = dbProvider.GetDb();

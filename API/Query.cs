@@ -18,7 +18,7 @@ public class Query(IDbProvider dbProvider)
 	/// <param name="interval">Interval that specifies time distance between two logs. If interval is null, then interval is decided dynamically (interval=1 minute for every hour between <param name="startDateTime"></param> and <param name="endDateTime"></param>).</param>
 	/// <param name="method">Method for combining multiple logs into one (min, max, avg, etc.)</param>
 	/// <returns></returns>
-	public async Task<CpuOutput?> Cpu(int serverId, DateTime? startDateTime, DateTime? endDateTime, double? interval, string? method)
+	public async Task<CpuOutput?> Cpu(int serverId, DateTimeOffset? startDateTime, DateTimeOffset? endDateTime, double? interval, string? method)
 	{
 		var getEmptyRecordFunc = () => new CpuLog();
 		Func<IList<CpuLogDbRecord>, CpuLog> combineLogsFunc = logs =>
@@ -58,9 +58,9 @@ public class Query(IDbProvider dbProvider)
 	/// <param name="interval">Interval that specifies time distance between two logs. If interval is null, then interval is decided dynamically (interval=1 minute for every hour between <param name="startDateTime"></param> and <param name="endDateTime"></param>).</param>
 	/// <param name="method">Method for combining multiple logs into one (min, max, avg, etc.)</param>
 	/// <returns></returns>
-	public async Task<MemoryOutput> Memory(int serverId, DateTime? startDateTime, DateTime? endDateTime, double? interval, string? method)
+	public async Task<MemoryOutput> Memory(int serverId, DateTimeOffset? startDateTime, DateTimeOffset? endDateTime, double? interval, string? method)
 	{
-		var getEmptyRecordFunc = () => new MemoryLog { Date = DateTime.Now };
+		var getEmptyRecordFunc = () => new MemoryLog { Date = DateTimeOffset.Now };
 		Func<IList<MemoryLogDbRecord>, MemoryLog> combineLogsFunc = logs =>
 		{
 			long? totalKb = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.TotalKb));
@@ -98,9 +98,9 @@ public class Query(IDbProvider dbProvider)
 	/// <summary>
 	/// Returns program logs
 	/// </summary>
-	public async Task<ProgramOutput> Program(int serverId, DateTime? startDateTime, DateTime? endDateTime, double? interval, string? method)
+	public async Task<ProgramOutput> Program(int serverId, DateTimeOffset? startDateTime, DateTimeOffset? endDateTime, double? interval, string? method)
 	{
-		var getEmptyRecordFunc = () => new ProgramLog { Name = "", Date = DateTime.Now };
+		var getEmptyRecordFunc = () => new ProgramLog { Name = "", Date = DateTimeOffset.Now };
 		Func<IList<ProgramLogDbRecord>, ProgramLog> combineLogsFunc = logs =>
 		{
 			decimal? cpuUsage = QueryHelper.CombineValues(method, logs.Select(l => l.CpuutilizationPercentage));
@@ -128,9 +128,9 @@ public class Query(IDbProvider dbProvider)
 	// /// <summary>
 	// /// Returns disk data
 	// /// </summary>
-	public async IAsyncEnumerable<DiskOutput> Disk(int serverId, string? uuid, DateTime? startDateTime, DateTime? endDateTime, double? interval, string? method)
+	public async IAsyncEnumerable<DiskOutput> Disk(int serverId, string? uuid, DateTimeOffset? startDateTime, DateTimeOffset? endDateTime, double? interval, string? method)
 	{
-		var getEmptyRecordFunc = () => new PartitionLog { Date = DateTime.Now };
+		var getEmptyRecordFunc = () => new PartitionLog { Date = DateTimeOffset.Now };
 		Func<IList<PartitionLogDbRecord>, PartitionLog> combineLogsFunc = logs =>
 		{
 			long? bytes = (long?)QueryHelper.CombineValues(method, logs.Select(l => l.BytesTotal).ToList());
@@ -175,11 +175,11 @@ public class Query(IDbProvider dbProvider)
 	// /// <summary>
 	// /// Returns alerts
 	// /// </summary>
-	public async IAsyncEnumerable<AlertOutput> Alert(int? serverId, DateTime? startDateTime, DateTime? endDateTime)
+	public async IAsyncEnumerable<AlertOutput> Alert(int? serverId, DateTimeOffset? startDateTime, DateTimeOffset? endDateTime)
 	{
 		await using var db = dbProvider.GetDb();
 		var alerts = await (from alert in db.Alerts
-			where alert.Serverid == (serverId ?? alert.Serverid) && alert.Date >= (startDateTime ?? DateTime.MinValue) && alert.Date <= (endDateTime ?? DateTime.MaxValue)
+			where alert.Serverid == (serverId ?? alert.Serverid) && alert.Date >= (startDateTime ?? DateTimeOffset.MinValue) && alert.Date <= (endDateTime ?? DateTimeOffset.MaxValue)
 			orderby alert.Date, alert.Serverid
 			select alert).ToListAsync();
 		foreach (var alert in alerts)

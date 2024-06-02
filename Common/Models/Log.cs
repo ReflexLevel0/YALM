@@ -2,10 +2,10 @@ namespace YALM.Common.Models;
 
 public abstract class Log : ILog
 { 
-	public DateTime Date { get; }
+	public DateTimeOffset Date { get; }
 	public int Interval { get; }
 	
-	protected Log(DateTime date, int interval)
+	protected Log(DateTimeOffset date, int interval)
 	{
 		Date = date;
 		Interval = interval;

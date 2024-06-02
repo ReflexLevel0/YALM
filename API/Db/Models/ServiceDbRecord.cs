@@ -18,7 +18,7 @@ namespace DataModel
 	{
 		[Column("serverid"         , IsPrimaryKey = true, PrimaryKeyOrder = 0)] public int      ServerId          { get; set; } // integer
 		[Column("serviceid"        , IsPrimaryKey = true, PrimaryKeyOrder = 1)] public int      ServiceId         { get; set; } // integer
-		[Column("date"             , IsPrimaryKey = true, PrimaryKeyOrder = 2)] public DateTime Date              { get; set; } // timestamp (6) without time zone
+		[Column("date"             , IsPrimaryKey = true, PrimaryKeyOrder = 2)] public DateTimeOffset Date              { get; set; } // timestamp (6) without time zone
 		[Column("interval"                                                   )] public int      Interval          { get; set; } // integer
 		[Column("ramusagemegabytes"                                          )] public int?     RamUsageMb { get; set; } // integer
 		[Column("statusid"                                                   )] public int?     StatusId          { get; set; } // integer

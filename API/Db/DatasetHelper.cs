@@ -7,7 +7,7 @@ public class DatasetHelper<TDbLog, TLog>(Func<IList<TDbLog>, TLog> combineLogsFu
 	where TLog : LogBase
 {
 	public string Hash { get; } = hash;
-	private DateTime? _nextDate;
+	private DateTimeOffset? _nextDate;
 	private readonly List<TDbLog> _logs = new();
 	private double _intervalSum;
 	private bool _break;
