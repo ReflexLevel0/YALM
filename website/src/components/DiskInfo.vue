@@ -20,7 +20,10 @@ export default {
   },
   props: {
     startDate: null,
-    endDate: null
+    endDate: null,
+    serverId: {
+      required: true
+    }
   },
   components: {
     Chart,
@@ -31,7 +34,7 @@ export default {
   },
   methods: {
     async refreshAllData(startDate, endDate){
-      let disks = await Api.getDisks(startDate, endDate)
+      let disks = await Api.getDisks(this.$props.serverId, startDate, endDate)
       this.$data.disks = []
       disks.forEach(d => {
         this.$data.disks.push(d)

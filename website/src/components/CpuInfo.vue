@@ -28,7 +28,10 @@ export default {
   },
   props: {
     startDate: null,
-    endDate: null
+    endDate: null,
+    serverId: {
+      required: true
+    }
   },
   components: {
     Chart,
@@ -37,7 +40,7 @@ export default {
   methods: {
     //Refreshing all CPU data
     async refreshData(startDate, endDate) {
-      this.$data.cpu = await Api.getCpu(startDate, endDate)
+      this.$data.cpu = await Api.getCpu(this.$props.serverId, startDate, endDate)
       await this.refreshCpuUsageChart(false)
       await this.refreshNumberOfTasksChart(false)
     },
@@ -45,7 +48,7 @@ export default {
     //Refreshing only CPU usage chart with provided logs (fetching logs if no logs are provided)
     async refreshCpuUsageChart(refresh) {
       if(refresh){
-        this.$data.cpu = await Api.getCpu(this.$data.cpuUsageChartConfig.startDate, this.$data.cpuUsageChartConfig.endDate)
+        this.$data.cpu = await Api.getCpu(this.$props.serverId, this.$data.cpuUsageChartConfig.startDate, this.$data.cpuUsageChartConfig.endDate)
       }
       this.$data.cpuUsageChartData = ChartHelper.CpuLogsToCpuUsageDataset(this.$data.cpu?.logs)
     },
@@ -53,7 +56,7 @@ export default {
     //Refreshing only number of tasks chart with provided logs (fetching logs if no logs are provided)
     async refreshNumberOfTasksChart(refresh) {
       if(refresh){
-        this.$data.cpu = await Api.getCpu(this.$data.numberOfTasksChartConfig.startDate, this.$data.numberOfTasksChartConfig.endDate)
+        this.$data.cpu = await Api.getCpu(this.$props.serverId, this.$data.numberOfTasksChartConfig.startDate, this.$data.numberOfTasksChartConfig.endDate)
       }
       this.$data.numberOfTasksChartData = ChartHelper.CpuLogsToNumberOfTasksDataset(this.$data.cpu?.logs);
     }

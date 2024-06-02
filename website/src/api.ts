@@ -30,12 +30,12 @@ export class Api {
     return `"${moment(date).format("yyyy-MM-DD HH:mm")}"`
   }
 
-  static async getCpu(startDate: Date, endDate: Date) {
+  static async getCpu(serverId: number, startDate: Date, endDate: Date) {
     let startDateString = this.dateToString(startDate)
     let endDateString = this.dateToString(endDate)
     const queryString = `
     { 
-      cpu(serverId: 0, startDateTime: ${startDateString}, endDateTime: ${endDateString}) {
+      cpu(serverId: ${serverId}, startDateTime: ${startDateString}, endDateTime: ${endDateString}) {
         serverId,
         name,
         architecture,
@@ -59,12 +59,12 @@ export class Api {
     return new Cpu(cpu.serverId, cpu.name, cpu.architecture, cpu.cores, cpu.threads, cpu.frequency, cpu.logs)
   }
 
-  static async getMemory(startDate: Date, endDate: Date){
+  static async getMemory(serverId: number, startDate: Date, endDate: Date){
     let startDateString = this.dateToString(startDate)
     let endDateString = this.dateToString(endDate)
     const queryString = `
     {
-      memory(serverId: 0, startDateTime: ${startDateString}, endDateTime: ${endDateString}) {
+      memory(serverId: ${serverId}, startDateTime: ${startDateString}, endDateTime: ${endDateString}) {
         serverId,
         logs{
           date, 
@@ -89,21 +89,21 @@ export class Api {
     return new Memory(memory.serverId, memory.logs)
   }
 
-  static async getDisks(startDate: Date, endDate: Date){
-    return await this.getDiskQuery(startDate, endDate)
+  static async getDisks(serverId: number, startDate: Date, endDate: Date){
+    return await this.getDiskQuery(serverId, startDate, endDate)
   }
 
-  static async getDisk(startDate: Date, endDate: Date, uuid: number){
-    let disks = await this.getDiskQuery(startDate, endDate, uuid)
+  static async getDisk(serverId: number, startDate: Date, endDate: Date, uuid: number){
+    let disks = await this.getDiskQuery(serverId, startDate, endDate, uuid)
     return disks.length > 0 ? disks[0] : null
   }
 
-  private static async getDiskQuery(startDate: Date, endDate: Date, uuid?: number){
+  private static async getDiskQuery(serverId: number, startDate: Date, endDate: Date, uuid?: number){
     let startDateString = this.dateToString(startDate)
     let endDateString = this.dateToString(endDate)
     let queryString = `
     {
-      disk(serverId: 0, startDateTime: ${startDateString}, endDateTime: ${endDateString}, uuid: ${uuid == undefined ? null : `"${uuid}"`}) {
+      disk(serverId: ${serverId}, startDateTime: ${startDateString}, endDateTime: ${endDateString}, uuid: ${uuid == undefined ? null : `"${uuid}"`}) {
         serverId,
         uuid,
         type,

@@ -18,7 +18,10 @@ export default {
   },
   props: {
     startDate: null,
-    endDate: null
+    endDate: null,
+    serverId: {
+      required: true
+    }
   },
   components: {
     Chart,
@@ -26,7 +29,7 @@ export default {
   },
   methods: {
     async refreshData(startDate, endDate) {
-      this.$data.memory = await Api.getMemory(startDate, endDate)
+      this.$data.memory = await Api.getMemory(this.$props.serverId, startDate, endDate)
       this.$data.memoryChartData = ChartHelper.MemoryLogsToDataset(this.$data.memory?.logs)
     }
   },

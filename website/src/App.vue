@@ -27,10 +27,17 @@ export default {
     MegaMenu
   },
   async created() {
+    //fetching the list of servers and adding them to the "Server" dropdown when app gets created
     let servers = await Api.getServers()
+    let first_server = undefined
     servers.forEach(s => {
-      this.$data.menu_items[0].items.push({label: s.serverId, icon: PrimeIcons.SERVER, route: '/'})
+      let serv = {label: s.serverId, icon: PrimeIcons.SERVER, route: '/' + s.serverId}
+      if (first_server === undefined) first_server = serv
+      this.$data.menu_items[0].items.push(serv)
     })
+
+    // navigating to first server in the list when home page gets opened (if any servers even exist)
+    if (first_server !== undefined) this.$router.push(first_server.route)
   }
 };
 </script>

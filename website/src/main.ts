@@ -8,7 +8,7 @@ import PrimeIcons from "primevue/config";
 import "primeicons/primeicons.css";
 
 const routes = [
-  { path: '/', component: HomeView },
+  { path: '/:id', component: HomeView },
   { path: '/alerts', component: AlertView }
 ]
 

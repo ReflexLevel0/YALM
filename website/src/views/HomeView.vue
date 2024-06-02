@@ -34,9 +34,9 @@ export default {
   <VueDatePicker v-model="startDate" format="yyyy-MM-dd HH:mm" />
   <VueDatePicker v-model="endDate" format="yyyy-MM-dd HH:mm" />
   <div class="summary">
-    <CpuInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
-    <MemoryInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
-    <DiskInfo :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+    <CpuInfo :server-id="this.$route.params.id" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+    <MemoryInfo :server-id="this.$route.params.id" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+    <DiskInfo :server-id="this.$route.params.id" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
   </div>
 </template>
 
