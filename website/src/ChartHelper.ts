@@ -9,7 +9,7 @@ export class ChartHelper {
     let points: object[] = [];
     logs.forEach(log => {
       points.push({
-        x: this.StringToDate(log.date),
+        x: log.date,
         y: log.usage * 100
       });
     });
@@ -33,7 +33,7 @@ export class ChartHelper {
     let points: object[] = []
     logs.forEach((log) => {
       points.push({
-        x: this.StringToDate(log.date),
+        x: log.date,
         y: log.numberOfTasks == null ? 0 : log.numberOfTasks
       })
     })
@@ -59,15 +59,15 @@ export class ChartHelper {
     let cachedPoints: object[] = [];
     logs.forEach(log => {
       memoryPoints.push({
-        x: this.StringToDate(log.date),
+        x: log.date,
         y: log.usedKb == null || log.totalKb == null ? 0 : log.usedKb / log.totalKb * 100
       })
       swapMemoryPoints.push({
-        x: this.StringToDate(log.date),
+        x: log.date,
         y: log.swapUsedKb == null || log.swapTotalKb == null ? 0 : log.swapUsedKb / log.swapTotalKb * 100
       })
       cachedPoints.push({
-        x: this.StringToDate(log.date),
+        x: log.date,
         y: log.cachedKb == null || log.totalKb == null ? 0 : log.cachedKb / log.totalKb * 100
       })
     })
@@ -105,7 +105,7 @@ export class ChartHelper {
     let usagePoints: object[] = []
     logs.forEach(l => {
       usagePoints.push({
-        x: this.StringToDate(l.date),
+        x: l.date,
         y: l.usedPercentage == null ? 0 : l.usedPercentage * 100
       })
     })
@@ -117,11 +117,5 @@ export class ChartHelper {
       backgroundColor: color,
       data: usagePoints
     }
-  }
-
-  static StringToDate(dateString: string) {
-    let date = new Date(dateString)
-    date.setMinutes(date.getMinutes() - new Date().getTimezoneOffset())
-    return date;
   }
 }
