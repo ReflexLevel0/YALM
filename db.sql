@@ -59,7 +59,7 @@ CREATE TABLE memoryLog
 (
     serverid    integer   NOT NULL,
     date        timestamp with time zone NOT NULL,
-    interval    bigint    NOT NULL,
+    interval    integer    NOT NULL,
     totalKb     bigint, --memory size (excluding swap size) 
     freeKb      bigint, --memory that isn't used or cached
     usedKb      bigint, --used memory
