@@ -16,17 +16,22 @@ public interface IMutationHelper
     /// <typeparam name="TOutput">Type of data to be returned</typeparam>
     /// <returns></returns>
     Task<Payload<TOutput>> AddModelAsync<TIdInput, TDbModel, TOutput>(
-        TDbModel model, TIdInput modelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
+        TDbModel model, TIdInput modelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery
+        ) where TDbModel : notnull;
 
     Task<Payload<List<TOutput>>> AddModelsAsync<TIdInput, TDbModel, TOutput>(
-        List<TDbModel> models, Func<TDbModel, TIdInput> getModelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
+        List<TDbModel> models, Func<TDbModel, TIdInput> getModelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery
+        ) where TDbModel : notnull;
     
     Task<Payload<TOutput>> AddOrReplaceModelAsync<TIdInput, TDbModel, TOutput>(
-        TDbModel model, TIdInput modelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
+        TDbModel model, TIdInput modelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery
+        ) where TDbModel : notnull;
     
     Task<Payload<List<TOutput>>> AddOrReplaceModelsAsync<TIdInput, TDbModel, TOutput>(
-        IEnumerable<TDbModel> models, Func<TDbModel, TIdInput> getModelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
+        IEnumerable<TDbModel> models, Func<TDbModel, TIdInput> getModelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery
+        ) where TDbModel : notnull;
 
     Task<Payload<TOutput>> DeleteModelAsync<TIdInput, TDbModel, TOutput>(
-        TIdInput modelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery) where TDbModel : notnull;
+        TIdInput modelId, Func<IDb, TIdInput, IQueryable<TDbModel>> getModelQuery
+        ) where TDbModel : notnull;
 }
