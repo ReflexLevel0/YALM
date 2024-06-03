@@ -82,6 +82,18 @@ export default {
         startDate: startDate,
           endDate: endDate
       }
+    },
+
+    bytesToString(bytes){
+      let suffix_list = ["B", "KB","MB","GB","TB"]
+      let count = 0
+
+      while(bytes >= 1024){
+        bytes = bytes/1024
+        count++
+      }
+
+      return bytes.toFixed(2) + " " + suffix_list[count];
     }
   },
   watch: {
@@ -100,19 +112,28 @@ export default {
 
 <template>
   <Fieldset legend="Disks" :toggleable="true">
-    <Fieldset v-for="d in disks" :legend="d.uuid" :toggleable="true">
-      <Chart
-        name="Disk usage"
-        :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
-        :chart-data="this.$data.chartDataDictionary[d.uuid]"
-        @zoom-changed="async (limits) =>
-          {
-            $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate
-            $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate
-            await this.refreshDiskData(d)
-          }"
-      />
-    </Fieldset>
+    <div v-for="d in disks">
+      <Fieldset :legend="d.uuid" :toggleable="true">
+        <div>UUID: {{d.uuid}}</div>
+        <div>Type: {{d.type}}</div>
+        <div>Serial: {{d.serial}}</div>
+        <div>Path: {{d.path}}</div>
+        <div>Vendor: {{d.vendor}}</div>
+        <div>Model: {{d.model}}</div>
+        <div>Size: {{bytesToString(d.bytesTotal)}}</div>
+        <Chart
+          name="Disk usage"
+          :scales="{ x: { type: 'time' }, y: { min: 0, max: 100 } }"
+          :chart-data="this.$data.chartDataDictionary[d.uuid]"
+          @zoom-changed="async (limits) =>
+            {
+              $data.chartConfigDictionary[d.uuid].startDate = limits.startDate == null ? $props.startDate : limits.startDate
+              $data.chartConfigDictionary[d.uuid].endDate = limits.endDate == null ? $props.endDate : limits.endDate
+              await this.refreshDiskData(d)
+            }"
+        />
+      </Fieldset>
+    </div>
   </Fieldset>
 </template>
 
