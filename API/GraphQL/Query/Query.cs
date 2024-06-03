@@ -5,7 +5,7 @@ using YALM.Common;
 using YALM.Common.Models.Graphql.Logs;
 using YALM.Common.Models.Graphql.OutputModels;
 
-namespace YALM.API;
+namespace YALM.API.GraphQL.Query;
 
 public class Query(IDbProvider dbProvider)
 {

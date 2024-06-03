@@ -3,7 +3,7 @@ using YALM.API.Db;
 using YALM.API.Db.Models;
 using YALM.Common;
 
-namespace YALM.API.Alerts;
+namespace YALM.API.GraphQL.Alerts;
 
 public class AlertHelper(IDbProvider dbProvider) : IAlertHelper
 {

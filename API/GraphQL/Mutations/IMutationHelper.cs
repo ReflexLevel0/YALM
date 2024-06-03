@@ -1,7 +1,7 @@
 using YALM.API.Db.Models;
 using YALM.Common.Models.Graphql;
 
-namespace YALM.API.Mutations;
+namespace YALM.API.GraphQL.Mutations;
 
 public interface IMutationHelper
 {

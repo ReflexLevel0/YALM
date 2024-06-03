@@ -5,7 +5,7 @@ using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
 
-namespace YALM.API.Mutations;
+namespace YALM.API.GraphQL.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
 public class ProgramLogMutation(IMutationHelper mutationHelper)

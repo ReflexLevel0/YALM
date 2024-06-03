@@ -1,7 +1,8 @@
 using YALM.API;
-using YALM.API.Alerts;
 using YALM.API.Db;
-using YALM.API.Mutations;
+using YALM.API.GraphQL.Alerts;
+using YALM.API.GraphQL.Mutations;
+using YALM.API.GraphQL.Query;
 
 var dbProvider = new MonitoringDbProvider();
 var builder = WebApplication.CreateBuilder(args);

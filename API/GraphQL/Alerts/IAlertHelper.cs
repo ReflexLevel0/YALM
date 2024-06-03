@@ -1,6 +1,6 @@
 using YALM.Common;
 
-namespace YALM.API.Alerts;
+namespace YALM.API.GraphQL.Alerts;
 
 public interface IAlertHelper
 {

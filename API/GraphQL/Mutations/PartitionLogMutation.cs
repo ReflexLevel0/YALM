@@ -1,15 +1,15 @@
 using DataModel;
 using HotChocolate.Language;
 using LinqToDB;
-using YALM.API.Alerts;
 using YALM.API.Db;
 using YALM.API.Db.Models;
+using YALM.API.GraphQL.Alerts;
 using YALM.Common;
 using YALM.Common.Models.Graphql;
 using YALM.Common.Models.Graphql.InputModels;
 using YALM.Common.Models.Graphql.Logs;
 
-namespace YALM.API.Mutations;
+namespace YALM.API.GraphQL.Mutations;
 
 [ExtendObjectType(OperationType.Mutation)]
 public class PartitionLogMutation(IMutationHelper mutationHelper, IAlertHelper alertHelper, IDbProvider dbProvider)

@@ -3,7 +3,7 @@ using LinqToDB;
 using YALM.API.Db;
 using YALM.Common.Models;
 
-namespace YALM.API;
+namespace YALM.API.GraphQL.Query;
 
 public class QueryHelper
 {
