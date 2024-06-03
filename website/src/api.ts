@@ -151,7 +151,10 @@ export class Api {
     console.log(response)
     if (response?.data?.alert == null) return []
     let alerts: Alert[] = []
-    response.data.alert.forEach((a: any) => alerts.push(a))
+    response.data.alert.forEach((a: any) => {
+      let date = new Date(a.date)
+      alerts.push(new Alert(a.serverId, date, a.severity, a.text))
+    })
     return alerts
   }
 
