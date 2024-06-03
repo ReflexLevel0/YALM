@@ -39,8 +39,8 @@ export default {
   },
   methods: {
     //Refreshing all CPU data
-    async refreshData(startDate, endDate) {
-      this.$data.cpu = await Api.getCpu(this.$props.serverId, startDate, endDate)
+    async refreshData() {
+      this.$data.cpu = await Api.getCpu(this.$props.serverId, this.$props.startDate, this.$props.endDate)
       await this.refreshCpuUsageChart(false)
       await this.refreshNumberOfTasksChart(false)
     },
@@ -62,19 +62,25 @@ export default {
     }
   },
   async mounted() {
-    await this.refreshData(this.$props.startDate, this.$props.endDate);
+    await this.refreshData();
   },
   watch: {
 
     //Refreshing data when used picks a new start date
     "startDate": async function() {
-      await this.refreshData(this.$props.startDate, this.$props.endDate);
+      await this.refreshData();
     },
 
     //Refreshing data when used picks a new end date
     "endDate": async function() {
-      await this.refreshData(this.$props.startDate, this.$props.endDate);
+      await this.refreshData();
+    },
+
+    //Refreshing data when serverId changes
+    "serverId": async function() {
+      await this.refreshData()
     }
+
   }
 };
 </script>

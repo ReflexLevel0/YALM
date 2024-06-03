@@ -12,6 +12,7 @@ export default {
     return {
       startDate: null,
       endDate: null,
+      serverId: null,
     };
   },
   components: {
@@ -26,6 +27,10 @@ export default {
     let weekAgo = new Date(Date.now())
     weekAgo = new Date(weekAgo.setDate(weekAgo.getDate() - 7))
     this.$data.startDate = weekAgo
+    this.$data.serverId = this.$route.params["id"]
+  },
+  beforeRouteUpdate(to, from){
+    this.$data.serverId = to.params["id"]
   }
 };
 </script>
@@ -33,10 +38,13 @@ export default {
 <template>
   <VueDatePicker v-model="startDate" format="yyyy-MM-dd HH:mm" />
   <VueDatePicker v-model="endDate" format="yyyy-MM-dd HH:mm" />
+  <h2>
+    Server ID: {{this.$data.serverId}}
+  </h2>
   <div class="summary">
-    <CpuInfo :server-id="this.$route.params.id" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
-    <MemoryInfo :server-id="this.$route.params.id" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
-    <DiskInfo :server-id="this.$route.params.id" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+    <CpuInfo :server-id="this.$data.serverId" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+    <MemoryInfo :server-id="this.$data.serverId" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
+    <DiskInfo :server-id="this.$data.serverId" :start-date="this.$data.startDate" :end-date="this.$data.endDate"/>
   </div>
 </template>
 

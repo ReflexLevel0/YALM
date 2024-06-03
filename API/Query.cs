@@ -197,7 +197,7 @@ public class Query(IDbProvider dbProvider)
 	public async IAsyncEnumerable<ServerOutput> Server(int? serverId)
 	{
 		await using var db = dbProvider.GetDb();
-		var statusList = await (from s in db.ServerStatus where s.Serverid == (serverId ?? s.Serverid) select s).ToListAsync();
+		var statusList = await (from s in db.ServerStatus where s.Serverid == (serverId ?? s.Serverid) orderby s.Serverid select s).ToListAsync();
 		foreach (var status in statusList)
 		{
 			yield return new ServerOutput(status.Serverid, string.CompareOrdinal(status.Status, "online") == 0);

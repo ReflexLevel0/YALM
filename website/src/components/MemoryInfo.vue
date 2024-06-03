@@ -28,20 +28,23 @@ export default {
     Fieldset
   },
   methods: {
-    async refreshData(startDate, endDate) {
+    async refreshData(startDate = this.$props.startDate, endDate = this.$props.endDate) {
       this.$data.memory = await Api.getMemory(this.$props.serverId, startDate, endDate)
       this.$data.memoryChartData = ChartHelper.MemoryLogsToDataset(this.$data.memory?.logs)
     }
   },
   async mounted() {
-    await this.refreshData(this.$props.startDate, this.$props.endDate)
+    await this.refreshData()
   },
   watch: {
     "startDate": async function() {
-      await this.refreshData(this.$props.startDate, this.$props.endDate);
+      await this.refreshData();
     },
     "endDate": async function() {
-      await this.refreshData(this.$props.startDate, this.$props.endDate);
+      await this.refreshData();
+    },
+    "serverId": async function() {
+      await this.refreshData()
     }
   }
 }

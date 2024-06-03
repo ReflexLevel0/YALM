@@ -33,7 +33,7 @@ export default {
     await this.refreshAllData(this.$props.startDate, this.$props.endDate)
   },
   methods: {
-    async refreshAllData(startDate, endDate){
+    async refreshAllData(startDate = this.$props.startDate, endDate = this.$props.endDate){
       let disks = await Api.getDisks(this.$props.serverId, startDate, endDate)
       this.$data.disks = []
       disks.forEach(d => {
@@ -86,10 +86,13 @@ export default {
   },
   watch: {
     "startDate": async function() {
-      await this.refreshAllData(this.$props.startDate, this.$props.endDate);
+      await this.refreshAllData();
     },
     "endDate": async function() {
-      await this.refreshAllData(this.$props.startDate, this.$props.endDate);
+      await this.refreshAllData();
+    },
+    "serverId": async function() {
+      await this.refreshAllData()
     }
   }
 }
