@@ -49,7 +49,7 @@ export default {
 
     async refreshDiskData(disk){
       let config = this.$data.chartConfigDictionary[disk.uuid]
-      let newDisk = await Api.getDisk(config.startDate, config.endDate, disk.uuid)
+      let newDisk = await Api.getDisk(this.$props.serverId, config.startDate, config.endDate, disk.uuid)
       if (newDisk == null) {
         console.log("ERROR IN FETCHING DISK DATA FOR DISK WITH UUID " + disk.uuid)
         return
