@@ -2,11 +2,10 @@ using YALM.Common.Models;
 
 namespace YALM.API.Db;
 
-public class DatasetHelper<TDbLog, TLog>(Func<IList<TDbLog>, TLog> combineLogsFunc, Func<TLog> getEmptyLogFunc, string hash)
+public class DatasetHelper<TDbLog, TLog>(Func<IList<TDbLog>, TLog> combineLogsFunc, Func<TLog> getEmptyLogFunc)
 	where TDbLog : ILog
 	where TLog : LogBase
 {
-	public string Hash { get; } = hash;
 	private DateTimeOffset? _nextDate;
 	private readonly List<TDbLog> _logs = new();
 	private double _intervalSum;

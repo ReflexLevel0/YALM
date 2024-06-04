@@ -41,7 +41,7 @@ public class Query(IDbProvider dbProvider)
 			cpuOutput.Threads = cpu.Threads;
 			cpuOutput.Frequency = cpu.FrequencyMhz;
 			var query = from l in db.CpuLogs where l.ServerId == serverId select l;
-			await foreach (var log in QueryHelper.GetLogs(query, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+			await foreach (var log in QueryHelper.GetLogs(query, combineLogsFunc, getEmptyRecordFunc, startDateTime, endDateTime, interval))
 			{
 				cpuOutput.Logs.Add(log);
 			}
@@ -89,7 +89,7 @@ public class Query(IDbProvider dbProvider)
 		var memoryOutput = new MemoryOutput(serverId);
 		await using var db = dbProvider.GetDb();
 		var query = from l in db.MemoryLogs where l.ServerId == serverId select l;
-		await foreach (var log in QueryHelper.GetLogs(query, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+		await foreach (var log in QueryHelper.GetLogs(query, combineLogsFunc, getEmptyRecordFunc, startDateTime, endDateTime, interval))
 		{
 			memoryOutput.Logs.Add(log);
 		}
@@ -120,7 +120,7 @@ public class Query(IDbProvider dbProvider)
 
 		await using var db = dbProvider.GetDb();
 		var query = from l in db.ProgramLogs where l.Serverid == serverId select l;
-		await foreach (var log in QueryHelper.GetLogs(query, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+		await foreach (var log in QueryHelper.GetLogs(query, combineLogsFunc, getEmptyRecordFunc, startDateTime, endDateTime, interval))
 		{
 			programOutput.Logs.Add(log);
 		}
@@ -165,7 +165,7 @@ public class Query(IDbProvider dbProvider)
 					from l in db.PartitionLogs
 					where l.Serverid == partition.Serverid && l.Partitionuuid == partition.Uuid
 					select l;
-				await foreach(var log in QueryHelper.GetLogs(partitionLogs, combineLogsFunc, getEmptyRecordFunc, _ => "", startDateTime, endDateTime, interval))
+				await foreach(var log in QueryHelper.GetLogs(partitionLogs, combineLogsFunc, getEmptyRecordFunc, startDateTime, endDateTime, interval))
 				{
 					partitionOutput.Logs.Add(log);
 				}

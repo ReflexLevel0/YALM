@@ -90,7 +90,6 @@ public class QueryHelper
 	/// <param name="table">Table from which the logs are fetched</param>
 	/// <param name="combineLogsFunc">Function to combine multiple logs into one</param>
 	/// <param name="getEmptyLogFunc">Function that returns an empty log</param>
-	/// <param name="calculateHash">Used for calculating hash of a log (this is important when there are multiple sets of data returned, for example 10 logs at the same date-time for 10 different cpu cores, so that dates and breaks between them don't get mixed up</param>
 	/// <param name="startDateTime">Start date for the data (if null, start is unlimited)</param>
 	/// <param name="endDateTime">End date for the data (if null, end is unlimited)</param>
 	/// <param name="interval">Interval between different log points (multiple points withing the interval are combined into one; if null then it is calculated dynamically)</param>
@@ -101,12 +100,11 @@ public class QueryHelper
 		IQueryable<ILog> table,
 		Func<IList<TDbLog>, TLog> combineLogsFunc,
 		Func<TLog> getEmptyLogFunc,
-		Func<TDbLog, string> calculateHash,
 		DateTimeOffset? startDateTime,
 		DateTimeOffset? endDateTime,
 		double? interval) where TDbLog : ILog where TLog : LogBase
 	{
-		var limits = new List<DatasetHelper<TDbLog, TLog>>();
+		var limit = new DatasetHelper<TDbLog, TLog>(combineLogsFunc, getEmptyLogFunc);
 
 		//Dynamically calculating the interval
 		interval ??= await CalculateInterval(table, startDateTime, endDateTime);
@@ -117,14 +115,6 @@ public class QueryHelper
 		if (endDateTime != null) selectQuery = selectQuery.Where(l => l.Date <= endDateTime.Value.ToLocalTime());
 		foreach (var log in selectQuery)
 		{
-			string hash = calculateHash((TDbLog)log);
-			var limit = limits.FirstOrDefault(l => string.Compare(l.Hash, hash, StringComparison.Ordinal) == 0);
-			if (limit == null)
-			{
-				limit = new DatasetHelper<TDbLog, TLog>(combineLogsFunc, getEmptyLogFunc, hash);
-				limits.Add(limit);
-			}
-
 			//Adding the log to the list of logs
 			foreach (var point in limit.AddLog((TDbLog)log, interval))
 			{
@@ -134,10 +124,7 @@ public class QueryHelper
 		}
 
 		//Combining last of the logs into a single log and returning it
-		foreach (var limit in limits)
-		{
-			var point = limit.CombineLogs();
-			if (point != null) yield return point;
-		}
+		var lastPoint = limit.CombineLogs();
+		if(lastPoint != null) yield return lastPoint;
 	}
 }
