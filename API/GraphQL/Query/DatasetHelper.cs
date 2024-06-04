@@ -1,6 +1,6 @@
 using YALM.Common.Models;
 
-namespace YALM.API.Db;
+namespace YALM.API.GraphQL.Query;
 
 public class DatasetHelper<TDbLog, TLog>(Func<IList<TDbLog>, TLog> combineLogsFunc, Func<TLog> getEmptyLogFunc)
 	where TDbLog : ILog
