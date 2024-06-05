@@ -126,10 +126,10 @@ public class ProgramInfoWrapper : ProgramInfo
 	private static IEnumerable<Tuple<string, double>> ParseTopLine(string line)
 	{
 		line = line.Replace("used.", "used,");
-		foreach (string value in line.Split(new[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries).Skip(1))
+		foreach (string value in line.Split(new[] { ":", ", " }, StringSplitOptions.RemoveEmptyEntries).Skip(1))
 		{
 			string[] valueParts = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-			yield return new Tuple<string, double>(valueParts.Last(), double.Parse(valueParts.First().Trim()));
+			yield return new Tuple<string, double>(valueParts.Last(), double.Parse(valueParts.First().Replace(',', '.').Trim()));
 		}
 	}
 }
