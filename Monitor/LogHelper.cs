@@ -61,6 +61,8 @@ public class LogHelper
 			log.Disks = new List<DiskInfo>();
 			foreach (var l in await _dataHelper.GetStorageInfo())
 			{
+				//TODO: this ignores disks that have a null UUID, it's only a temporary solution (find a way to always get a non-null UUID) 
+				if (l.DiskUuid == null) continue;
 				log.Disks.Add(l);
 			}
 		}
