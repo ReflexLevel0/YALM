@@ -5,7 +5,6 @@
 \usepackage{blindtext}
 \usepackage{listings}
 \usepackage{hyperref}
-\usepackage[dvipsnames]{xcolor}
 \definecolor{darkgreen}{rgb}{0, 0.6, 0}
 
 \lstdefinelanguage{CSharp}{
@@ -449,7 +448,7 @@ Primjer dijela jedne mutacije:
 \lstinputlisting[language=CSharp, firstline=10, lastline=24, title=CpuMutation.cs]{API/GraphQL/Mutations/CpuMutation.cs}
 
 \subsection{IAlertHelper.cs}
-Koristi se za slanje obavijesti bazi podataka.
+Koristi se za slanje obavijesti bazi podataka. Poruka se odbacuje ukoliko je ista poruka za isti poslužitelj već poslana prije manje od sat vremena.
 \lstinputlisting[language=CSharp, firstline=5, title=IAlertHelper.cs]{API/GraphQL/Alerts/IAlertHelper.cs}
 
 \section{Db direktorij}
@@ -501,7 +500,7 @@ Aplikacija Monitor se koristi za prikupljanje podataka o poslužitelju te slanje
 	\label{slk:monitor_structure.png}
 \end{figure}
 
-Objašnjenje važnijih dijelova aplikacije
+Objašnjenje važnijih dijelova aplikacije:
 \begin{itemize}
 	\item Monitor.cs - pokreće se prilikom pokretanja aplikacije
 	\item Models direktorij - sadržava klase koje se koriste za serijalizaciju i deserijalizaciju podataka dohvaćenih sa terminala
@@ -513,7 +512,7 @@ Objašnjenje važnijih dijelova aplikacije
 \end{itemize}
 
 \section{Monitor.cs}
-Pokreće se prilikom pokretanja aplikacija. Na početku učitava konfiguracijsku datoteku, te zatim pomoću beskonačnoj petlji pokreće proces prikupljanja podataka te slanje tih podataka API-u.
+Pokreće se prilikom pokretanja aplikacija. Na početku učitava konfiguracijsku datoteku, te zatim generira nasumični broj za ID poslužitelja. Na kraju se u beskonačnoj petlji pokreće proces prikupljanja podataka te slanje tih podataka API-u.
 \lstinputlisting[firstline=10,lastline=30,language=CSharp]{Monitor/Monitor.cs}
 
 \chapter{Common}
@@ -527,6 +526,7 @@ Projekt Common sadržava klase i sučelja koje koristi više projekata. Stvoren 
 
 \section{ILog.cs}
 Glavno sučelje, svaki Log nasljeđuje polja definirana u njemu.
+\lstinputlisting[firstline=3,language=CSharp]{Common/Models/ILog.cs}
 
 \section{Graphql direktorij}
 Graphql direktorij sadržava klase i sučelja koji se koriste za komunikaciju API i Monitor programa.
