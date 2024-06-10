@@ -39,3 +39,11 @@ API/dbConnectionString.txt
 data.sql
 Monitor/log_date.txt
 website/.browserslistrc
+
+zavrsni_rad.aux
+zavrsni_rad.bbl
+zavrsni_rad.blg
+zavrsni_rad.log
+zavrsni_rad.out
+zavrsni_rad.synctex.gz
+zavrsni_rad.toc

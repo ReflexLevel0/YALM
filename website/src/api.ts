@@ -168,9 +168,6 @@ export class Api {
     }`
 
     let response = await this.executeQuery(queryString)
-    console.log(queryString)
-    console.log("server response:")
-    console.log(response)
     if (response?.data?.server == null) return []
     let servers: Server[] = []
     response.data.server.forEach((s: any) => servers.push(s))
