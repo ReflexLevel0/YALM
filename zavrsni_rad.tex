@@ -581,7 +581,7 @@ Primjer dijela jedne mutacije:
 \begin{figure}[htb]
 	\centering
 	\lstinputlisting[language=CSharp, firstline=10, lastline=24]{API/GraphQL/Mutations/CpuMutation.cs}
-	\caption{Dio CpuMutation mutacije}
+	\caption{Isječak CpuMutation mutacije}
 \end{figure}
 \FloatBarrier
 
@@ -647,7 +647,7 @@ API se pokreće iz komandne linije/terminala pomoću naredbe "dotnet run" unutar
 \FloatBarrier
 
 \chapter{Monitor}
-Aplikacija Monitor se koristi za prikupljanje podataka o poslužitelju te slanje tih podataka programskom sučelju.
+Aplikacija Monitor koristi se za prikupljanje i slanje podataka o poslužitelju programskom sučelju.
 
 \begin{figure}[htb!]
 	\centering
@@ -659,27 +659,34 @@ Aplikacija Monitor se koristi za prikupljanje podataka o poslužitelju te slanje
 
 Objašnjenje važnijih dijelova aplikacije:
 \begin{itemize}
-	\item Monitor.cs - pokreće se prilikom pokretanja aplikacije
+	\item Monitor.cs - sadržava metodu \textit{Main} koja se pokreće prilikom pokretanja aplikacije. Na početku učitava konfiguracijsku datoteku i zatim generira nasumični broj za ID poslužitelja. Na kraju se u beskonačnoj petlji pokreće proces prikupljanja podataka te slanje tih podataka programskom sučelju
+	\begin{figure}[htb]
+		\centering
+		\lstinputlisting[firstline=10,lastline=30,language=CSharp]{Monitor/Monitor.cs}
+		\caption{Glavna metoda programa Monitor}
+	\end{figure}
+	\FloatBarrier	
 	\item Models direktorij - sadržava klase koje se koriste za serijalizaciju i deserijalizaciju podataka dohvaćenih sa terminala
-	\item ApiHelper.cs - koristi se za slanje podataka programskom sučelju
-	\item config.json - koristi ju korisnik kako bi konfigurirao aplikaciju
+	\item ApiHelper.cs - koristi se za slanje podataka programskom sučelju. Prilikom poziva metode \textit{SendLog} radi se GraphQL zahtjev koristeći prikupljene podatke te se šalje zahtjev programskom sučelju
+	\begin{figure}[htb]
+		\centering
+		\lstinputlisting[firstline=165,lastline=179,language=CSharp]{Monitor/ApiHelper.cs}
+		\caption{Isječak metode \textit{SendLog}}
+	\end{figure}
+	\FloatBarrier		
 	\item DataHelper.cs - čita podatke sa terminala te ih deserijalizira u klase koje se nalaze u Models direktoriju
 	\item LogHelper.cs - pokreće proces dohvaćanja podataka svakin [n] minuta (n = definiran u config.json datoteci)
 	\item ProcessHelper.cs - koristi se za pokretanje procesa u terminalu
+	\begin{figure}[htb]
+		\centering
+		\lstinputlisting[firstline=9,lastline=27,language=CSharp]{Monitor/ProcessHelper.cs}
+		\caption{Isječak metode \textit{StartProcess}}
+	\end{figure}	
+	\item config.json - koristi ju korisnik kako bi konfigurirao aplikaciju
 \end{itemize}
 
-\section{Monitor.cs}
-Pokreće se prilikom pokretanja aplikacija. Na početku učitava konfiguracijsku datoteku, te zatim generira nasumični broj za ID poslužitelja. Na kraju se u beskonačnoj petlji pokreće proces prikupljanja podataka te slanje tih podataka programskom sučelju.
-
-\begin{figure}[htb]
-	\centering
-	\lstinputlisting[firstline=10,lastline=30,language=CSharp]{Monitor/Monitor.cs}
-	\caption{Glavna metoda programa Monitor}
-\end{figure}
-\FloatBarrier
-
 \chapter{Common}
-Projekt Common sadržava klase i sučelja koje koristi više projekata. Stvoren je kako bi se izbjeglo ponavljanje koda. Neke od važnijih klasa i sučelja:
+Projekt Common sadržava klase i sučelja koje koriste više projekata. Stvoren je kako bi se izbjeglo ponavljanje koda. Neke od važnijih klasa i sučelja:
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=0.4\linewidth]{images/common_structure.png} 
@@ -689,7 +696,7 @@ Projekt Common sadržava klase i sučelja koje koristi više projekata. Stvoren 
 \FloatBarrier
 
 \section{ILog.cs}
-Glavno sučelje, svaki Log nasljeđuje polja definirana u njemu.
+Glavno sučelje je \textit{ILog.cs} i svaki Log nasljeđuje polja definirana u njemu.
 \begin{figure}[htb]
 	\centering
 	\lstinputlisting[firstline=3,language=CSharp]{Common/Models/ILog.cs}
@@ -699,10 +706,10 @@ Glavno sučelje, svaki Log nasljeđuje polja definirana u njemu.
 
 \section{Graphql direktorij}
 Graphql direktorij sadržava klase i sučelja koji se koriste za komunikaciju API i Monitor programa.
-Neko od važnijih komponenti direktorija:
+Neke od važnijih komponenti direktorija:
 \begin{itemize}
 	\item Payload.cs - sastoji se od Data polja koje sadržava podatke o poslužitelju koji se vraćaju korisniku te Error polja koje je prazno osim u slučaju pogreške prilikom obrade zahtjeva
-	\item InputModels direktorij - sadržava klase koje se koriste prilikom dodavanja ili izmijene podataka. Primjer klase:
+	\item InputModels direktorij - sadržava klase koje se koriste prilikom dodavanja ili izmjene podataka. Primjer klase:
 	\begin{figure}[htb]
 		\centering
 		\lstinputlisting[firstline=3,language=CSharp]{Common/Models/Graphql/InputModels/CpuInput.cs}
@@ -720,37 +727,37 @@ Neko od važnijih komponenti direktorija:
 \end{itemize}
 
 \chapter{Web stranica}
-Web stranica je napravljena pomoću \ref{pog:vue} Vue razvojne okoline. Sastoji se od raznih kompoennti koje se koriste za prikaz i dohvaćanje podataka od programskog sučelja.
-Koristi se Vue razvojna okolina te se zbog toga koristi samo jedna HTML stranica koja se nalazi u direktoriju "public". Stranica se koristi kao kostur web-stranice u kojem se prikazuju renderirane komponente.
+Web stranica je napravljena pomoću \ref{pog:vue} Vue razvojne okoline. Sastoji se od raznih komponenti koje se koriste za prikaz i dohvaćanje podataka od programskog sučelja.
+Koristi se Vue razvojna okolina te se zbog toga upotrebljava samo jedna HTML stranica koja se nalazi u direktoriju "public". Stranica se koristi kao kostur web-stranice u kojemu se prikazuju renderirane komponente.
 
 \section{App.vue}
-Glavna Vue komponenta koja kontrolira sadržaj koji se prikazuje, stvara se prilikom pokretanja programa.
-\\Na početku komponente se nalazi glavni izbornik koji koristi \textit{Vue router} komponentu koja renderira određenu komponentu, ovisno o tome na kojoj putanji se korisnik nalazi. Kod za prikaz izbornika je preuzet sa službene Vue dokumentacije te je djelomično izmijenjen:
+Glavna Vue komponenta koja kontrolira prikazani sadržaj stvara se prilikom pokretanja programa.
+\\Na početku komponente nalazi se glavni izbornik koji koristi \textit{Vue router} komponentu koja renderira određenu komponentu, ovisno o tome na kojoj putanji se korisnik nalazi. Kod za prikaz izbornika je preuzet sa službene Vue dokumentacije te je djelomično izmijenjen:
 \begin{figure}[htb]
 	\centering
 	\lstinputlisting[firstline=50, lastline=69, language=HTML]{website/src/App.vue}
 	\caption{Kod za prikaz izbornika}
 \end{figure}
 \FloatBarrier
-Prilikom stvaranja komponente se šalje upit programskom sučelju kako bi se dohvatila i popunila lista poslužitelja, te se zatim korisnik prosljeđuje na putanju prikaza podataka prvog poslužitelja (osim ako nisu zabilježeni podaci za bilo koji poslužitelj).
+Prilikom stvaranja komponente šalje se upit programskom sučelju kako bi se dohvatila i popunila lista poslužitelja, a zatim se korisnik prosljeđuje na putanju prikaza podataka prvog poslužitelja (osim ako nisu zabilježeni podaci za bilo koji poslužitelj).
 
 \section{Vue komponente}
-Vue razvojna okolina koristi komponente kako bi se dijelovi koda mogli ponovno koristiti. Sve korištene komponente se nalaze u direktoriju \textit{components}.
+Vue razvojna okolina koristi komponente kako bi se dijelovi koda mogli ponovno koristiti. Sve korištene komponente nalaze se u direktoriju \textit{components}.
 
 \subsubsection{Komponenta Chart}
-Komponenta \textit{Chart} se koristi za prikaz linijskog grafa.
+Komponenta \textit{Chart} koristi se za prikaz linijskog grafa.
 \\Parametri komponente:
 \begin{itemize}
 	\item \textit{name} - naslov grafa
 	\item \textit{chartData} - točke grafa
 	\item \textit{scales} - konfiguracijsko polje za x i y osi
 \end{itemize}
-Koristi nekoliko pomoćnih polja za ispravan rad, od kojih je najvažnije polje \textit{options} koje omogućava pregled uvećanje grafa, postavlja x os kao vremensku od i y os kao brojčanu os, te pokreće \textit{emitZoomChanged} događaj.
-\\Komponenta koristi \textit{emitZoomChanged} događaj kako bi roditelju javila da je graf uvećan, što je potrebno kako bi roditelj mogao osvježiti za taj period vremena i poslati ih ih komponenti.
+Koristi nekoliko pomoćnih polja za ispravan rad, od kojih je najvažnije  \textit{options} koje omogućava uvećanje grafa, postavlja x os kao vremensku os i y os kao brojčanu os  te pokreće događaj \textit{emitZoomChanged}.
+\\Komponenta koristi \textit{emitZoomChanged}  kako bi roditelju javila da je graf uvećan, što je potrebno kako bi roditelj mogao osvježiti podatke za određeni period i poslati ih komponenti.
 
 
 \subsubsection{Ostale komponente}
-Komponente \textit{CpuInfo}, \textit{DiskInfo} i \textit{MemoryInfo} se koriste za prikaz podataka o procesoru i pohrani. Komponente rade na sličan način:
+Komponente \textit{CpuInfo}, \textit{DiskInfo} i \textit{MemoryInfo} koriste se za prikaz podataka o procesoru i pohrani. Komponente rade na sličan način:
 \begin{itemize}
 	\item komponenti se mogu predati parametri \textit{startDate} (specificira početni datum grafa), \textit{endDate} (završni datum grafa) i \textit{serverId} (ID poslužitelja na kojeg se komponenta odnosi)
 	\item nakon kreiranja komponente se učitavaju podaci pomoću \textit{Api} klase te se ti podaci pretvaraju u podatke povoljne za prikaz grafom pomoću \textit{ChartHelper} klase
@@ -761,7 +768,7 @@ Primjer dijela jedne takve komponente:
 \begin{figure}[htb]
 	\centering
 	\lstinputlisting[language=Javascript,firstline=53]{website/src/components/MemoryInfo.vue}
-	\caption{Dio MemoryInfo komponente}
+	\caption{Isječak MemoryInfo komponente}
 \end{figure}
 \FloatBarrier
 
@@ -776,7 +783,7 @@ Direktorij Models sadržava razne klase koje se koriste za pohranjivanje podatak
 \FloatBarrier
 
 \section{Klasa Api}
-Klasa Api je zadužena za komunikaciju s programskim sučeljem.
+Klasa Api zadužena je za komunikaciju s programskim sučeljem.
 \\Primjer dohvaćanja podataka o poslužiteljima:
 \begin{figure}[htb]
 	\centering
@@ -786,7 +793,7 @@ Klasa Api je zadužena za komunikaciju s programskim sučeljem.
 \FloatBarrier
 
 \section{ChartHelper.ts}
-Pomoćna datoteka koja se koristi za pretvorbu podataka koje programsko sučelje vraća u točke na grafu. Metode ove klase prolaze kroz \textit{logs} parametar te za svaki podataka vraćaju podatke relevantne za graf.
+CharHelper.ts pomoćna je datoteka koja se koristi za pretvorbu podataka koje programsko sučelje vraća u točke na grafu. Metode ove klase prolaze kroz \textit{logs} parametar te za svaki podataka vraćaju podatke relevantne za graf.
 \\Primjer metode koja vraća točke za graf particije:
 \begin{figure}[htb]
 	\centering
@@ -796,23 +803,23 @@ Pomoćna datoteka koja se koristi za pretvorbu podataka koje programsko sučelje
 \FloatBarrier
 
 \chapter{Korisničko sučelje i interakcija}
-Otvaranjem web-stranice se prikazuje glavna stranica. Na njoj se prikazuje izbornik sa listom poslužitelja i karticom za obavijesti. Ukoliko barem jedan poslužitelj postoji, prikazuju se podaci o prvom poslužitelju.
+Otvaranjem web-stranice prikazuje se glavna stranica na kojoj se nalazi izbornik sa listom poslužitelja i karticom za obavijesti. Ukoliko barem jedan poslužitelj postoji, prikazuju se podaci o prvom poslužitelju.
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=1\linewidth]{images/web_1.png} 
 	\caption{Početna stranica}
 \end{figure}
 \FloatBarrier
-Moguće je odabrati početni i završni datum, čijim mijenjanjem se osvježavaju svi podaci web stranice.
+Moguće je odabrati početni i završni datum, čijim se mijenjanjem osvježavaju svi podaci web stranice.
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=1\linewidth]{images/web_2.png} 
 	\caption{Početna stranica sa filtriranim datumom}
 \end{figure}
 \FloatBarrier
-Prilikom učitavanja podataka za graf se prikazuje poruka \textit{Loading...}, a u slučaju da podataka nema se prikazuje \textcolor{red}{\textit{No data...}}
+Prilikom učitavanja podataka za graf prikazuje se poruka \textit{Loading...}, a u slučaju da podataka nema prikazuje se \textcolor{red}{\textit{No data...}}
 
-Pojedinačne grafove je moguće uvećati čime se osvježavaju podaci. Graf je također moguće \textcolor{red}{resetirati} čime se osvježavaju podaci za originalni period.
+Pojedinačne grafove moguće je uvećati čime se osvježavaju podaci. Graf je također moguće \textcolor{red}{resetirati} čime se osvježavaju podaci za originalni period.
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=1\linewidth]{images/web_3.png} 
@@ -820,15 +827,15 @@ Pojedinačne grafove je moguće uvećati čime se osvježavaju podaci. Graf je t
 \end{figure}
 \FloatBarrier
 
-Kartice komponenti je moguće smanjiti čime se mijenja izgled stranice (proširuju se komponente kako bi stale na ekran).
+Kartice komponenti moguće je smanjiti čime se mijenja izgled stranice (proširuju se komponente kako bi stale na ekran).
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.75\linewidth]{images/web_4.png} 
-	\caption{Izgled web-stranice nakon umanjena kartica}
+	\caption{Izgled web-stranice nakon umanjenja kartica}
 \end{figure}
 \FloatBarrier
 
-Klikom na karticu \textit{Alerts} se prikazuju obavijesti i upozorenja.
+Klikom na karticu \textit{Alerts} prikazuju se obavijesti i upozorenja.
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.9\linewidth]{images/web_5.png} 
@@ -836,7 +843,7 @@ Klikom na karticu \textit{Alerts} se prikazuju obavijesti i upozorenja.
 \end{figure}
 \FloatBarrier
 
-Web-stranica podržava široke ekrane te mobilne uređaje.
+Web-stranica podržava široke ekrane i mobilne uređaje.
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.75\linewidth]{images/web_6.png} 
