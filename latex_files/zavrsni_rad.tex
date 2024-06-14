@@ -118,7 +118,7 @@
 
 \begin{zahvale}
   % Ovdje upišite zahvale / Write in the acknowledgment
-  \textcolor{red}{Hvala na kavi...}
+Zahvaljujem mentorici izv. prof. dr. sc. Ivani Bosnić na stpljenju, savjetima i brzim odgovorima tijekom izrade rada.
 \end{zahvale}
 
 
@@ -272,7 +272,7 @@ HotChocolate je C\# biblioteka koja se koristi za izgradnju GraphQL poslužitelj
 \FloatBarrier
 
 \section{.NET i C\#}
-.NET je otvorena platforma za razvoj raznih tipova aplikacija (web-aplikacije, aplikacije za mobilne uređaje, video igre te drugo). Obuhvaća razne tehnologije i alate koji omogućavaju brzi razvoj aplikacija. Ključne komponente su \textit{.NET Runtime} (zadužen za automatsko skupljanje smeća i upravljanje memorijom), \textit{.NET SDK} (alati i biblioteke koje se koriste za razvoj .NET aplikacija, alati za \textcolor{red}{debuggiranje}) i \textit{.NET biblioteke} (osnovne funkcionalnosti potrebne za razvoj aplikacija).
+.NET je otvorena platforma za razvoj raznih tipova aplikacija (web-aplikacije, aplikacije za mobilne uređaje, video igre te drugo). Obuhvaća razne tehnologije i alate koji omogućavaju brzi razvoj aplikacija. Ključne komponente su \textit{.NET Runtime} (zadužen za automatsko skupljanje smeća i upravljanje memorijom), \textit{.NET SDK} (alati i biblioteke koje se koriste za razvoj .NET aplikacija, alati za ispravljanje pogrešaka) i \textit{.NET biblioteke} (osnovne funkcionalnosti potrebne za razvoj aplikacija).
 \\.NET okruženje podržava C\#, F\# i VB.NET jezike.
 \\Korištena .NET verzija: net8.0
 
@@ -288,7 +288,7 @@ C\# je objektno orijentiran programski jezik dizajniran 2000. godine. Sintaksa C
 \end{figure}
 \FloatBarrier
 
-\subsection{linq2db}
+\subsubsection{linq2db}
 \label{pog:linq2db}
 linq2db je .NET biblioteka koja se koristi za pretvaranje LINQ koda u SQL kod kako bi se moglo lako pristupati bazi podataka.
 \\Nakon instalacije biblioteke se pomoću određenih naredbi može spojiti na bazu podataka i iz nje generirati C\# klase koje odgovaraju tablicama u bazi podataka:
@@ -320,7 +320,7 @@ linq2db je .NET biblioteka koja se koristi za pretvaranje LINQ koda u SQL kod ka
 \end{figure}
 \FloatBarrier
 
-\subsection{Newtonsoft.Json}
+\subsubsection{Newtonsoft.Json}
 Newtonsoft.Json je C\# biblioteka koja se koristi za serijalizaciju i deserijalizaciju JSON podataka.
 
 \section{Vue}
@@ -409,7 +409,7 @@ Github je platforma za razvoj aplikacija temeljena na Git-u. Koristi se za lakš
 %-------------------------------------------------------------------------------
 \chapter{Opis rješenja}
 \label{pog:opis_rjesenja}
-\section{\textcolor{red}{Softver}}
+\section{Programsko rješenje}
 Napravljene su tri .NET projekta (API, Common i Monitor), web stranica te baza podataka.
 \\\textit{API} (programsko sučelje) je centralna aplikacija koja povezuje \textit{Monitor} i web-stranicu s bazom podataka. To je ostvareno pomoću GraphQL-a, kod kojeg se koristi \textit{Query} objekt za dohvaćanje podatka za web-stranicu te \textit{Mutation} objekti koji se koriste kako bi \textit{Monitor} mogao pisati podatke u bazu podataka.
 \\\textit{Monitor} je aplikacija koja se pokreće na poslužitelju koji se prati. Ona u specificiranom intervalu prikuplja razne podatke o poslužitelju te ih šalje programskom sučelju koji ih zapisuje u bazu podataka.
@@ -440,7 +440,7 @@ Također je napravljen pogled koji se koristi za dohvat statusa poslužitelja. P
 
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[firstline=16,lastline=22,language=SQL,label=]{db.sql}
+	\lstinputlisting[firstline=16,lastline=22,language=SQL,label=]{../db.sql}
 	\caption{serverStatus pogled}
 \end{figure}
 \FloatBarrier
@@ -526,7 +526,7 @@ Uz tablicu je također napravljena i metoda \textit{before\_alert\_insert\_func(
 
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[firstline=172,lastline=176,language=SQL]{db.sql}
+	\lstinputlisting[firstline=172,lastline=176,language=SQL]{../db.sql}
 	\caption{Metoda \textit{before\_alert\_insert\_func()}}
 \end{figure}
 \FloatBarrier
@@ -575,7 +575,7 @@ Neki od parametara koje gotova svaka metoda sadržava:
 Klasa se oslanja na \textit{IDbProvider} sučelje za rad s bazom podataka te na metodu \textit{GetLogs} za dohvat podataka iz baze podataka. Primjer jedne takve metode:
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[language=CSharp, firstline=21, lastline=48]{API/GraphQL/Query/Query.cs}
+	\lstinputlisting[language=CSharp, firstline=21, lastline=48]{../API/GraphQL/Query/Query.cs}
 	\caption{Metoda \textit{Cpu}}
 \end{figure}
 \FloatBarrier
@@ -596,7 +596,7 @@ Algoritam radi tako da pomoću početnog i krajnjeg datuma izračuna interval un
 Nakon izračuna intervala dohvaćaju se podaci iz tablice koji su pohranjeni nakon specificiranog početnog datuma i prije krajnjeg datuma. Nakon toga se prolazi kroz svaki podatak te se koristi klasa \textit{DatasetHelper} za spajanje više podataka u jedan te se na kraju vraća lista spojenih podataka.
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[language=CSharp, firstline=99, lastline=105]{API/GraphQL/Query/QueryHelper.cs}
+	\lstinputlisting[language=CSharp, firstline=99, lastline=105]{../API/GraphQL/Query/QueryHelper.cs}
 	\caption{Parametri metode \textit{GetLogs}}
 	\label{GetLogs}
 \end{figure}
@@ -610,7 +610,7 @@ Na primjer ako je interval 30 minuta, a podaci se bilježe svakih 5 minuta, spaj
 
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[language=CSharp, firstline=20, lastline=50]{API/GraphQL/Query/DatasetHelper.cs}
+	\lstinputlisting[language=CSharp, firstline=20, lastline=50]{../API/GraphQL/Query/DatasetHelper.cs}
 	\caption{Metoda AddLog}
 \end{figure}
 \FloatBarrier
@@ -627,7 +627,7 @@ Važnije klase i sučelja u direktoriju:
 Primjer dijela jedne mutacije:
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[language=CSharp, firstline=10, lastline=24]{API/GraphQL/Mutations/CpuMutation.cs}
+	\lstinputlisting[language=CSharp, firstline=10, lastline=24]{../API/GraphQL/Mutations/CpuMutation.cs}
 	\caption{Isječak mutacije \textit{CpuMutation}}
 \end{figure}
 \FloatBarrier
@@ -636,7 +636,7 @@ Primjer dijela jedne mutacije:
 Sučelje \textit{IAlertHelper} koristi se za slanje obavijesti bazi podataka. Poruka se odbacuje ako je ista poruka za isti poslužitelj već poslana prije manje od sat vremena.
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[language=CSharp, firstline=5]{API/GraphQL/Alerts/IAlertHelper.cs}
+	\lstinputlisting[language=CSharp, firstline=5]{../API/GraphQL/Alerts/IAlertHelper.cs}
 	\caption{Sučelje \textit{IAlertHelper}}
 \end{figure}
 \FloatBarrier
@@ -658,7 +658,7 @@ Neke od važnijih klasa i sučelja direktorija:
 	\item \textit{sučelje IDb} - sučelje koje sadržava popis svih tablica u bazi podataka
 	\begin{figure}[htb]
 		\centering
-		\lstinputlisting[language=CSharp,firstline=6]{API/Db/Models/IDb.cs}
+		\lstinputlisting[language=CSharp,firstline=6]{../API/Db/Models/IDb.cs}
 		\caption{Sučelje \textit{IDb}}
 	\end{figure}
 	\FloatBarrier
@@ -695,7 +695,7 @@ Objašnjenje važnijih dijelova aplikacije:
 	\item \textit{klasa Monitor} - sadržava metodu \textit{Main} koja se pokreće prilikom pokretanja aplikacije. Na početku učitava konfiguracijsku datoteku i zatim generira nasumični broj za ID poslužitelja. Na kraju se u beskonačnoj petlji pokreće proces prikupljanja podataka te slanje tih podataka programskom sučelju
 	\begin{figure}[htb]
 		\centering
-		\lstinputlisting[firstline=10,lastline=30,language=CSharp]{Monitor/Monitor.cs}
+		\lstinputlisting[firstline=10,lastline=30,language=CSharp]{../Monitor/Monitor.cs}
 		\caption{Glavna metoda programa Monitor}
 	\end{figure}
 	\FloatBarrier	
@@ -703,7 +703,7 @@ Objašnjenje važnijih dijelova aplikacije:
 	\item \textit{klasa ApiHelper} - koristi se za slanje podataka programskom sučelju. Prilikom poziva metode \textit{SendLog} radi se GraphQL zahtjev koristeći prikupljene podatke te se šalje zahtjev programskom sučelju
 	\begin{figure}[htb]
 		\centering
-		\lstinputlisting[firstline=165,lastline=179,language=CSharp]{Monitor/ApiHelper.cs}
+		\lstinputlisting[firstline=165,lastline=179,language=CSharp]{../Monitor/ApiHelper.cs}
 		\caption{Isječak metode \textit{SendLog}}
 	\end{figure}
 	\FloatBarrier		
@@ -712,7 +712,7 @@ Objašnjenje važnijih dijelova aplikacije:
 	\item \textit{klasa ProcessHelper} - koristi se za pokretanje procesa u terminalu
 	\begin{figure}[htb]
 		\centering
-		\lstinputlisting[firstline=9,lastline=27,language=CSharp]{Monitor/ProcessHelper.cs}
+		\lstinputlisting[firstline=9,lastline=27,language=CSharp]{../Monitor/ProcessHelper.cs}
 		\caption{Isječak metode \textit{StartProcess}}
 	\end{figure}	
 	\item \textit{datoteka config.json} - koristi ju administrator kako bi konfigurirao aplikaciju
@@ -732,7 +732,7 @@ Projekt \textit{Common} sadržava klase i sučelja koje koriste više projekata.
 Glavno sučelje je \textit{ILog} i svaka \textit{Log} klasa nasljeđuje polja definirana u njemu.
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[firstline=3,language=CSharp]{Common/Models/ILog.cs}
+	\lstinputlisting[firstline=3,language=CSharp]{../Common/Models/ILog.cs}
 	\caption{Sučelje \textit{ILog}}
 \end{figure}
 \FloatBarrier
@@ -746,7 +746,7 @@ Neke od važnijih komponenti direktorija:
 	\item \textit{direktorij InputModels}  - sadržava klase koje se koriste prilikom dodavanja ili izmjene podataka. Primjer klase:
 	\begin{figure}[htb]
 		\centering
-		\lstinputlisting[firstline=3,language=CSharp]{Common/Models/Graphql/InputModels/CpuInput.cs}
+		\lstinputlisting[firstline=3,language=CSharp]{../Common/Models/Graphql/InputModels/CpuInput.cs}
 		\caption{Klasa \textit{CpuInput}}
 	\end{figure}
 	\FloatBarrier
@@ -754,7 +754,7 @@ Neke od važnijih komponenti direktorija:
 	\item \textit{direktorij OutputModels} - sadržava klase koje se koriste prilikom vraćanja odgovora programskog sučelja. Primjer klase:
 	\begin{figure}[htb]
 		\centering
-		\lstinputlisting[firstline=3,language=CSharp]{Common/Models/Graphql/OutputModels/AlertOutput.cs}
+		\lstinputlisting[firstline=3,language=CSharp]{../Common/Models/Graphql/OutputModels/AlertOutput.cs}
 		\caption{Klasa \textit{AlertOutput}}
 	\end{figure}
 	\FloatBarrier
@@ -764,13 +764,13 @@ Neke od važnijih komponenti direktorija:
 Web-stranica je napravljena pomoću \textit{Vue} razvojne okoline. Sastoji se od raznih komponenti koje se koriste za prikaz i dohvaćanje podataka od programskog sučelja.
 Koristi se \textit{Vue} razvojna okolina te se zbog toga upotrebljava samo jedna HTML stranica koja se nalazi u direktoriju "\textit{public}". Stranica se koristi kao kostur web-stranice u kojemu se prikazuju renderirane komponente.
 
-\section{App.vue}
+\section{Komponenta App}
 Komponenta \textit{App} je glavna Vue komponenta koja kontrolira prikazani sadržaj stvara se prilikom pokretanja programa.
 
 Na početku komponente nalazi se glavni izbornik koji koristi \textit{Vue router} komponentu koja renderira određenu komponentu, ovisno o tome na kojoj putanji se korisnik nalazi:
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[firstline=50, lastline=69, language=HTML]{website/src/App.vue}
+	\lstinputlisting[firstline=50, lastline=69, language=HTML]{../website/src/App.vue}
 	\caption{Kod za prikaz izbornika [14]}
 \end{figure}
 \FloatBarrier
@@ -804,7 +804,7 @@ Komponente \textit{CpuInfo}, \textit{DiskInfo} i \textit{MemoryInfo} koriste se 
 Primjer dijela jedne takve komponente:
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[language=Javascript,firstline=53]{website/src/components/MemoryInfo.vue}
+	\lstinputlisting[language=Javascript,firstline=53]{../website/src/components/MemoryInfo.vue}
 	\caption{Isječak \textit{MemoryInfo} komponente}
 \end{figure}
 \FloatBarrier
@@ -815,7 +815,7 @@ Direktorij \textit{Models} sadržava razne klase koje se koriste za pohranjivanj
 Primjer modela:
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[firstline=3,language=Javascript]{website/src/models/Partition.ts}
+	\lstinputlisting[firstline=3,language=Javascript]{../website/src/models/Partition.ts}
 	\caption{Model particije}
 \end{figure}
 \FloatBarrier
@@ -826,7 +826,7 @@ Klasa \textit{Api} zadužena je za komunikaciju s programskim sučeljem.
 Primjer dohvaćanja podataka o poslužiteljima:
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[firstline=161,language=Javascript]{website/src/api.ts}
+	\lstinputlisting[firstline=161,language=Javascript]{../website/src/api.ts}
 	\caption{Dohvaćanje podataka o poslužiteljima}
 \end{figure}
 \FloatBarrier
@@ -837,7 +837,7 @@ Klasa \textit{CharHelper} pomoćna je datoteka koja se koristi za pretvorbu poda
 Primjer metode koja vraća točke za graf particije:
 \begin{figure}[htb]
 	\centering
-	\lstinputlisting[firstline=102,language=javascript]{website/src/ChartHelper.ts}
+	\lstinputlisting[firstline=102,language=javascript]{../website/src/ChartHelper.ts}
 	\caption{Vraćanje točaka grafa za podatke particije}
 \end{figure}
 \FloatBarrier
@@ -858,9 +858,9 @@ Moguće je odabrati početni i krajnji datum, čijim se mijenjanjem osvježavaju
 	\caption{Početna stranica sa filtriranim datumom}
 \end{figure}
 \FloatBarrier
-Prilikom učitavanja podataka za graf prikazuje se poruka \textit{Loading...}, a u slučaju da podataka nema prikazuje se \textcolor{red}{\textit{No data...}}
+Prilikom učitavanja podataka za graf prikazuje se poruka "\textit{Loading...}", a u slučaju da podataka nema prikazuje se "\textit{No data (try choosing a different date range)}"
 
-Pojedinačne grafove moguće je uvećati čime se osvježavaju podaci. Graf je također moguće \textcolor{red}{resetirati} čime se osvježavaju podaci za originalni period.
+Pojedinačne grafove moguće je uvećati čime se osvježavaju podaci. Graf je također moguće vratiti na početne postavke čime se osvježavaju podaci za originalni period.
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=1\linewidth]{images/web_3.png} 
@@ -891,8 +891,6 @@ Web-stranica podržava široke ekrane i mobilne uređaje.
 	\caption{Web-stranica na mobilnim uređajima}
 \end{figure}
 \FloatBarrier
-
-\textcolor{red}{DODAJ SLIKU ZA MOBILNE UREDAJE}
 
 \chapter{Komentari}
 U trenutnom obliku, napravljeno rješenje nije bolje od raznih drugih rješenja za praćenje statusa poslužitelja. Svako od tih rješenja nudi neka poboljšanja od sigurnosti, optimizacije, bolje administracije pozlužitelja, osvježavanja podataka u stvarnom vremenu te brojne druge funkcionalnosti i poboljšanja.
@@ -939,22 +937,25 @@ Jedno od potencijalnih rješenja je instalacija "\textit{Windows Subsystem for L
 
 % Sažetak na hrvatskom
 \begin{sazetak}
-  Unesite sažetak na hrvatskom.
+	U sklopu ovog završnog rada implementirana je skupina programa koji omogućuju praćenje i pregled stanja raznih aspekata poslužitelja. Aplikacija za praćenje stanja poslužitelja i programsko sučelje napravljeni su koristeći ASP .NET Core, a za izradu web-aplikacije koristi se Vue razvojna okolina. Baza podataka implementirana je u PostgreSQL sustavu.
+	
+	Aplikacija za praćenje stanja poslužitelja periodički šalje podatke programskom sučelju, koje ih zatim zapisuje u bazu podataka. Web-stranica slanjem zahtjeva programskom sučelju može dohvatiti i prikazivati podatke o procesoru, radnoj memoriji, diskovima i obavijestima za određeni poslužitelj.
 \end{sazetak}
 
 \begin{kljucnerijeci}
-  prva ključna riječ; druga ključna riječ; treća ključna riječ
+  Vue.js; ASP .NET Core; web-aplikacija; Linux; GraphQL; C\#; poslužitelj
 \end{kljucnerijeci}
 
 
 % Abstract in English
 \begin{abstract}
-  Enter the abstract in English.
-  
+	As a part of this final thesis, multiple programs have been made which enable the monitoring of various aspects of a server. The monitoring application and the API have been made using ASP .NET Core, and the website has been made using the Vue framework. The database has been made using PostgreSQL RDBMS.
+	
+	The monitoring application periodically sends data to the API which then writes them to the database. The website can then get and view the stored data about the processor, RAM, hard disks and alerts for a specific server by sending queries to the API.
 \end{abstract}
 
 \begin{keywords}
-  the first keyword; the second keyword; the third keyword
+	Vue.js; ASP .NET Core; website; Linux; GraphQL; C\#; server
 \end{keywords}
 
 
