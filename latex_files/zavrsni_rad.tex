@@ -127,7 +127,7 @@ Nažalost, nije dovoljno konfigurirati poslužitelj da obavlja određene zadaće
 
 Zbog tih razloga postoji mnogo aplikacija koje se koriste za praćenje rada poslužitelja i obavještavanje administratora u slučaju neispravnog rada. Problem koji se javlja kod većine ovakvih aplikacija je nemogućnost pregleda specifičnog perioda u kojemu se dogodila pogreška, potreba za plaćanjem naprednijih funkcionalnosti aplikacije te pohranjivanje podataka samo za zadnjih nekoliko dana ili tjedana. Nadalje, većina takvih aplikacija oslanja se na programsko sučelje REST kojem je često potrebno slati veliki broj zahtjeva za dohvat podataka.
 
-Cilj ove aplikacije je omogućiti praćenje jednog ili više poslužitelja kroz neograničen period, što omogućuje administratorima pregledavanje podataka o radu poslužitelja tijekom specifičnog perioda u kojemu je nastala pogreška na njemu. Također, cilj je optimiziranje slanja podataka korisnicima te na poslužitelj korištenjem jezika GraphQL radi rasterećivanja poslužitelj.
+Cilj ove aplikacije je omogućiti praćenje jednog ili više poslužitelja kroz neograničen period, što omogućuje administratorima pregledavanje podataka o radu poslužitelja tijekom specifičnog perioda u kojemu je nastala pogreška na njemu. Također, cilj je optimiziranje slanja podataka korisnicima te na poslužitelj korištenjem jezika GraphQL radi rasterećivanja poslužitelja.
 
 
 %-------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ Korisnik također može odabrati globalni period: nakon promjene početnog ili k
 \section{Zahtjevi sustava}
 Za pohranu podataka o poslužiteljima koristi se baza podataka.
 
-Programsko sučelje pomoću \textit{GraphQL} sustava procesira zahtjeve za pisanje i čitanje podataka o poslužiteljima te komunicira s bazom podataka. Sučelje ima razne parametre kojima se omogućava filtriranje podataka za određeni poslužitelj i period te parametre koji određuju način kompresije podataka (min/max/average). Aplikacije za praćenje stanja poslužitelja šalje podatke koji se pohranjuju  u bazu podataka, a web-stranica šalje zahtjeve za čitanje podataka o poslužiteljima.
+Programsko sučelje pomoću sustava \textit{GraphQL} procesira zahtjeve za pisanje i čitanje podataka o poslužiteljima te komunicira s bazom podataka. Sučelje ima razne parametre kojima se omogućava filtriranje podataka za određeni poslužitelj i period te parametre koji određuju način kompresije podataka (min/max/average). Aplikacije za praćenje stanja poslužitelja šalje podatke koji se pohranjuju  u bazu podataka, a web-stranica šalje zahtjeve za čitanje podataka o poslužiteljima.
 
 Aplikacija za praćenje stanja poslužitelja pokreće se na poslužitelju koji se prati. Aplikaciju je moguće pokrenuti na više poslužitelja. Također je moguće konfigurirati interval slanja podataka te odabrati koji se podaci šalju pomoću konfiguracijske datoteke u formatu \textit{JSON}.
 
@@ -164,7 +164,7 @@ Web-stranica šalje zahtjeve za čitanje podataka na programsko sučelje te pomo
 %-------------------------------------------------------------------------------
 \chapter{Korištene tehnologije}
 \label{pog:koristene_tehnologije}
-U ovom projektu je korišten sustav upravljanja relacijskim bazama podataka (\textit{RDBMS - Relational Database Management System}), web razvojna okolina, jezik GraphQL te brojne druge tehnologije, čiji opis slijedi u nastavku.
+U ovom projektu je korišten sustav upravljanja relacijskim bazama podataka (\textit{RDBMS - Relational Database Management System}), web razvojna okolina, jezik \textit{GraphQL} te brojne druge tehnologije, čiji opis slijedi u nastavku.
 
 \section{Operacijski sustav Linux}
 \textit{Linux} je operacijski sustav otvorenog kôda temeljen na operacijskom sustavu \textit{Unix} koji je nastao 1991. godine. Postoje razne distribucije operacijskog sustava (\textit{Ubuntu, Mint, Arch, Fedora, CentOS} i druge) koje uključuju jezgru te razne aplikacije i modifikacijama koje čine tu distribuciju jedinstvenom. Odabran je operacijski sustav \textit{Linux} jer je poznat po svojoj stabilnosti, sigurnosti i fleksibilnosti, što ga čini vrlo popularnom opcijom za poslužitelje. Njegova otvorenost omogućava korisnicima i programerima da slobodno modificiraju i dijele kôd, ali unatoč tome su sve distribucije temeljene na istoj jezgri što omogućava ovom programu da ispravno radi na svim modernim distribucijama operacijskog sustava \textit{Linux}.
@@ -176,15 +176,17 @@ Koriste se razni programi za prikupljanje podataka kao:
 	\item \textit{lsblk} -  podaci o diskovima i particijama na računalu
 	\item \textit{journalctl} - poruke koje je određeni servis poslao
 \end{itemize}
+
 Za programiranje i testiranje programa korištene su distribucije \textit{Arch} i \textit{Mint}, ali program bi trebao raditi na svim distribucijama operacijskog sustava \textit{Linux}, dokle god se na njih mogu instalirati potrebni programi za prikupljanje podataka i pokretanje aplikacija.
 
 \section{Jezik GraphQL}
 \textit{GraphQL} je jezik za upite podataka, hibrid programskog sučelja \textit{REST} i jezika \textit{SQL}. Napravljen je da omogući klijentima da definiraju podatke koji su im potrebni, čime se izbjegava dohvaćanje previše ili premalo podataka što su česti problemi kod tradicionalnih \textit{REST} programskih sučelja.
-\\Odabran je jezik \textit{GraphQL} umjesto programskog sučelja \textit{REST} zbog raznih karakteristika jezika \textit{GraphQL}; neke od važnijih su:
+
+Odabran je jezik \textit{GraphQL} umjesto programskog sučelja \textit{REST} zbog raznih karakteristika jezika \textit{GraphQL}; neke od važnijih su:
  \begin{itemize}
  	\item \textit{deklarativni podaci} - korisnici navode točno koji podaci im trebaju te se ne šalje ništa više od toga
  	\item \textit{jedan URL} - koristi se samo jedan URL za sve upite, od upita za dohvaćanje podataka do onih za slanje podataka, što znatno ubrzava razvoj programskog sučelja te olakšava njegovo održavanje
- 	\item \textit{ugrađena validacija polja} - ovo omogućava jeziku \textit{GraphQL} provjeru polja koja korisnik unosi tako da se ne treba ručno programirati provjeravanje polja (na primjer \textit{GraphQL} će automatski izbaciti grešku ako se u brojčano polje unese znakovni niz). Također podcrtava pogreške prilikom korištenja nepoznatih parametara i polja:
+ 	\item \textit{ugrađena validacija polja} - ovo omogućava jeziku \textit{GraphQL} provjeru polja koja korisnik unosi tako da se ne treba ručno programirati provjeravanje polja (na primjer \textit{GraphQL} će automatski izbaciti poruku greške ako se u brojčano polje unese znakovni niz). Također podcrtava pogreške prilikom korištenja nepoznatih parametara i polja:
 
 	\begin{figure}[htb]
 		\centering
@@ -209,7 +211,7 @@ Za programiranje i testiranje programa korištene su distribucije \textit{Arch} 
 				]
 			}
 		\end{lstlisting}
-		\caption{Primjer krivog \textit{GraphQL} upita [1]}
+		\caption{Primjer krivog \textit{GraphQL} upita \cite{graphql_validation}}
 	\end{figure}
 	\FloatBarrier
 
@@ -240,12 +242,13 @@ Za programiranje i testiranje programa korištene su distribucije \textit{Arch} 
  				}
  			}
  		\end{lstlisting}
- 		\caption{Primjer \textit{GraphQL} upita [2]}
+ 		\caption{Primjer \textit{GraphQL} upita \cite{graphql_query}}
  	\end{figure}
  	\FloatBarrier
  	
   	\item {fleksibilnost razvoja programskog sučelja} - stari upiti će raditi čak i ako se shema programskog sučelja promijeni, dokle god polja koja korisnik dohvaća još uvijek postoje
  \end{itemize}
+
 Jezik \textit{GraphQL} se sastoji od četiri važna dijela:
 \begin{itemize}
 	\item shema (\textit{schema}) - glavni dio sustava \textit{GraphQL} koji definira vrste podataka te upite koje korisnici mogu izvršavati
@@ -253,44 +256,46 @@ Jezik \textit{GraphQL} se sastoji od četiri važna dijela:
 	\item mutacija (\textit{mutation}) - omogućava slanje podataka poslužitelju koji se koriste za dodavanje, izmjenu te brisanje podataka
 	\item pretplata (\textit{subscription}) - omogućava osvježavanje podataka u stvarnom vremenu
 \end{itemize}
+
 Navedene karakteristike jezika \textit{GraphQL} omogućavaju efikasno prenošenje velike količine podataka te smanjuju kompleksnost održavanja i dokumentiranja kôda, zbog čega je on odabran umjesto programskog sučelja \textit{REST}.
 
-\section{HotChocolate}
+\section{Biblioteka HotChocolate}
 \label{pog:hotchocolate}
-HotChocolate je biblioteka za programski jezik \textit{C\#} koja se koristi za izgradnju \textit{GraphQL} poslužitelja. Ona omogućava korištenje svih funkcionalnosti \textit{GraphQL} tehnologije pomoću razvojne okoline \textit{.NET} bez potrebe ručne implementacije.
+HotChocolate je biblioteka za programski jezik \textit{C\#} koja se koristi za izgradnju \textit{GraphQL} poslužitelja. Ona omogućava korištenje svih funkcionalnosti tehnologije \textit{GraphQL} pomoću razvojne okoline \textit{.NET} bez potrebe ručne implementacije.
 
-Postoje razne druge biblioteke koje se koriste za interakciju s \textit{GraphQL} poslužiteljem, no ova biblioteka je odabrana zbog opširne dokumentacije i podrške za moderne funkcionalnosti \textit{GraphQL} jezika.
+Postoje razne druge biblioteke koje se koriste za interakciju s \textit{GraphQL} poslužiteljem, no ova biblioteka je odabrana zbog opširne dokumentacije i podrške za moderne funkcionalnosti jezika \textit{GraphQL}.
 
-Korištena verzija biblioteke je 13.6.0
+Korištena verzija biblioteke je 13.6.0.
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.6\linewidth]{images/hot_chocolate.png} 
-	\caption{\textit{HotChocolate} poslužitelj [3]}
+	\caption{\textit{HotChocolate} poslužitelj \cite{hotchocolate_doc}}
 	\label{slk:hot_chooclate}
 \end{figure}
 \FloatBarrier
 
-\section{.NET i C\#}
+\section{Razvojno okruženje .NET i jezik C\#}
 \textit{.NET} je otvorena platforma za razvoj raznih tipova aplikacija (web-aplikacije, aplikacije za mobilne uređaje, video igre te drugo). Obuhvaća razne tehnologije i alate koji omogućavaju brzi razvoj aplikacija. Ključne komponente su \textit{.NET Runtime} (zadužen za automatsko skupljanje smeća i upravljanje memorijom), \textit{.NET SDK} (alati i biblioteke koje se koriste za razvoj \textit{.NET} aplikacija, alati za ispravljanje pogrešaka) i biblioteke za \textit{.NET} razvojnu platformu (osnovne funkcionalnosti potrebne za razvoj aplikacija).
-\\\textit{.NET} razvojno okruženje podržava \textit{C\#}, \textit{F\#} i \textit{VB.NET} jezike.
-\\Korištena razvojnog okruženja \textit{.NET} je net8.0
+\\Razvojno okruženje \textit{.NET} podržava jezike \textit{C\#}, \textit{F\#} i \textit{VB.NET}.
+\\Korištena verzija razvojnog okruženja \textit{.NET} je net8.0.
 
-\textit{C\#} je objektno orijentiran programski jezik dizajniran 2000. godine. Sintaksa \textit{C\#} jezika je jednostavna te jezik omogućava izgradnju paralelnog kôda što znatno ubrzava aplikacije. Često je uspoređivan s programskim jezikom Java.
-\\Odabrane su ove tehnologije zbog jednostavnosti razvoja aplikacija u njima te zbog toga što .NET podržava izvođenje i razvoj aplikacija na više platformi, uključujući operacijske sustave \textit{Windows} i \textit{Linux}.
-\\Korištena verzija programskog jezika \textit{C\#} je 12.0
+\textit{C\#} je objektno orijentiran programski jezik dizajniran 2000. godine. Sintaksa jezika \textit{C\#} je jednostavna te jezik omogućava izgradnju paralelnog kôda što znatno ubrzava aplikacije. Često je uspoređivan s programskim jezikom \textit{Java}.
+\\Korištena verzija programskog jezika \textit{C\#} je 12.0.
+
+Odabrane su ove tehnologije zbog jednostavnosti razvoja aplikacija u njima te zbog toga što .NET podržava izvođenje i razvoj aplikacija na više platformi, uključujući operacijske sustave \textit{Windows} i \textit{Linux}.
 
 \begin{figure}[htb]
 	\centering
 	\includegraphics[trim={0 0 15cm 5cm},clip,width=1\linewidth]{images/dotnet5_platform.png} 
-	\caption{Alati platforme \textit{.NET} [4]}
+	\caption{Alati platforme \textit{.NET} \cite{dotnet_descr}}
 	\label{slk:dotnet}
 \end{figure}
 \FloatBarrier
 
 \subsubsection{linq2db}
 \label{pog:linq2db}
-\textit{linq2db} je biblioteka za \textit{.NET} razvojno okruženuje koja se koristi za pretvaranje LINQ kôda u SQL kôd kako bi se moglo lako pristupati bazi podataka.
-\\Nakon instalacije biblioteke se može spojiti na bazu podataka i iz nje generirati \textit{C\#} klase koje odgovaraju tablicama u bazi podataka:
+\textit{linq2db} je biblioteka za razvojno okruženje \textit{.NET} koja se koristi za pretvaranje LINQ kôda u SQL kôd kako bi se moglo lako pristupati bazi podataka.
+\\Nakon instalacije biblioteke se može spojiti na bazu podataka i iz nje generirati klase jezika \textit{C\#} koje odgovaraju tablicama u bazi podataka:
 \begin{figure}[htp]
 	\centering
 	\begin{lstlisting}[language=CSharp]
@@ -315,17 +320,18 @@ Korištena verzija biblioteke je 13.6.0
 			// ... other columns ...
 		}
 	\end{lstlisting}
-	\caption{Primjer klase generirane pomoću biblioteke \textit{linq2db} [5]}
+	\caption{Primjer klase generirane pomoću biblioteke \textit{linq2db} \cite{linq2db_doc}}
 \end{figure}
 \FloatBarrier
 
 \subsubsection{Newtonsoft.Json}
 Newtonsoft.Json je biblioteka za programski jezik \textit{C\#} koja se koristi za serijalizaciju i deserijalizaciju podataka koji koriste format \textit{JSON}.
 
-\section{Vue}
+\section{Razvojno okruženje Vue}
 \label{pog:vue}
-\textit{Vue} razvojno okruženje za jezik \textit{JavaScript} koje se koristi za izradu korisničkog sučelja. Omogućava jednostavniji rad s prikazom podataka i bolje strukturiranje kôda od samog jezika \textit{JavaScript}.
-\\Neke od prednosti razvojnog okruženja \textit{Vue}:
+Razvojno okruženje \textit{Vue} se koristi za izradu korisničkog sučelja pomoću jezika \textit{JavaScript}. Omogućava jednostavniji rad s prikazom podataka i bolje strukturiranje kôda od samog jezika \textit{JavaScript}.
+
+Neke od prednosti razvojnog okruženja \textit{Vue}:
 \begin{itemize}
 	\item \textit{progresivna arhitektura} - može se lako integrirati u postojeće projekte te se nakon toga postepeno proširivati
 	\item \textit{komponente} - koriste se komponente kako bi se aplikacija razdvojila na manje, ponovno upotrebljive dijelove
@@ -343,16 +349,16 @@ Primjer \textit{Vue} kôda za povećanje gumba:
 		</button>
 		</div>
 	\end{lstlisting}
-	\caption{Primjer \textit{Vue} kôda [7]}
+	\caption{Primjer \textit{Vue} kôda \cite{vue_doc}}
 \end{figure}
 \FloatBarrier
 
-Korištena verzija razvojnog okruženja \textit{Vue} je 3.2.13
+Korištena verzija razvojnog okruženja \textit{Vue} je 3.2.13.
 
 \subsubsection{primevue}
 Biblioteka \textit{Primevue} sadržava razne \textit{Vue} komponente koje se koriste za dinamički prikaz podataka na ekranu (prilikom promjene podataka se odmah mijenja i prikaz bez potrebe za dodatnim kôdom). Koristi se i biblioteka \textit{primeicons} koja omogućuje korištenje raznih ikona.
-\\Korištena verzija biblioteke \textit{primevue} je 3.52.0
-\\Korištena verzija biblioteke \textit{primeicons} je 7.0.0
+\\Korištena verzija biblioteke \textit{primevue} je 3.52.0.
+\\Korištena verzija biblioteke \textit{primeicons} je 7.0.0.
 
 \subsubsection{vue-chartjs}
 \label{pog:chart.vue}
@@ -360,12 +366,12 @@ Biblioteka \textit{Vue-chartjs} se koristi za vizualizaciju podataka ovisno o pr
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.9\linewidth]{images/chartjs_example.png} 
-	\caption{Primjer \textit{chartjs} grafa [9]}
+	\caption{Primjer \textit{chartjs} grafa \cite{chartjs_repo}}
 	\label{slk:chartjs_example}
 \end{figure}
 \FloatBarrier
 
-Korištena verzija biblioteke \textit{primevue} je 5.2.0
+Korištena verzija biblioteke \textit{primevue} je 5.2.0.
 
 \subsubsection{vue-datepicker}
 \textit{Vue-datepicker} je \textit{Vue} komponenta koja se koristi za odabir datuma i vremena.
@@ -377,31 +383,34 @@ Korištena verzija biblioteke \textit{primevue} je 5.2.0
 \end{figure}
 \FloatBarrier
 
-Korištena verzija biblioteke \textit{vue-datepicker} je 7.1.0
+Korištena verzija biblioteke \textit{vue-datepicker} je 7.1.0.
 
-\section{PostgreSQL}
+\section{Baza podataka PostgreSQL}
 \label{pog:postgresql}
 \textit{PostgreSQL} je relacijski sustav za upravljanje bazama podataka (\textit{Relational Database Management System}) koji je otvorenog kôda i besplatan. Poznat je po svojoj stabilnosti i fleksibilnosti.
-\\Važne karakteristike sustava \textit{PostgreSQL}:
+
+Važne karakteristike sustava \textit{PostgreSQL}:
 \begin{itemize}
 	\item \textit{otvoreni kôd} - \textit{PostgreSQL} je sustav otvorenog kôda zbog čega ga bilo tko može vidjeti, izmijeniti i distribuirati
 	\item \textit{moderni standardi} - implementira puno modernih karakteristika SQL jezika
 	\item \textit{podrška za JSON} - omogućava rad s podacima u formatu \textit{JSON}, uključujući njihovu pohranu
-	\item \textit{razni tipovi podataka} - podržava integer, varchar, boolean, array, uuid, xml te razne druge tipove podataka
+	\item \textit{razni tipovi podataka} - podržava integer, varchar, boolean, array, uuid, formate \textit{XML} i \textit{JSON} te razne druge tipove podataka
 	\item \textit{ACID (atomicity, consistency, isolation, durability)} - osigurava pouzdane transakcije i integritet podataka
 \end{itemize}
 
 Odabran je \textit{PostgreSQL} kao \textit{RDBMS} sustav za upravljanje bazom podataka zato što je otvorenog kôda te ima opširnu dokumentaciju i korisničku podršku.
-\\Korištena verzija sustava \textit{PostgreSQL} je 16.2
+
+Korištena verzija sustava \textit{PostgreSQL} je 16.2.
 
 \section{Web-stranica Github}
 Git je sustav za upravljanje kôdom. Podržava verzioniranje datoteka što omogućava praćenje promjena kôda te suradnju sa drugim programerima. Napravio ga je Linus Torvalds 2005. godine te je danas jedan od najvažnijih alata za razvoj programa. Neke od važnijih karakteristika:
 \begin{itemize}
 	\item \textit{distribuiranost} - svaki korisnik ima kompletnu kopiju repozitorija na svom računalu što omogućava rad na projektu kada korisnik nema pristup internetu
-	\item \textit{verzioniranje datoteka} - pohranjuje stare datoteke datoteka što olakšava pronalazak kôda koji je uzrokovao novu grešku
+	\item \textit{verzioniranje datoteka} - pohranjuje stare datoteke datoteka što olakšava pronalazak kôda koji je uzrokovao novu pogrešku
 	\item \textit{grananje} - omogućava rad na odvojenim dijelovima projekta, neovisno o main/master grani
 	\item \textit{rad u timu} - olakšava suradnju više programera koji svi rade na istom projektu pomoću raznih mehanizama, jedan od kojih je spriječavanje nestanka kôda kojeg je jedan programer objavio s kôdom kojeg drugi programer pokušava objaviti
 \end{itemize}
+
 Github je platforma za razvoj aplikacija temeljena na distribuiranom sustavu za upravljanje izvornim kôdom Git. Koristi se za lakše korištenje Git-a te pruža razne alate koji se mogu koristiti za organizaciju zadaća programerima.
 
 
@@ -411,7 +420,7 @@ Github je platforma za razvoj aplikacija temeljena na distribuiranom sustavu za 
 
 \section{Arhitektura sustava}
 \subsubsection{Programsko rješenje}
-Napravljene su tri \textit{.NET} projekta (\textit{API, Common i Monitor}), web stranica te baza podataka.
+Napravljene su tri \textit{.NET} projekta (\textit{API, Common i Monitor}), web-stranica te baza podataka.
 
 \textit{API} (programsko sučelje) je centralna aplikacija koja povezuje \textit{Monitor} i web-stranicu s bazom podataka. To je ostvareno pomoću jezika \textit{GraphQL}. Za dohvaćanje podataka koristi se objekt \textit{Query} pomoću kojeg korisnik definira podatke koje želi dohvatiti. Za pisanje podataka koriste se \textit{Mutation} objekti kojima se predaju podaci koji se zapisuju u bazu podataka.
 
@@ -422,7 +431,7 @@ Napravljene su tri \textit{.NET} projekta (\textit{API, Common i Monitor}), web 
 \subsubsection{Topologija}
 Postoji jedan centralni poslužitelj na kojem su pokrenute dvije aplikacije: \textit{Vue} web-stranica i programsko sučelje.
 
-Web-stranica se dohvaća \textit{HTTP} protokolom, nakon čega ona šalje zahtjeve programskom sučelju na centralnom poslužitelju radi dohvata podataka iz baze podataka.
+Web-stranica se dohvaća \textit{HTTP}-protokolom, nakon čega ona šalje zahtjeve programskom sučelju na centralnom poslužitelju radi dohvata podataka iz baze podataka.
 
 Poslužitelji koji su konfigurirani za praćenje podataka također komuniciraju s programskim sučeljem, ali ne za dohvaćanje nego za slanje podataka sučelju koji onda te podatke pohranjuje u bazu podataka.
 \begin{figure}[htb!]
@@ -435,7 +444,7 @@ Poslužitelji koji su konfigurirani za praćenje podataka također komuniciraju 
 U nastavku slijedi detaljan opis funkcionalnosti i kôda svih projekata.
 
 \section{Baza podataka}
-Glavni direktorij rješenja sadržava datoteku \textit{db.sql} koja se koristi za stvaranje \textit{PostgreSQL} baze podataka. U nastavku je opisana struktura baze podataka.
+Glavni direktorij rješenja sadržava datoteku \textit{db.sql} koja se koristi za stvaranje baze podataka \textit{PostgreSQL}. U nastavku je opisana struktura baze podataka.
 
 \subsection{Poslužitelj}
 Za praćenje poslužitelja koristi se tablica \textit{server} koja pohranjuje samo ID poslužitelja. Ovu tablicu referencira većina drugih tablica.
@@ -462,7 +471,7 @@ Tablica \textit{cpulog} pohranjuje podatke o procesoru koji se mijenjaju tijekom
 \FloatBarrier
 
 \subsection{Radna memorija}
-Za pohranjivanje podataka o radnoj memoriji koristi se tablica \textit{memorylog} koja pohranjuje podatke o datumu prikupljanja podataka (\textit{date}) ukupnoj memoriji (\textit{totalkb, freekb, usedkb}), \textit{swap} memoriji (\textit{swaptotalkb, swapfreekb, swapusedkb}), neiskorištenoj memoriji (\textit{availablekb}), priručnoj memoriji (\textit{cachedkb}) te ID poslužitelja kojem memorija pripada (\textit{serverid}).
+Za pohranjivanje podataka o radnoj memoriji koristi se tablica \textit{memorylog} koja pohranjuje podatke o datumu prikupljanja podataka (\textit{date}), ukupnoj memoriji (\textit{totalkb, freekb, usedkb}), \textit{swap} memoriji (\textit{swaptotalkb, swapfreekb, swapusedkb}), neiskorištenoj memoriji (\textit{availablekb}), priručnoj memoriji (\textit{cachedkb}) te ID poslužitelja kojem memorija pripada (\textit{serverid}).
 
 Za razliku od procesora, ne koristi se zasebna tablica za pohranu općenitih podataka o priručnoj memoriji kao proizvođač, serijski broj te drugo jer nije pronađen način da se ti podaci očitaju s poslužitelja bez administratorskih privilegija.
 
@@ -489,7 +498,7 @@ Za pohranu trajne memorije koriste se tablice:
 \FloatBarrier
 
 \subsection{Servisi}
-Servisi nisu do kraja implementirani u aplikaciji, no podloga za praćenje podataka o servisima je implementirana u bazi podataka. Moguće je prikupljati podatke o servisima sa poslužitelja te su napravljene funkcije programskog sučelja za rad sa servisima koje djelomično rade.
+Servisi nisu do kraja implementirani u aplikaciji, no podloga za praćenje podataka o servisima je implementirana u bazi podataka. Moguće je prikupljati podatke o servisima s poslužitelja te su napravljene funkcije programskog sučelja za rad sa servisima koje djelomično rade.
 
 Za praćenje servisa koriste se tablice:
 \begin{itemize}
@@ -507,7 +516,7 @@ Za praćenje servisa koriste se tablice:
 \FloatBarrier
 
 \subsection{Programi}
-Podrška za programe nije do kraja implementirana u aplikaciji, no podloga za njihovo praćenje je implementirana u bazi podataka. Moguće je prikupljati podatke o programima sa poslužitelja te su napravljene funkcije programskog sučelja za rad sa servisima koje djelomično rade.
+Podrška za programe nije do kraja implementirana u aplikaciji, no podloga za njihovo praćenje je implementirana u bazi podataka. Moguće je prikupljati podatke o programima s poslužitelja te su napravljene funkcije programskog sučelja za rad sa servisima koje djelomično rade.
 
 Za praćenje programa koristi se tablica \textit{programlog} koja pohranjuje podatke kao ime programa (\textit{name}) te postotak procesora (\textit{cpuutilizationpercentage}) i memorije (\textit{memoryutilizationpercentage}) koju program koristi.
 
@@ -528,7 +537,7 @@ Stvorena je tablica za obavijesti koja pohranjuje važnost poruke (\textit{sever
 \end{figure}
 \FloatBarrier
 
-Uz tablicu je također napravljena i metoda \textit{before\_alert\_insert\_func()} koja se poziva prije unosa podataka u tablicu. Metoda je stvorena kako bi se onemogućio unos iste obavijesti ako je ona već poslana u zadnjih sat vremena (na primjer ako se pokuša unijeti "\textit{Server 0 cpu load above 90\%}" u razmaku od 30 minuta, ta poruka će biti zapisana samo prvi put u bazu podataka, a drugi put se odbacuje uz grešku).
+Uz tablicu je također napravljena i metoda \textit{before\_alert\_insert\_func()} koja se poziva prije unosa podataka u tablicu. Metoda je stvorena kako bi se onemogućio unos iste obavijesti ako je ona već poslana u zadnjih sat vremena (na primjer ako se pokuša unijeti "\textit{Server 0 cpu load above 90\%}" u razmaku od 30 minuta, ta poruka će biti zapisana samo prvi put u bazu podataka, a drugi put se odbacuje uz poruku greške).
 
 \begin{figure}[htb]
 	\centering
@@ -538,7 +547,7 @@ Uz tablicu je također napravljena i metoda \textit{before\_alert\_insert\_func(
 \FloatBarrier
 
 \section{Programsko sučelje (API)}
-Programsko sučelje (\textit{API}) je implementirano koristeći biblioteku \textit{HotChocolate server} koja implementira funkcionalnosti \textit{GraphQL} poslužitelja.
+Programsko sučelje (\textit{API}) je implementirano koristeći biblioteku \textit{HotChocolate} koja implementira funkcionalnosti \textit{GraphQL} poslužitelja.
 
 Struktura projekta:
 \begin{figure}[htb]
@@ -578,7 +587,8 @@ Neki od parametara koje gotova svaka metoda sadržava:
 	\item \textit{startDateTime} - dohvaćaju se samo podaci poslani nakon specificiranog datuma i vremena
 	\item \textit{endDateTime} - dohvaćaju se samo podaci poslani prije specificiranog datuma i vremena
 \end{itemize}
-Klasa se oslanja na \textit{IDbProvider} sučelje za rad s bazom podataka te na metodu \textit{GetLogs} za dohvat podataka iz baze podataka. Primjer jedne takve metode:
+
+Klasa se oslanja na sučelje \textit{IDbProvider} za rad s bazom podataka te na metodu \textit{GetLogs} za dohvat podataka iz baze podataka. Primjer jedne takve metode:
 \begin{figure}[htb]
 	\centering
 	\lstinputlisting[language=CSharp, firstline=21, lastline=48]{../API/GraphQL/Query/Query.cs}
@@ -626,8 +636,8 @@ Direktorij \textit{Mutations} sadržava klase i sučelja koji se koriste za doda
 
 Važnije klase i sučelja u direktoriju:
 \begin{itemize}
-	\item \textit{IMutationHelper} - sučelje koje definira funkcionalnosti koje su potrebne za umetanje, osvježavanje i brisanje podataka iz baze podataka
-	\item \textit{MutationHelper} - implementacija \textit{IMutationHelper} sučelja
+	\item \textit{sučelje IMutationHelper} - definira funkcionalnosti koje su potrebne za umetanje, osvježavanje i brisanje podataka iz baze podataka
+	\item \textit{klasa MutationHelper} - implementacija \textit{IMutationHelper} sučelja
 \end{itemize}
 
 Primjer dijela jedne mutacije:
@@ -714,7 +724,7 @@ Objašnjenje važnijih dijelova aplikacije:
 	\end{figure}
 	\FloatBarrier		
 	\item \textit{klasa DataHelper} - čita podatke s terminala te ih deserijalizira u klase koje se nalaze u direktoriju \textit{Models}
-	\item \textit{klasa LogHelper} - pokreće proces dohvaćanja podataka svakin [n] minuta (n = definiran u datoteci \textit{config.json})
+	\item \textit{klasa LogHelper} - pokreće proces dohvaćanja podataka svakih [n] minuta (n = definiran u datoteci \textit{config.json})
 	\item \textit{klasa ProcessHelper} - koristi se za pokretanje procesa u terminalu
 	\begin{figure}[htb]
 		\centering
@@ -748,7 +758,7 @@ Direktorij \textit{Graphql} sadržava klase i sučelja koji se koriste za komuni
 
 Neke od važnijih komponenti direktorija:
 \begin{itemize}
-	\item klasa \textit{Payload} - sastoji se od \textit{Data} polja koje sadržava podatke o poslužitelju koji se vraćaju korisniku te \textit{Error} polja koje je prazno osim u slučaju pogreške prilikom obrade zahtjeva
+	\item \textit{klasa Payload} - sastoji se od \textit{Data} polja koje sadržava podatke o poslužitelju koji se vraćaju korisniku te \textit{Error} polja koje je prazno osim u slučaju pogreške prilikom obrade zahtjeva
 	\item \textit{direktorij InputModels}  - sadržava klase koje se koriste prilikom dodavanja ili izmjene podataka. Primjer klase:
 	\begin{figure}[htb]
 		\centering
@@ -777,7 +787,7 @@ Na početku komponente nalazi se glavni izbornik koji koristi komponentu \textit
 \begin{figure}[htb]
 	\centering
 	\lstinputlisting[firstline=50, lastline=69, language=HTML]{../website/src/App.vue}
-	\caption{Kôd za prikaz izbornika [14]}
+	\caption{Kôd za prikaz izbornika \cite{primevue_menubar_component}}
 \end{figure}
 \FloatBarrier
 Prilikom stvaranja komponente šalje se upit programskom sučelju kako bi se dohvatila i popunila lista poslužitelja, a zatim se korisnik prosljeđuje na putanju prikaza podataka prvog poslužitelja (osim ako nisu zabilježeni podaci za bilo koji poslužitelj).
@@ -807,6 +817,7 @@ Komponente \textit{CpuInfo}, \textit{DiskInfo} i \textit{MemoryInfo} koriste se 
 	\item podaci se prikazuju pomoću komponente \textit{Fieldset} na čijem početku se nalaze generalni podaci o komponenti te graf (ili grafovi) ispod toga
 	\item nakon primanja događaja \textit{zoomChanged} od grafa podaci za taj graf se ponovno učitavaju za novi period
 \end{itemize}
+
 Primjer dijela jedne takve komponente:
 \begin{figure}[htb]
 	\centering
@@ -900,13 +911,14 @@ Web-stranica podržava široke ekrane i mobilne uređaje.
 
 \chapter{Analiza rješenja}
 U trenutnom obliku, napravljeno rješenje nije bolje od raznih drugih rješenja za praćenje statusa poslužitelja. Svako od tih rješenja nudi neka poboljšanja od sigurnosti, optimizacije, bolje administracije pozlužitelja, osvježavanja podataka u stvarnom vremenu te brojne druge funkcionalnosti i poboljšanja.
-\\Uz dovoljno vremena i truda moguće je implementirati te funkcionalnosti i brojne druge koje bi učinile ovaj alat vrlo korisnim za administraciju i praćenje poslužitelja. U ovom poglavlju bit će opisani razni aspekti aplikacije koji se mogu poboljšati ili dodati.
+
+Uz dovoljno vremena i truda moguće je implementirati te funkcionalnosti i brojne druge koje bi učinile ovaj alat vrlo korisnim za administraciju i praćenje poslužitelja. U ovom poglavlju bit će opisani razni aspekti aplikacije koji se mogu poboljšati ili dodati.
 
 \section{Sigurnost}
-Web sučelje i programsko sučelje nemaju implementiranu autentifikaciju što omogućava bilo kome da pristupi njima ako može pristupiti web mreži i vratima na kojeima se aplikacije izvršavaju. Ovo predstavlja veliki sigurnosni propust, pogotovo za velike mreže poslužiteljima o kojima bi se mogli pročitati povjerljivi podaci i dodati neispravni podaci u bazu podataka. Kako bi se ovo spriječilo potrebno je dodati određenu metodu autentifikacije kao OAuth2, čime bi se pristup omogućio samo korisnicima s ispravnom lozinkom ili tokenom.
+Web sučelje i programsko sučelje nemaju implementiranu autentifikaciju što omogućava bilo kome da pristupi njima ako može pristupiti web mreži i vratima na kojima se aplikacije izvršavaju. Ovo predstavlja veliki sigurnosni propust, pogotovo za velike mreže poslužitelja o kojima bi se mogli pročitati povjerljivi podaci i dodati neispravni podaci u bazu podataka. Kako bi se ovo spriječilo potrebno je dodati određenu metodu autentifikacije kao \textit{OAuth2}, čime bi se pristup omogućio samo korisnicima s ispravnom lozinkom ili tokenom.
 
 \section{Brzina rada}
-\textit{PostgreSQL} baza podataka omogućava indekse koji nisu korišteni u ovom rješenju. Indeksi se koriste radi brzog pretraživanja podataka po određenom polju (na primjer po datumu) što može znatno ubrzati aplikaciju, pogotovo ako se nakupila velika količina podataka o više poslužitelja.
+Baza podataka \textit{PostgreSQL} omogućava indekse koji nisu korišteni u ovom rješenju. Indeksi se koriste radi brzog pretraživanja podataka po određenom polju (na primjer po datumu) što može znatno ubrzati aplikaciju, pogotovo ako se nakupila velika količina podataka o više poslužitelja.
 
 Također, prilikom dohvaćanja podataka iz programskog sučelja uvijek se učitavaju svi podaci, bez obzira želi li ih korisnik dohvatiti. Ovo znatno usporava aplikaciju jer je najviše vremena potrebno za čitanje i procesiranje velike količine podataka. Potrebno je naći način da se iz baze podataka pročitaju samo podaci koje korisnik želi dohvatiti.
 
@@ -920,11 +932,11 @@ Trenutno se prate samo podaci o procesoru te trajnoj i radnoj memoriji. Djelomi�
 
 Također se mogu dodati podaci o poslužitelju (vrijeme rada, status, obavijesti te drugo), mreži (IP adrese, praćenje stanja registriranih domena, graf slanja i primanja podataka) te razni drugi podaci koji bi bili korisni administratorima poslužitelja radi otkrivanja grešaka.
 
-\section{Mail obavijesti}
-Obavijesti su trenutno vidljive samo na web-stranici. Ovo je korisno za pregled velike količine obavijesti, ali je problem u tome što administratori moraju često posjećivati web-stranicu kako bi vidjeli je li došla nova obavijest. Moglo bi se osim praćenja obavijesti na web-stranici dodati opcija za slanje podatka na adresu e-pošte administratora kako bi mogao na vrijeme vidjeti obavijest i popraviti grešku ako je došlo do problema s radom poslužitelja.
+\section{Slanje obavijesti e-poštom}
+Obavijesti su trenutno vidljive samo na web-stranici. Ovo je korisno za pregled velike količine obavijesti, ali je problem u tome što administratori moraju često posjećivati web-stranicu kako bi vidjeli je li došla nova obavijest. Moglo bi se osim praćenja obavijesti na web-stranici dodati opcija za slanje podatka na adresu e-pošte administratora kako bi mogao na vrijeme vidjeti obavijest i popraviti pogrešku ako je došlo do problema s radom poslužitelja.
 
 \section{Osvježavanje podataka na web-stranici}
-Web-stranica omogućava pregled podataka za određeni period. Korisnik može polje za krajnji datum ostaviti prazno kako bi se dohvatili svi podaci do zadnje poslanih podataka, no nakon dohvaćanja tih podataka oni se neće osvježiti dolaskom novih podataka. Jezik \textit{GraphQL} omogućava korištenje \textit{subscription} komponente kako bi se korisnik mogao prijaviti na određeni događaj i dobiti nove podatke kada se oni pošalju. Implementacija \textit{subscripiton} komponente bi omogućila osvježavanje podataka u stvarnom vremenu.
+Web-stranica omogućava pregled podataka za određeni period. Korisnik može polje za krajnji datum ostaviti prazno kako bi se dohvatili svi podaci do zadnje poslanih podataka, no nakon dohvaćanja tih podataka oni se neće osvježiti dolaskom novih podataka. Jezik \textit{GraphQL} omogućava korištenje komponente \textit{subscription} kako bi se korisnik mogao prijaviti na određeni događaj i dobiti nove podatke kada se oni pošalju. Implementacija komponente \textit{subscription} omogućila bi osvježavanje podataka u stvarnom vremenu.
 
 \section{Podrška za operacijski sustav Windows}
 \textit{.NET} aplikacije se mogu izvršavati na \textit{Linux} i \textit{Windows} operacijskom sustavu što omogućava ovom rješenju da se koristi i za praćenje podataka o \textit{Windows} poslužiteljima uz određene promjene. Najveći problem podržavanja više operacijskih sustava je drugačije dohvaćanje podataka o računalu (na operacijskom sustavu \textit{Linux} koriste se određeni alati kao \textit{lsblk} koje operacijski sustav \textit{Windows} ne podržava) zbog čega bi se trebali koristiti drugi alati i drugačije čitanje i procesiranje podataka.
@@ -935,29 +947,21 @@ Jedno od potencijalnih rješenja je instalacija "\textit{Windows Subsystem for L
 Izvoz podataka za određeni period omogućio bi njihovu pohranu čak i ako korisnik izbriše podatke iz baze podataka. Ova funkcionalnost omogućila bi dugotrajnu pohranu bitnih podataka, a uvoz bi omogućio njihov pregled. Uvoz podataka dodatno je koristan jer administratori ne bi morali odabrati početni i krajnji datum svaki put kada žele pregledali podatke za određeni period, nego bi mogli lako uvesti te podatke i pregledati ih.
 
 \chapter{Zaključak}
-U sklopu rada napravljene su aplikacije za prikupljanje podataka o poslužiteljima (\textit{Monitor}), programsko sučelje (\textit{API}) pomoću \textit{GraphQL} sustava, \textit{PostgreSQL} baza podataka i web-stranica temeljena na razvojnom okruženju \textit{Vue}.
+U sklopu rada napravljene su aplikacije za prikupljanje podataka o poslužiteljima (\textit{Monitor}), programsko sučelje (\textit{API}) koje koristi sustav \textit{GraphQL}, baza podataka \textit{PostgreSQL} i web-stranica temeljena na razvojnom okruženju \textit{Vue}.
 
 Rješenje omogućava prikupljanje i prikaz podataka o poslužiteljima, uključujući podatke o procesoru, privremenoj memoriji, trajnoj pohrani i obavijestima za određeni poslužitelj. Svaki poslužitelj moguće je konfigurirati kako bi slao informacije koje administrator želi prikupljati o tom poslužitelju te je moguće konfigurirati interval prikupljanja podataka. Web-stranica podržava stolna računala i mobilne uređaje te je pomoću nje moguće pregledati podatke o poslužiteljima i odrediti period za koji se podaci prikazuju.
 
-Napravljeno programsko sučelje koristi \textit{GraphQL} sustav kojeg je moguće koristiti kao zasebnu aplikaciju. Ovo omogućava drugim programerima da naprave svoju web-stanicu ili neku drugu aplikaciju koja šalje i prikuplja podatke sa programskog sučelja.
+Napravljeno programsko sučelje koristi sustav \textit{GraphQL} kojeg je moguće koristiti kao zasebnu aplikaciju. Ovo omogućava drugim programerima da naprave svoju web-stanicu ili neku drugu aplikaciju koja šalje i prikuplja podatke sa programskog sučelja.
 
-Rješenje je javno objavljeno na \textit{Github} repozitoriju na poveznici \url{https://github.com/ReflexLevel0/YALM}. Rješenju fale brojne funkcionalnosti koje slični sustavi imaju, no aplikacije su strukturirane na način da se mogu jednostavno nadograditi.
-
-%--- LITERATURA / REFERENCES ---------------------------------------------------
-
-% Literatura se automatski generira iz zadane .bib datoteke / References are automatically generated from the supplied .bib file
-% Upiši ime BibTeX datoteke bez .bib nastavka / Enter the name of the BibTeX file without .bib extension
-\bibliography{literatura}
-
-
+Rješenje je javno objavljeno na \textit{Github} repozitoriju na poveznici \url{https://github.com/ReflexLevel0/YALM}. Rješenju nedostaju brojne funkcionalnosti koje slični sustavi imaju, no aplikacije su strukturirane na način da se mogu jednostavno nadograditi.
 
 %--- SAŽETAK / ABSTRACT --------------------------------------------------------
 
 % Sažetak na hrvatskom
 \begin{sazetak}
-	U sklopu ovog završnog rada implementirana je skupina programa koji omogućuju praćenje i pregled stanja raznih aspekata poslužitelja. Aplikacija za praćenje stanja poslužitelja i programsko sučelje napravljeni su koristeći programski jezik C\# u razvojnom okruženju ASP .NET Core. Za izradu programskog sučelja dodatno se koristi jezik GraphQL. Web-aplikacija je napravljena pomoću razvojne okoline Vue, a baza podataka implementirana je u sustavu PostgreSQL.
+	U sklopu ovog završnog rada implementirana je skupina programa koji omogućuju praćenje i pregled stanja raznih aspekata udaljenih poslužitelja. Aplikacija za praćenje stanja poslužitelja i programsko sučelje napravljeni su koristeći programski jezik C\# u razvojnom okruženju ASP .NET Core. Za izradu programskog sučelja dodatno se koristi jezik GraphQL. Web-aplikacija je napravljena pomoću razvojne okoline Vue, a baza podataka implementirana je u sustavu PostgreSQL.
 	
-	Aplikacija za praćenje stanja poslužitelja periodički šalje podatke programskom sučelju, koje ih zatim zapisuje u bazu podataka. Web-stranica slanjem GraphQL zahtjeva programskom sučelju može dohvatiti i prikazivati podatke o procesoru, radnoj memoriji, diskovima i obavijestima za određenoga poslužitelja. Korisnik može odabrati period za koji se prikazuju podaci te uvećati grafove i vratiti grafove na početne postavke.
+	Aplikacija za praćenje stanja poslužitelja periodički šalje podatke programskom sučelju, koje ih zatim zapisuje u bazu podataka. Web-stranica slanjem GraphQL zahtjeva programskom sučelju može dohvatiti i prikazivati podatke o procesoru, radnoj memoriji, diskovima i obavijestima za određeni poslužitelj. Korisnik može odabrati period za koji se prikazuju podaci te uvećati grafove i mijenjati njihove postavke prikaza.
 \end{sazetak}
 
 \begin{kljucnerijeci}
@@ -967,7 +971,7 @@ Rješenje je javno objavljeno na \textit{Github} repozitoriju na poveznici \url{
 
 % Abstract in English
 \begin{abstract}
-	As a part of this final thesis, multiple programs have been developed that enable the monitoring of various aspects of a server. The monitoring application and the API have been made using the C\# programming language in the ASP .NET Core framework. Additionally, GraphQL query language is used by the API. The website has been made using the Vue framework, and the database has been made using PostgreSQL relational database management system.
+	As a part of this final thesis, a set of programs have been developed that enable the monitoring of various aspects of remote servers. The monitoring application and the API have been made using the C\# programming language in the ASP .NET Core framework. Additionally, GraphQL query language is used by the API. The website has been made using the Vue framework, and the database has been made using PostgreSQL relational database management system.
 	
 	The monitoring application periodically sends data to the API which then writes it to the database. The website can then get and view the stored data about the processor, RAM, hard disks, and alerts for a specific server by sending GraphQL queries to the API. The user can select a period for which data is displayed, expand a part of the chart or reset it to its original settings.
 \end{abstract}
@@ -976,27 +980,16 @@ Rješenje je javno objavljeno na \textit{Github} repozitoriju na poveznici \url{
 	Vue.js; ASP .NET Core; website; Linux; GraphQL; C\#; server
 \end{keywords}
 
-
 %--- PRIVITCI / APPENDIX -------------------------------------------------------
 
 % Sva poglavlja koja slijede će biti označena slovom i riječi privitak / All following chapters will be denoted with an appendix and a letter
 \backmatter
 
-\chapter{Literatura}
-\label{literature:1} [1] GraphQL validacija polja, \url{https://graphql.org/learn/validation}, 11.6.2024.
-\\\label{literature:2} [2] GraphQL query, \url{https://graphql.org/learn/queries}, 11.6.2024.
-\\\label{literature:3} [3] HotChocolate slika, \url{https://chillicream.com/docs/hotchocolate/v13}, 11.6.2024.
-\\\label{literature:4} [4] .NET slika, \url{https://auth0.com/blog/what-is-dotnet-platform-overview}, 11.6.2024.
-\\\label{literature:5} [5] linq2db dokumentacija, \url{https://github.com/linq2db/linq2db}, 11.6.2024.
-\\\label{literature:6} [6] , Newtonsoft.Json repozitorij, \url{https://github.com/JamesNK/Newtonsoft.Json}, 11.6.2024.
-\\\label{literature:7} [7] , Vue uvodna dokumentacija, \url{https://vuejs.org/guide/introduction.html}, 11.6.2024.
-\\\label{literature:8} [8] , primevue dokumentacija, \url{https://primevue.org}, 11.6.2024.
-\\\label{literature:9} [9] , chartjs repozitorij, \url{https://raw.githubusercontent.com/apertureless/vue-chartjs}, 11.6.2024.
-\\\label{literature:10} [10] vue-datepicker dokumentacija, \url{https://vue3datepicker.com}, 11.6.2024.
-\\\label{literature:11} [11] PostgreSQL dokumentacija, \url{https://www.postgresql.org/docs}, 11.6.2024.
-\\\label{literature:12} [12] git stranica, \url{https://git-scm.com}, 11.6.2024.
-\\\label{literature:13} [13] Github stranica, \url{https://github.com}, 11.6.2024.
-\\\label{literature:14} [14] Primevue Menubar komponenta , \url{https://primevue.org/menubar}, 11.6.2024.
+%--- LITERATURA / REFERENCES ---------------------------------------------------
+
+% Literatura se automatski generira iz zadane .bib datoteke / References are automatically generated from the supplied .bib file
+% Upiši ime BibTeX datoteke bez .bib nastavka / Enter the name of the BibTeX file without .bib extension
+\bibliography{literatura}
 
 \chapter{Pokretanje programa}
 
