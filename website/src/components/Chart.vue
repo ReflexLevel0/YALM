@@ -32,14 +32,12 @@ export default defineComponent({
   components: {
     Scatter,
   },
-  emits: ['zoomChanged', 'reloadChart'],
+  emits: ['zoomChanged'],
   data() {
     return {
+      loadingData: true,
       noData: false,
-      loadingData: false,
-      loadedData: false,
-      chartData: null,
-      apiError: false,
+      chart: null,
       options: {
         responsive: true,
         maintainAspectRatio: true,
@@ -89,44 +87,38 @@ export default defineComponent({
   },
   async mounted() {
     this.$data.options.scales = this.$props.scales
-    await this.refreshData()
+    if (this.$props.chartData != null) this.onChartDataChanged()
   },
   methods: {
-    async refreshData(){
-      this.loadingData = true;
-      this.getDataPromise.then((data) => {
-        this.chartData = data;
-        let dataCount = 0
-        data.datasets.forEach(dataset => dataCount += dataset.data.length)
-        this.$data.noData = dataCount === 0
-        this.loadingData = false;
-        this.loadedData = true;
-      }).catch(err => {
-        console.log(err)
-        this.loadingData = false;
-        this.loadedData = false;
-        this.apiError = true;
-      })
-    },
     emitZoomChanged(chart){
-      let chartJS = chart.chart
-      const startDate = new Date(chartJS.scales.x.min)
-      const endDate = new Date(chartJS.scales.x.max)
+      let chartJS = chart?.chart
+      const startDate = chartJS == null ? null : new Date(chartJS.scales.x.min)
+      const endDate = chartJS == null ? null : new Date(chartJS.scales.x.max)
       this.$emit('zoomChanged', {
           startDate: startDate,
           endDate: endDate
       })
     },
     reloadChart(){
-      this.$emit('reloadChart')
+      this.$data.loadingData = true
+      this.$emit('zoomChanged', {
+        startDate: null,
+        endDate: null
+      })
+    },
+    onChartDataChanged(){
+      console.log("chart data changed: ");
+      console.log(this.$props.chartData);
+      this.$data.loadingData = false;
+      this.$data.noData = this.$props.chartData.data === null || this.$props.chartData.datasets.length === 0;
     }
   },
   props: {
     name: {
       type: String,
     },
-    getDataPromise: {
-      required: true,
+    chartData: {
+      type: Object
     },
     scales: {
       type: Object,
@@ -134,27 +126,29 @@ export default defineComponent({
     },
   },
   watch: {
-    'getDataPromise': {
-      handler: function(){
-        this.refreshData()
-      }
+    chartData: {
+      handler: function() {
+        this.onChartDataChanged()
+      },
+      deep: true
     }
   }
 });
 </script>
 
 <template>
-  <Scatter v-if="this.loadedData && this.noData === false" :data="chartData" :options="options" ref="chart" />
-  <div v-if="this.loadingData" class="info">
-    Loading {{ this.$props.name }} data...
+  <div class="summary-container">
+    <div v-if="this.loadingData" class="info">
+      Loading {{ this.$props.name }} data...
+    </div>
+    <div v-else-if="this.noData" class="info">
+      No data (try choosing a different date range)
+    </div>
+    <div v-else-if="this.loadingData === false">
+        <Scatter :id="chart" :data="this.$props.chartData" :options="options" style="float: left"/>
+        <button style="display: inline-block" @click="reloadChart">R</button>
+    </div>
   </div>
-  <div v-if="this.noData" class="info">
-    No data (try choosing a different date range)
-  </div>
-  <div v-if="this.apiError" class="info">
-    API error! Try checking if API setup is correct.
-  </div>
-  <button @click="reloadChart">Reset zoom</button>
 </template>
 
 <style scoped>
@@ -162,6 +156,27 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+}
+</style>
+
+<style scoped>
+.summary-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+@media screen and (min-width: 1000px) {
+  .summary-container {
+    height: 250px;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 999px) {
+  .summary-container{
+    height: 150px;
+    width: 100vw;
+  }
 }
 </style>

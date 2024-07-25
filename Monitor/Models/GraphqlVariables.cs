@@ -4,6 +4,7 @@ namespace YALM.Monitor.Models;
 
 public class GraphqlVariables
 {
+	public ServerInput? Server { get; set; }
 	public CpuInput? Cpu { get; set; }
 	public CpuLogInput? CpuLog { get; set; }
 	public MemoryLogInput? MemoryLog { get; set; }

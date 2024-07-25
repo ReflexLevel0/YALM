@@ -56,7 +56,7 @@ public class DataHelper
 	/// <param name="lastLogDate">Last time data about service was logged</param>
 	/// <returns></returns>
 	/// <exception cref="ServiceNotFoundException"></exception>
-	public async Task<ServiceLog> GetServiceInfo(string serviceName, DateTime? lastLogDate)
+	public async Task<ServiceLog> GetServiceInfo(string serviceName, DateTimeOffset? lastLogDate)
 	{
 		var service = new ServiceLog { Name = serviceName };
 		var process = await ProcessHelper.StartProcess("systemctl", $"status {serviceName}");
@@ -101,7 +101,7 @@ public class DataHelper
 		{
 			int index = logString.IndexOf(" ", StringComparison.Ordinal);
 			if (index == -1 || logString.StartsWith("--")) continue;
-			var date = DateTime.Parse(logString[..index]);
+			var date = DateTimeOffset.Parse(logString[..index]);
 			var log = new ServiceJournalLog(date, logString[(index + 1)..]);
 			service.Logs.Add(log);
 		}
@@ -110,35 +110,11 @@ public class DataHelper
 		return service;
 	}
 
-	public async IAsyncEnumerable<DiskInfo> GetStorageInfo()
+	public async Task<List<DiskInfo>> GetStorageInfo()
 	{
 		var process = await ProcessHelper.StartProcess("lsblk", "--json -p -b -o FSTYPE,FSUSED,LABEL,NAME,PARTTYPENAME,PARTUUID,PATH,PTTYPE,PTUUID,SERIAL,SIZE,STATE,MOUNTPOINT,TYPE,UUID,VENDOR,FSVER,FSAVAIL,FSUSE%");
 		var jsonStorage = JsonConvert.DeserializeObject<StorageJson>(await process.StandardOutput.ReadToEndAsync());
 		if (jsonStorage == null) throw new Exception("Can't parse storage info!");
-
-		foreach (var disk in jsonStorage.BlockDevices)
-		{
-			if (disk.Children == null) continue;
-			
-			// //Going through every partition and returning it
-			// foreach (var partition in disk.Children)
-			// {
-				// if (partition.PartitionUuid == null) continue;
-				// long? fsAvail = disk.FilesystemAvailable == null ? null : long.Parse(disk.FilesystemAvailable);
-				// double? used = partition.UsagePercentage == null ? null : double.Parse(partition.UsagePercentage.Split('%').First()) / 100;
-				// yield return new StorageLog
-				// {
-				// 	DiskUuid = partition.DiskUuid,
-				// 	PartitionUuid = partition.PartitionUuid,
-				// 	Bytes = fsAvail != null && used != null ? (long)(fsAvail / used) : -1,
-				// 	FilesystemType = partition.FilesystemType,
-				// 	FilesystemVersion = partition.FilesystemVersion,
-				// 	Mountpoint = partition.Mountpoint,
-				// 	UsedPercentage = used
-				// };
-			//}
-
-			yield return disk;
-		}
+		return jsonStorage.BlockDevices;
 	}
 }

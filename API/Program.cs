@@ -1,16 +1,15 @@
-using DataModel;
-using LinqToDB;
 using YALM.API;
-using YALM.API.Models.Db;
-using YALM.API.Mutations;
+using YALM.API.Db;
+using YALM.API.GraphQL.Alerts;
+using YALM.API.GraphQL.Mutations;
+using YALM.API.GraphQL.Query;
 
-string connectionString = File.ReadAllText("dbConnectionString.txt");
-var dataOptions = new DataOptions<MonitoringDb>(new DataOptions().UsePostgreSQL(connectionString));
-var db = new MonitoringDb(dataOptions);
+var dbProvider = new MonitoringDbProvider();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-	.AddSingleton<IDb>(db)
-	.AddTransient<IMutationHelper>(_ => new MutationHelper(db))
+	.AddScoped<IDbProvider>(_ => dbProvider)
+	.AddScoped<IMutationHelper>(_ => new MutationHelper(dbProvider))
+	.AddSingleton<IAlertHelper>(_ => new AlertHelper(dbProvider))
 	.AddGraphQLServer()
 	.AddQueryType<Query>()
 	.AddMutationType(m => m.Name("Mutation"))
@@ -20,7 +19,8 @@ builder.Services
 	.AddType<PartitionMutation>()
 	.AddType<PartitionLogMutation>()
 	.AddType<ProgramLogMutation>()
-	.AddType<DiskMutation>();
+	.AddType<DiskMutation>()
+	.AddType<ServerMutation>();
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAll", b =>

@@ -2,9 +2,9 @@ using System.Text;
 
 namespace YALM.Monitor.Models.LogInfo;
 
-public class LogBase(DateTime logTime)
+public class LogBase(DateTimeOffset logTime)
 {
-	public DateTime LogTime { get; } = logTime;
+	public DateTimeOffset LogTime { get; } = logTime;
 	public CpuInfo? CpuInfo { get; set; }
 	public ProgramInfo? ProgramInfo { get; set; }
 	public List<DiskInfo>? Disks { get; set; }

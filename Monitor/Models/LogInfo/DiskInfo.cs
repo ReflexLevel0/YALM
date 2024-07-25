@@ -11,7 +11,7 @@ public class DiskInfo
 	public string? Path { get; set; }
 
 	[JsonProperty("ptuuid")]
-	public string DiskUuid { get; set; }
+	public string? DiskUuid { get; set; }
 
 	[JsonProperty("size")]
 	public long? Bytes { get; set; }

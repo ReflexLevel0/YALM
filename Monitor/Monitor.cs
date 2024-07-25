@@ -15,7 +15,7 @@ internal class Monitor
 		//Creating server ID if the program is running for the first time
 		if (File.Exists(ServerIdFilename) == false)
 		{
-			await File.WriteAllTextAsync(ServerIdFilename, DateTime.UtcNow.GetHashCode().ToString());
+			await File.WriteAllTextAsync(ServerIdFilename, DateTimeOffset.UtcNow.GetHashCode().ToString());
 		}
 
 		int serverId = int.Parse(await File.ReadAllTextAsync(ServerIdFilename));
